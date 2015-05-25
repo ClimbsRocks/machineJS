@@ -1,0 +1,44 @@
+{
+  "name": "kpComplete",
+  "version": "0.0.1",
+  "description": "Katrina & Preston optimize your ml algos!",
+  "main": "kpLib.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kuychaco/kpComplete.git"
+  },
+  "keywords": [
+    "neuralNet",
+    "machine",
+    "learning",
+    "ml",
+    "algorithms",
+    "random",
+    "forest",
+    "svm",
+    "naive",
+    "bayes",
+    "bagging",
+    "optimization",
+    "data",
+    "science",
+    "brainjs",
+    "neural",
+    "networks",
+    "date",
+    "night"
+  ],
+  "author": "Katrina Uychaco & Preston Parry",
+  "license": "No license currently available",
+  "bugs": {
+    "url": "https://github.com/kuychaco/kpComplete/issues"
+  },
+  "homepage": "https://github.com/kuychaco/kpComplete",
+  "dependencies": {
+    "brain": "^0.7.0",
+    "paralleljs": "^0.2.1"
+  }
+}
