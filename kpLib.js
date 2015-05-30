@@ -24,10 +24,10 @@ module.exports = {
 };
 
 
-var parallelNets = function(netParams, trainingData) {
-  var p = new Parallel(netParams) //.require(netParams);
+var parallelNets = function(allParamComboArr, trainingData) {
+  var p = new Parallel(allParamComboArr) //.require(netParams);
 
-  p.spawn(function(netParams) {
+  p.map(function(netParams) {
     // MVP:
       // This is the minified source code for brain.js 0.6.0
       // Copying and invoking it here inside our thread ensures that we have access to it
@@ -41,11 +41,20 @@ var parallelNets = function(netParams, trainingData) {
       learningRate: 0.6
     });
 
-    console.log('netParams:',netParams);
-
     var trainingResults = net.train(JSON.parse(process.env.trainingData), netParams.trainingObj);
     console.log('trainingResults is:',trainingResults);
-    return trainingResults;
+
+    // bestNetChecker(trainingResults, net);
+    // TODO: return an object that has properties for the netParams, trainingResults, and the fully trained net as well. 
+    return {
+      trainingResults:trainingResults,
+      net: net,
+      netParams: netParams
+    };
+  }).then(function() {
+    console.log('arguemnts passed to .then from p.map');
+    console.log(arguments);
+    // TODO: either return a promise or invoke our recursive function again to get a new set of params. 
   });
 
 };
@@ -68,11 +77,20 @@ var bestNetChecker = function(trainingResults,trainedNet) {
 };
 
 var multipleNetAlgo = function(trainingData) {
+  // TODO: 
+    // nest everything inside a recursive function
+    // that function will recurse until we've covered the entire space and converged on an answer
+    // each iteration will create a new set of params we want to test against
+    // we will then invoke parallelNets, which will take in an array of params we want to try, and return a promise. 
+    // once we get the promise back, we'll invoke the recursive function again
+    // that recursive function will then perform some logic, find a new set of params to train against, and then invoke parallelNets...
+    // Yeah, Katrina for sure gets the challenging part. 
+    // That'll be a ton of fun for her :)
   console.log('inside multipleNetAlgo');
   //create logic for training as many nets as we need. 
   // TODO: refactor this to use map instead
   var allParamComboArr = [];
-  for(var i = 2; i > 0; i--) {
+  for(var i = 3; i > 0; i--) {
 
     var hlArray = [];
     for (var j = 0; j < i; j++) {
@@ -81,12 +99,15 @@ var multipleNetAlgo = function(trainingData) {
 
     var trainingObj = {
       errorThresh: 0.05,  // error threshold to reach
-      iterations: 10,   // maximum training iterations
+      iterations: 1000,   // maximum training iterations
       log: true,           // console.log() progress periodically
-      logPeriod: 1,       // number of iterations between logging
-      learningRate: 0.3    // learning rate
+      logPeriod: 50,       // number of iterations between logging
+      learningRate: 0.6    // learning rate
     };
 
-    parallelNets({hiddenLayers: hlArray, trainingObj: trainingObj}, trainingData);
+    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj});
   }
+  console.log('allParamComboArr:',allParamComboArr);
+  console.log('i:',i);
+  parallelNets(allParamComboArr);
 };
