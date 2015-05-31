@@ -11,7 +11,7 @@ module.exports = {
     // write the training data to the global scope for this process. 
     // This means that all our threads can access it, and we don't need to create a bunch of different copies of it. 
     process.env.trainingData = JSON.stringify(trainingData);
-    multipleNetAlgo(trainingData);
+    multipleNetAlgo();
 
     // return the net itself
     // var net = kpComplete.train(trainingData); should be something they can type in. 
@@ -24,10 +24,13 @@ module.exports = {
 };
 
 
-var parallelNets = function(allParamComboArr, trainingData) {
-  var p = new Parallel(allParamComboArr) //.require(netParams);
+var parallelNets = function(allParamComboArr) {
+  var p = new Parallel(allParamComboArr, {synchronous: false}) //.require(netParams);
+  console.log('inside parallelNets');
+  console.log('p is:',p);
 
   p.map(function(netParams) {
+    console.log('inside callback function');
     // MVP:
       // This is the minified source code for brain.js 0.6.0
       // Copying and invoking it here inside our thread ensures that we have access to it
@@ -40,6 +43,8 @@ var parallelNets = function(allParamComboArr, trainingData) {
       hiddenLayers: netParams.hiddenLayers,
       learningRate: 0.6
     });
+
+    
 
     var trainingResults = net.train(JSON.parse(process.env.trainingData), netParams.trainingObj);
     console.log('trainingResults is:',trainingResults);
@@ -76,7 +81,7 @@ var bestNetChecker = function(trainingResults,trainedNet) {
       // I'm thinking we write to a backup file first, then overwrite the main file, or rename the backup file to be the same name as the main file. 
 };
 
-var multipleNetAlgo = function(trainingData) {
+var multipleNetAlgo = function() {
   // TODO: 
     // nest everything inside a recursive function
     // that function will recurse until we've covered the entire space and converged on an answer
@@ -90,7 +95,7 @@ var multipleNetAlgo = function(trainingData) {
   //create logic for training as many nets as we need. 
   // TODO: refactor this to use map instead
   var allParamComboArr = [];
-  for(var i = 3; i > 0; i--) {
+  for(var i = 8; i > 0; i--) {
 
     var hlArray = [];
     for (var j = 0; j < i; j++) {
