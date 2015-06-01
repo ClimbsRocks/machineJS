@@ -1,4 +1,8 @@
 var Parallel = require('paralleljs');
+var fs = require('fs');
+var brain = require('brain');
+var path = require('path');
+var byline = require('byline');
 
 var bestNet = {
   jsonBackup: '',
@@ -11,7 +15,47 @@ module.exports = {
     // write the training data to the global scope for this process. 
     // This means that all our threads can access it, and we don't need to create a bunch of different copies of it. 
     process.env.trainingData = JSON.stringify(trainingData);
-    multipleNetAlgo();
+    // TODO: make this more secure. Ideally write to an encrypted database or sqlite file that we could then delete the whole file. 
+    // trainingData.push(null);
+    // var secondTrainingData = [];
+
+    // open a writeStream
+    var writeStream = fs.createWriteStream('inputData.txt',{encoding: 'utf8'});
+
+    // brain.js's streaming interface expects to get a single item in at a time. 
+    // to do this, we are saving each object in trainingData into a new row
+    // and then later on, reading the file one row at a time
+    // while the for loop is synchronous, writing to the file itself is an asynch operation
+    // and that asynch operation can take some time since it's just an I/O call
+    // To prevent the rest of our code from running while we're still working through our queue of writing lines
+    // we'll stagger them by 1 millisecond
+    // This is definitely not the most elegant implementation. But it works. 
+    // We're super open to pull requests for a better way to do this :)
+    var writeCount = 0;
+    var intervalID = setInterval(function() {
+      if(writeCount++ === trainingData.length -1) {
+        clearInterval(intervalID);
+        writeStream.end();
+        multipleNetAlgo();
+      } else {
+        writeStream.write(JSON.stringify(trainingData[writeCount]));
+        writeStream.write('\n');
+      }
+    },1);
+    // for(var i = 0; i < trainingData.length; i++) {
+    //   console.log('inside for loop');
+    //   // secondTrainingData.push(JSON.stringify(trainingData[i]);
+    //   // secondTrainingData.push('\n');
+    // }
+    // console.log('outside for loop');
+    // setTimeout(function() {
+    //   writeStream.end();
+    //   // fs.writeFileSync('inputData.txt', secondTrainingData);
+    //   // TODO: Write to a memcached or sqlite DB. sqlite might take it out of memory entirely, which would be nice! Then, once we've written to that DB, delete the object. Or at least overwrite it's properties to be null. 
+    //   // Yeah, overwrite the data stored at each property to just be an empty string after we've saved to a db. Later we can work on deleting the object itself by deleting all references to it, which will kick in JS's auto garbage collection. 
+    //   multipleNetAlgo();
+      
+    // },5000);
 
     // return the net itself
     // var net = kpComplete.train(trainingData); should be something they can type in. 
@@ -26,11 +70,9 @@ module.exports = {
 
 var parallelNets = function(allParamComboArr) {
   var p = new Parallel(allParamComboArr, {synchronous: false}) //.require(netParams);
-  console.log('inside parallelNets');
-  console.log('p is:',p);
 
   p.map(function(netParams) {
-    console.log('inside callback function');
+    console.log('inside a callback in our map threads');
     // MVP:
       // This is the minified source code for brain.js 0.6.0
       // Copying and invoking it here inside our thread ensures that we have access to it
@@ -39,23 +81,64 @@ var parallelNets = function(allParamComboArr) {
 
 
     console.log('inside callback func inside map inside paralleljs');
-    var net = new brain.NeuralNetwork({
-      hiddenLayers: netParams.hiddenLayers,
-      learningRate: 0.6
+    var net = new brain.NeuralNetwork();
+
+    // This starts the brain.js example for using streams. 
+    // We need to build out this functionality
+    var getAllDataFromDB = function() {
+      // SELECT * FROM memcached table
+      // Ideally get that to return as a stream. 
+      // If we can get a stream, we can pipe that directly into net.createTrainStream
+      // Otherwise, we'll have to write that to a stream ourselves, like we're doing for MVP. 
+    }    
+
+    var trainStream = net.createTrainStream({
+      /**
+       * Write training data to the stream. Called on each training iteration.
+       */
+      floodCallback: function() {
+        // inside flood callback!
+        fs.createReadStream('inputData.txt');
+      },
+
+      /**
+       * Called when the network is done training.
+       */
+      doneTrainingCallback: function(obj) {
+        console.log("trained in " + obj.iterations + " iterations with error: "
+                    + obj.error);
+      }
     });
 
-    
+    fs.createReadStream('inputDat.txt').pipe(trainStream);
 
-    var trainingResults = net.train(JSON.parse(process.env.trainingData), netParams.trainingObj);
-    console.log('trainingResults is:',trainingResults);
 
-    // bestNetChecker(trainingResults, net);
-    // TODO: return an object that has properties for the netParams, trainingResults, and the fully trained net as well. 
-    return {
-      trainingResults:trainingResults,
-      net: net,
-      netParams: netParams
-    };
+
+    // // kick it off
+    // flood(trainStream, xor);
+
+
+    // function flood(stream, data) {
+    //   for (var i = 0; i < data.length; i++) {
+    //     stream.write(data[i]);
+    //   }
+    //   // let it know we've reached the end of the data
+    //   stream.write(null);
+    // }
+    // this ends the brain.js example for streams. 
+
+
+
+    // var trainingResults = net.train(JSON.parse(process.env.trainingData), netParams.trainingObj);
+    // console.log('trainingResults is:',trainingResults);
+
+    // // bestNetChecker(trainingResults, net);
+    // // TODO: return an object that has properties for the netParams, trainingResults, and the fully trained net as well. 
+    // return {
+    //   trainingResults:trainingResults,
+    //   net: net,
+    //   netParams: netParams
+    // };
   }).then(function() {
     console.log('arguemnts passed to .then from p.map');
     console.log(arguments);
@@ -91,14 +174,14 @@ var multipleNetAlgo = function() {
     // that recursive function will then perform some logic, find a new set of params to train against, and then invoke parallelNets...
     // Yeah, Katrina for sure gets the challenging part. 
     // That'll be a ton of fun for her :)
-  console.log('inside multipleNetAlgo');
+
   //create logic for training as many nets as we need. 
   // TODO: refactor this to use map instead
   var allParamComboArr = [];
-  for(var i = 8; i > 0; i--) {
+  for(var i = 1; i > 0; i--) {
 
     var hlArray = [];
-    for (var j = 0; j < i; j++) {
+    for (var j = 0; j < 8; j++) {
       hlArray.push(10);
     }
 
@@ -113,6 +196,77 @@ var multipleNetAlgo = function() {
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj});
   }
   console.log('allParamComboArr:',allParamComboArr);
-  console.log('i:',i);
-  parallelNets(allParamComboArr);
+
+
+  // //copying here to test if it's parallelization issues or brain issues:
+  var net = new brain.NeuralNetwork({
+    errorThresh: 0.05,  // error threshold to reach
+    iterations: 100,    // maximum training iterations
+    log: true,          // console.log() progress periodically
+    logPeriod: 1,       // number of iterations between logging
+    learningRate: 0.6   // learning rate
+  }); 
+
+  var trainStream = net.createTrainStream({
+    errorThresh: 0.05,  // error threshold to reach
+    iterations: 100,    // maximum training iterations
+    log: true,          // console.log() progress periodically
+    logPeriod: 1,       // number of iterations between logging
+    learningRate: 0.6,   // learning rate
+    /**
+     * Write training data to the stream. Called on each training iteration.
+     */
+    floodCallback: function() {
+      console.log('inside flood callback');
+      var currentPath = path.join(__dirname, '../inputData.txt');
+      var newStream = fs.createReadStream(currentPath);
+      newStream = byline(newStream);
+      var numOfItems = 0;
+      newStream.on('data', function(data) {
+        trainStream.write(JSON.parse(data));
+        numOfItems++;
+      });
+      // newStream.pipe(trainStream, {end: false});
+      newStream.on('end', function() {
+        // console.log('heard an end!');
+        // setTimeout(function() {
+        //   console.log('writing null to trainStream after 3 seconds');
+          trainStream.write(null);  
+          console.log('numOfItems',numOfItems);
+        // }, 3000);
+      });
+      // console.log('end of floodCallback (synchronously)');
+    },
+
+    /**
+     * Called when the network is done training.
+     */
+    doneTrainingCallback: function(obj) {
+      console.log("trained in " + obj.iterations + " iterations with error: "
+                  + obj.error);
+    }
+  });
+
+  var currentPath = path.join(__dirname, '../inputData.txt');
+  var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
+  readStream = byline(readStream);
+  var numOfItems = 0;
+  readStream.on('data', function(data) {
+    // console.log('one line of data in readStream is:',JSON.parse(data));
+    trainStream.write(JSON.parse(data));
+    numOfItems++;
+  });
+  // readStream.pipe(trainStream, {end: false});
+  readStream.on('end', function() {
+    // console.log('ended reading the stream');
+    // setTimeout(function() {
+    //   console.log('writing null to trainStream after a 3 second delay');
+    console.log('numOfItems',numOfItems);
+      trainStream.write(null);
+    // },3000);
+  });
+  console.log('happening asynch after createReadStream');
+
+
+  // parallelNets(allParamComboArr);
 };

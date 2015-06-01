@@ -39,6 +39,7 @@
   "homepage": "https://github.com/kuychaco/kpComplete",
   "dependencies": {
     "brain": "^0.7.0",
+    "byline": "^4.2.1",
     "paralleljs": "^0.2.1"
   }
 }
