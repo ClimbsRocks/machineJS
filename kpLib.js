@@ -64,16 +64,30 @@ var parallelNets = function(allParamComboArr) {
   var p = new Parallel(allParamComboArr, {synchronous: false}) //.require(netParams);
 
   // Creating a new version of our p.map function that follows the q promise api. 
+  // TODO: use this to test what scope is to make sure we have access to everything we expect to. 
+  var futureAdder = function(num1, num2) {
+    console.log('inside adder');
+    return num1 + num2;
+  };
+
+  var adder = function(num1, num2) {
+    console.log('inside adder');
+    return num1 + num2;
+  };
+
+  console.log('trainingObj',allParamComboArr.trainingObj);
+  // TODO: I would expect us to have to return this promised value
+  Q.fcall(adder, allParamComboArr[0].trainingObj.iterations, allParamComboArr[0].trainingObj.logPeriod);
   return Q.fcall(
   // TODO: We might need to wrap this in a q promise if we want to get fancy with our promises. 
-  p.map(function(netParams) {
+  p.map, function(netParams) {
     var path = require('path');
     var fs = require('fs');
     // TODO: navigate to brain.js inside of our own node module. once we turn this into a module, of course. 
     var brain = require(path.join(__dirname + '../../../brain/lib/brain.js'));
     var byline = require(path.join(__dirname + '../../../byline/lib/byline.js'));
     var Q = require(path.join(__dirname + '../../../q/q.js'));
-    var Promise = require(path.join(__dirname + '../../../bluebird/js/main/bluebird.js'));
+    // var Promise = require(path.join(__dirname + '../../../bluebird/js/main/bluebird.js'));
     var deferred = Q.defer();
     console.log('inside a callback in our map threads');
     // console.log('__dirname:',__dirname);
@@ -240,7 +254,7 @@ var parallelNets = function(allParamComboArr) {
     // //   net: net,
     // //   netParams: netParams
     // // };
-  })
+  }
   ).
 // TODO: Likely make this into a q promise too. 
 // I think we probably want to make parallelNets entirely promisified. Then we can just return an array and a promise to where we invoked it (multipleNetAlgo), where we'd get to invoke multipleNetAlgo recursively again most likely. 
@@ -295,7 +309,7 @@ var multipleNetAlgo = function() {
       errorThresh: 0.05,  // error threshold to reach
       iterations: 1000,   // maximum training iterations
       log: true,           // console.log() progress periodically
-      logPeriod: 50,       // number of iterations between logging
+      logPeriod: 5,       // number of iterations between logging
       learningRate: 0.6    // learning rate
     };
 
