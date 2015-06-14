@@ -1,0 +1,50 @@
+assets: 
+
+Promises:
+Q
+Bluebird
+
+What we need to do:
+start a parallel process
+Get access to data
+  ideally by reading it through fs (this way we don't need to serialize and create a copy of the data for each parallel process)
+  pass in modules
+    fs** most likely
+    brain
+  pass in brain parameters
+
+Parallelization libs:
+
+webworker-threads
+  claims to use the same memory space (but I can't seem to make this work)
+    mechanism: doesn't start new processes, just new threads within the existing process. not sure how to leverage this (or if it's a blocker). i certainly like their API. 
+  doesn't throw errors (WHOA!)
+  allows you to pass in messages through .onmessage
+  only closes when you call self.close();
+  is not promised based
+  lets you send messages back out through postmessage
+  doesn't let you load node modules
+  haven't investigated whether it lets you load them by reading a file as in: var brain = require(path.join(__dirname + '../../../brain/lib/brain.js'));
+  I think this one does not let us read from process.env
+
+paralleljs:
+  lets you require fs!
+  lets you require modules as in: var brain = require(path.join(__dirname + '../../../brain/lib/brain.js'));
+  promise based
+  but doesn't appear to let you return a deferred promise (at least from Q)
+  has a map method (we could pass in all the parameters for our brain as objs in map, then only process the results once we've gotten all the experiments back)
+  also has a spawn method for just a single process being created (maybe this is promisified differently?)
+  The issue is that you must return something (it says something like "message cannot be undefined"), but that reading from our stream is async, so we reach the return synchronously well before we finish training. and that when we try to return a deferred promise, it just returns immediately. 
+  I may just be using promises incorrectly. That appears to be the only blocker. 
+  I think this is the one that lets us read from process.env. But this only appears to work for ~1150 rows of data. after that it just mysteriously crashes without erro rmessages. 
+
+brainjs: 
+  we are training this using streams. that should (theoretically) prevent us from having to hold the entire training set in memory. 
+  training via a stream requires each stream event to be a single row. we accomplish this by writing our data to a file that is delimited via newline characters, then using byline to read that file line by line. 
+  this method works well on it's own. i have it mostly working from within paralleljs (hard to tell because paralleljs returns immediatley). 
+  theorteically, I could try to work around the synchronous returning by forcing the stream to be synchronous somehow? nesting each reading of the stream in a while loop, or setInterval or process.nextTick?
+  we can also copy the entire minified source code into a parallel function. it's not pretty, but it works. this requires some work, as it's requiring a bunch of different modules at the moment. we'd have to do something like copy the source code for each module in place of it's require statement. 
+
+Summary and known blockers:
+webworker-threads: reading in modules. claims to share same address (memory) space, but can't prove it. 
+paralleljs: returning deferred promises. everything works here, except it returns synchronously. we could just train synchronously for now ()
