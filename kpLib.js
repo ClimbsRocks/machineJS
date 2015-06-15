@@ -19,7 +19,7 @@ module.exports = {
   train: function(trainingData) {
     // TODO: make this more secure. Ideally write to an encrypted database or sqlite file that we could then delete the whole file. 
     // open a writeStream
-    var writeStream = fs.createWriteStream('inputData.txt',{encoding: 'utf8', objectMode: true});
+    var writeStream = fs.createWriteStream('inputData.txt',{encoding: 'utf8'});
 
     // brain.js's streaming interface expects to get a single item in at a time. 
     // to do this, we are saving each object in trainingData into a new row
@@ -35,7 +35,7 @@ module.exports = {
     // TODO: investigate using the drain event to figure out when to write more data to the stream. 
     // This writes larger chunks of data to the writeStream at a time, which signgificantly improved performance over writing each line and each newline character individually.
     // We are open to pull requests if anyone wants to optimize this further. 
-    for(var i = 0; i < trainingData.length; i+= 10) {
+    for(var i = 0; i < trainingData.length; i+=10) {
       var writeString = '';
       for(var j = 0; j < 10; j++) {
         if(i + j < trainingData.length) {
@@ -46,6 +46,7 @@ module.exports = {
       }
       writeStream.write(writeString);
       writeString = '';
+
       // now delete our trainingData by overwriting it with null. I'm not sure why I nested it within a setTimeout. I don't think that's working properly anyways. 
     }
     // writeStream.write(JSON.stringify(null));
@@ -136,7 +137,7 @@ var parallelNets = function(allParamComboArr) {
   // console.log('numCPUs:',numCPUs);
 
   // create a new child_process for all but one cpus on this machine. 
-  for (var i = 0; i < numCPUs -1; i++) {
+  for (var i = 0; i < numCPUs; i++) {
     var child = child_process.fork('./brainChild',{cwd: '/Users/preston/ghLocal/machineLearningWork/kpComplete'});
     child.send(allParamComboArr[i]);
     child.on('message', function(message) {

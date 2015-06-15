@@ -26,30 +26,64 @@ process.on('message', function(message) {
     floodCallback: function() {
       // TODO: Investigate this if there are bugs
       var currentPath = message.pathToData;
-      var newStream = fs.createReadStream(currentPath, {encoding:'utf8'});
-      newStream = byline(newStream);
-      var parseStream = new stream.Transform();
-      parseStream._transform = function(chunk, encoding, done) {
-        chunk = JSON.parse(chunk);
-        this.push(chunk, 'utf8');
-        done();
-      }
-      newStream.pipe(parseStream).pipe(trainStream);
-      // newStream.on('data', function(data) {
-      //   trainStream.write(JSON.parse(data));
-      // });
-      // newStream.on('end', function() {
-      //   trainStream.write(null);  
-      // });
-    },
+      var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
+      // readStream = byline(readStream);
+      // var parseStream = new stream.Transform();
+      // parseStream._transform = function(chunk, encoding, done) {
+      //   chunk = JSON.parse(chunk);
+      //   this.push(chunk, 'utf8');
+      //   done();
+      // }
+      // readStream.pipe(parseStream).pipe(trainStream);
+      // TODO: create a transform stream.
+        // This stream will take in the raw readfile string
+        // make sure the encoding is figured out
+        // break it out by line
+        // make sure that everything's parsed to be js objects
+        // pass each individual object onto our trainStream.
+        // there will be a different number of incoming chunks than there will be outgoing objects
+        // be sure to handle line endings breaking midline
+        var transformStream = new stream.Transform({objectMode: true});
+        transformStream._partialLineData = '';
+
+        transformStream._transform = function (chunk, encoding, done) {
+          // TODO: investigate this parsing if things break. 
+          var data = chunk.toString();
+          data = this._partialLineData + data;
+
+          var lines = data.split('\n');
+          this._partialLineData = lines.splice( lines.length - 1, 1 )[0];
+
+          for(var i = 0; i < lines.length; i++) {
+            this.push(JSON.parse(lines[i]));
+          }
+          done();
+        };
+
+        transformStream._flush = function (done) {
+          if (this._partialLineData) {
+            this.push(this._partialLineData);
+          }
+          this._partialLineData = '';
+          done();
+        };
+        readStream.pipe(transformStream).pipe(trainStream, {end: false});
+
+        // readStream.on('data', function(data) {
+        //   trainStream.write(JSON.parse(data));
+        // });
+        readStream.on('end', function() {
+          trainStream.write(null);  
+        });
+      },
 
     /**
      * Called when the network is done training.
      */
-    doneTrainingCallback: function(obj) {
+     doneTrainingCallback: function(obj) {
       var trainingTime = Date.now() - startTime;
       console.log("trained in " + obj.iterations + " iterations with error: "
-                  + obj.error + "taking", trainingTime,"seconds.");
+        + obj.error + "taking", trainingTime,"seconds.");
       // TODO: invoke bestNetChecker here. Well, we can't, because this thread is actually in a different memory space. 
       // TODO: write the fully trained net to a file. Save a path to that file. Make it in the same location as our inputData.txt file. 
       returnData = obj;
@@ -65,9 +99,9 @@ process.on('message', function(message) {
       // TODO: write net to file
       // TODO: self.close after some time
         // Post MVP: set that time to be dependent on the size of the net
-    }
-  });
-  
+      }
+    });
+
   var currentPath = message.pathToData;
   var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
   readStream = byline(readStream);
