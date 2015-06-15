@@ -8,7 +8,45 @@ process.on('message', function(message) {
 
   var net = new brain.NeuralNetwork(); 
 
+  var currentPath = message.pathToData;
+
+  // create all the right streams to start an iteration of our brain. 
   var startBrain = function() {
+    var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
+    // setting objectMode: true means we can pass JS objects through to the train stream, rather than having to pass them as strings or buffers as we normally would have to. 
+    var transformStream = new stream.Transform({objectMode: true});
+
+    // This variable accounts for what happens when the incoming buffer ends in the middle of a line
+    transformStream._partialLineData = '';
+
+    // transforms a giant chunk of buffer object into individual JS objects, which we pass one at at time into our brain training stream in objectMode
+    transformStream._transform = function (chunk, encoding, done) {
+      var data = chunk.toString();
+      data = this._partialLineData + data;
+
+      var rows = data.split('\n');
+      this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+
+      for(var i = 0; i < rows.length; i++) {
+        this.push(JSON.parse(rows[i]));
+      }
+      done();
+    };
+
+    transformStream._flush = function (done) {
+      if (this._partialLineData) {
+        this.push(this._partialLineData);
+      }
+      this._partialLineData = '';
+      done();
+    };
+
+    // pipe our data from the file, into our transformStream, which turns it into a tidy stream of JS objects, into our trainStream (which we must leave open for the next iteration).
+    readStream.pipe(transformStream).pipe(trainStream, {end: false});
+
+    readStream.on('end', function() {
+      trainStream.write(null);  
+    });
 
   };
 
@@ -22,47 +60,10 @@ process.on('message', function(message) {
     // Write training data to the stream. Called on each training iteration.
     // Streams happen asynchronously. 
     floodCallback: function() {
-      var currentPath = message.pathToData;
-      var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
-      // setting objectMode: true means we can pass JS objects through to the train stream, rather than having to pass them as strings or buffers as we normally would have to. 
-      var transformStream = new stream.Transform({objectMode: true});
-
-      // This variable accounts for what happens when the incoming buffer ends in the middle of a line
-      transformStream._partialLineData = '';
-
-      // transforms a giant chunk of buffer object into individual JS objects, which we pass one at at time into our brain training stream in objectMode
-      transformStream._transform = function (chunk, encoding, done) {
-        var data = chunk.toString();
-        data = this._partialLineData + data;
-
-        var rows = data.split('\n');
-        this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
-
-        for(var i = 0; i < rows.length; i++) {
-          this.push(JSON.parse(rows[i]));
-        }
-        done();
-      };
-
-      transformStream._flush = function (done) {
-        if (this._partialLineData) {
-          this.push(this._partialLineData);
-        }
-        this._partialLineData = '';
-        done();
-      };
-
-      // pipe our data from the file, into our transformStream, which turns it into a tidy stream of JS objects, into our trainStream (which we must leave open for the next iteration).
-      readStream.pipe(transformStream).pipe(trainStream, {end: false});
-
-      // readStream.on('end', function() {
-      //   trainStream.write(null);  
-      // });
+      startBrain();
     },
 
-    /**
-     * Called when the network is done training.
-     */
+     // Called when the network is done training.
      doneTrainingCallback: function(obj) {
       var trainingTime = Date.now() - startTime;
       console.log("trained in " + obj.iterations + " iterations with error: "
@@ -85,21 +86,6 @@ process.on('message', function(message) {
       }
     });
 
-  var currentPath = message.pathToData;
-  var readStream = fs.createReadStream(currentPath, {encoding:'utf8'});
-  readStream = byline(readStream);
-  readStream.on('data', function(data) {
-    // console.log('one line of data in readStream is:',JSON.parse(data));
-    trainStream.write(JSON.parse(data));
-    // TODO: can we just do a pipe? 
-    // TODO: might have to be a transformStream if we really need to parse.
-  });
-  // readStream.pipe(trainStream, {end: false});
-  readStream.on('end', function() {
-    // TODO: can we just add a null at the end of our file? 
-    console.log('finished our first iteration');
-    trainStream.write(null);
-  });
-  // TODO: run bestNetChecker
+  startBrain();
 
 });
