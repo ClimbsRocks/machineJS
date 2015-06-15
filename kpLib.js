@@ -49,7 +49,7 @@ module.exports = {
 
       // now delete our trainingData by overwriting it with null. I'm not sure why I nested it within a setTimeout. I don't think that's working properly anyways. 
     }
-    // writeStream.write(JSON.stringify(null));
+    writeStream.write(JSON.stringify(null));
     console.log('finished writing all the data to the stream itself');
     writeStream.on('drain', function() {
       console.log('heard the stream is drained after our for loop');
