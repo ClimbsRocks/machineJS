@@ -31,8 +31,6 @@ module.exports = {
       writeString = '';
     }
 
-    console.log('finished writing all the data to the stream itself');
-
     writeStream.on('drain', function() {
       writeStream.end();
     });
@@ -42,27 +40,7 @@ module.exports = {
       console.log('finished writing the data to a file');
       trainingData = null; //make sure to no longer point any variables to our trainingData, in case any still exists. 
 
-      // Create multiple copies of the data; one for each child process
-      var readStream = fs.createReadStream('inputData.txt', {encoding: 'utf8'});
-      readStream.pause();
-      readStream.setMaxListeners(0);
-      for (var i = 0; i < numCPUs; i++) {
-        (function(num) {
-          // We are making our files 1-indexed (inpudData1.txt - inputData8.txt). 
-          var writeStream = fs.createWriteStream('inputData' + (num + 1) + '.txt');
-          readStream.pipe(writeStream);
-        })(i); //since streams are an asynch operation, we're making sure we store the current value of i in a closure. 
-          
-      }
-      setTimeout(function() {
-        readStream.resume();
-      },1000); //just to be super extra cautious, wait a full second to make sure all of our writable streams are ready to go. 
-      // TODO: we could create a new readable stream for each new writeable stream. but that might be blocking?
-
-      // we have multiple writable streams receiving data from the same readable stream. As soon as that single readable stream finishes, we know we've written all the data that we need to all the files that we need. 
-      readStream.on('end', function() {
-        multipleNetAlgo();
-      });
+      multipleNetAlgo();
 
     });
 
@@ -98,7 +76,6 @@ var parallelNets = function(allParamComboArr) {
   }
 
 };
-
 
 var bestNetChecker = function(trainingResults,trainedNet) {
   console.log('checking if this is the best net');
@@ -146,7 +123,7 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var currentPath = path.join(__dirname, '../inputData' /*+ i */+ '.txt');
+    var currentPath = path.join(__dirname, '../inputData.txt');
 
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: currentPath});
   }

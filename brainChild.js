@@ -63,28 +63,26 @@ process.on('message', function(message) {
       startBrain();
     },
 
-     // Called when the network is done training.
-     doneTrainingCallback: function(obj) {
-      var trainingTime = Date.now() - startTime;
-      console.log("trained in " + obj.iterations + " iterations with error: "
-        + obj.error + "taking", trainingTime,"seconds.");
-      // TODO: invoke bestNetChecker here. Well, we can't, because this thread is actually in a different memory space. 
-      // TODO: write the fully trained net to a file. Save a path to that file. Make it in the same location as our inputData.txt file. 
-      returnData = obj;
-      // TODO: add our net to returnData
-      returnData.net = net.toJSON();
-      returnData.trainingTime = trainingTime;
+   // Called when the network is done training.
+   doneTrainingCallback: function(obj) {
+    var trainingTime = Date.now() - startTime;
+    console.log("trained in " + obj.iterations + " iterations with error: "
+      + obj.error + "taking", trainingTime,"seconds.");
+    // TODO: invoke bestNetChecker here. Well, we can't, because this thread is actually in a different memory space. 
+    // TODO: write the fully trained net to a file. Save a path to that file. Make it in the same location as our inputData.txt file. 
+    returnData = obj;
+    // TODO: add our net to returnData
+    returnData.net = net.toJSON();
+    returnData.trainingTime = trainingTime;
 
-      process.send(obj);
-      // console.log('sent a message from the child!');
-      // self.close();
+    process.send(obj);
+    // self.close();
 
-      // TODO: send message (will this message include the JSON version of the net? probably)
-      // TODO: write net to file
-      // TODO: self.close after some time
-        // Post MVP: set that time to be dependent on the size of the net
-      }
-    });
+    // TODO: write net to file
+    // TODO: self.close after some time
+      // Post MVP: set that time to be dependent on the size of the net
+    }
+  });
 
   startBrain();
 
