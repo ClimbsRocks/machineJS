@@ -14,6 +14,8 @@ var bestNet = {
 
 module.exports = {
   readFile: function(pathToData) {
+    console.log('reading a file:',pathToData);
+    // FUTURE: give them the option to invoke this from within a larger program as a module, or to just invoke it straight from the command line??
     // TODO: allow the user to give us either a file path, or a fully formatted dataset in JS. Maybe give them both train and readFile as APIs, and readFile will invoke train();
     // TODO: again, figure out where we want to write this to the computer
     // TODO: figure out how to write it securely (encryption, etc.)
@@ -25,31 +27,115 @@ module.exports = {
     // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
       // TODO: add in info on how to make sure your data is formatted using UTF-8
     var readStream = fs.createReadStream(pathToData, {encoding: 'utf8'});
+    //tStream1: format as arrays; get the mean and median for each column
+    // TODO: get summary stats
+      // mode
+      // highest
+      // lowest
+      // distribution
+      // how many outliers
+      // etc. 
+      // present these to the user to make sure they know what their data looks like
+      // give them options for how to format that data (remove all rows with outliers, overwrite outliers with median data, etc.)
+    // tStream2: calculate standard deviation for each column
+    // tStream3: 
+      // normalize data 
+      // turn it into a number between 0 and 1
+      // binarize categorical data
+      // TODO: take square or cubic roots of exponential data
+      // overwrite missing data with median values
+        // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
+      // put it into our expected object format for brain.js
 
-    var transformStream = new stream.Transform({objectMode: true});
-    transformStream._partialLineData = '';
+    var dataSummary = {};
+    // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
+    var createdSummary = false;
 
-    transformStream._transform = function (chunk, encoding, done) {
+    var tStream1 = new stream.Transform({objectMode: true});
+    tStream1._partialLineData = '';
+    var countOfRows = 0;
+    var expectedRowLength = 0;
+
+    tStream1._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
 
       var rows = data.split('\r\n');
-      console.log(rows);
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
       for(var i = 0; i < rows.length; i++) {
         var columns = rows[i].split(',');
         var thisRow = [];
-        for (var j = 0; j < columns.length; j++) {
-          thisRow.push(columns[j]);
+
+        // Create the dataSummary object
+        if( !createdSummary ) {
+          createdSummary = true;
+          // change this to be the names of each column
+          // change this to include the categorical flag from row 2 (which is rows[1]). 
+          // or actually, can we just assume that anything that's not a number is a string, and is therefore categorical? 
+          // is there any case where we would have string values that are not categorical?
+          // is there any data we would accept other than categorical (string) or numbers?
+          // we might have to force string representations of numbers to be actual numbers. 
+          // this is probably an area we'd have to give the user some control over. usernames would normally be strings, but we might occasionally have a username that is a number (represented as a string). we could go through and do a majority rules type of thing, but then, i'd be worried about sparse data (we're missing bank account info for most customers, but we have it for a few, so therefore, it's going to look lifke the majority are not numbers). we could possibly work around this by utilizing the nullOrMissing count in this calculation. 
+          // no it's simpler than that. let's just be strict. number columns must be numbers. FUTURE: we could build in some flexibility here (if 98% of the values present in a column- excluding missing- are numbers, then we'll assume it's a numerical column and just ignore the random strings). 
+          expectedRowLength = columns.length;
+          for (var j = 0; j < columns.length; j++) {
+            dataSummary[j] = {
+              sum: 0, //FUTURE: figure out how we want to handle negative numbers. 
+              standardDeviationSum: 0,
+              count: 0,
+              nullOrMissing: 0,
+              countOfZeros: 0,
+              countOfStrings: 0,
+              median: undefined//FUTURE: this one will be more difficult to figure out. 
+            };
+          }
+          console.log('dataSummary at the start');
+          console.log(dataSummary);
         }
-        this.push(JSON.stringify(thisRow));
-        columns = [];
+
+        if(columns.length !== expectedRowLength) {
+          console.log('this row appears to be a different length than expected:');
+          console.log(columns);
+        } else {
+          // iterate through the columns for this particular row. 
+          for (var j = 0; j < columns.length; j++) {
+            dataSummary[j].count++;
+            var item = columns[j];
+            if(item.toString() === 'NaN') {
+              console.log('the raw item is NaN');
+            }
+            if(parseFloat(item, 10).toString() !== 'NaN') {
+              item = parseFloat(item);
+              if(item.toString() === 'NaN') console.log('the parsed item is NaN');
+            }
+            if(typeof item === 'number') {
+              if(item.toString() === 'NaN') console.log('the item checked against number is NaN');
+              dataSummary[j].sum += item;
+              if(dataSummary[j].sum.toString() === 'NaN') {
+                console.log('sum is NaN, j is:', j,"i is:", i);
+              }
+              if(item === 0) {
+                dataSummary[j].countOfZeros++;
+              }
+            } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
+              dataSummary[j].nullOrMissing++;
+            } else if (typeof item === 'string') {
+              dataSummary[j].countOfStrings++;
+            } else {
+              console.log('we do not know what to do with this value:',item, 'which is in column number:',j);
+            }
+            thisRow.push(columns[j]);
+          }
+
+          this.push(JSON.stringify(thisRow));
+          columns = [];
+        } 
       }
       done();
     };
 
-    transformStream._flush = function (done) {
+    tStream1._flush = function (done) {
       if (this._partialLineData) {
         this.push(this._partialLineData);
       }
@@ -57,7 +143,25 @@ module.exports = {
       done();
     };
 
-    readStream.pipe(transformStream).pipe(writeStream);
+
+    readStream.pipe(tStream1).pipe(writeStream);
+
+    writeStream.on('finish', function() {
+      console.log('dataSummary:', dataSummary);
+      // TODO: create the next transformStream!
+      readStream2.pipe(transformStream2).pipe(writeStream2);
+      writeStream2.on('finish', function() {
+        console.log('finished the second transform!');
+        readStream3.pipe(transformStream3).pipe(writeStream3);
+        writeStream3.on('finish', function() {
+          console.log('finished the second transform!');
+        });
+      })
+    });
+
+    var writeStream2 = fs.createWriteStream('formattingData2.txt', {encoding: 'utf8'});
+    var readStream2 = fs.createReadStream('formattingData.txt', {encoding: 'utf8'});
+
 
 
     // Pseudocode:
@@ -159,10 +263,14 @@ var parallelNets = function(allParamComboArr) {
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
     // TODO: generalize this path!
+    // TODO: point this to wherever kpComplete is on your computer. 
+    // start this by booting up 
+    // KATRINA: change this directory to where your kpComplete folder is. 
     var child = child_process.fork('./brainChild',{cwd: '/Users/preston/ghLocal/machineLearningWork/kpComplete'});
     child.send(allParamComboArr[i]);
     child.on('message', function(message) {
       console.log('parent received a message from its child:');
+      // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
       // TODO: start a new child process after doing some logic
       // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)
       // TODO: have some way of timeboxing each experiment??
@@ -221,6 +329,7 @@ var multipleNetAlgo = function() {
 
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: currentPath});
   }
+  console.log('allParamComboArr:',allParamComboArr);
 
   parallelNets(allParamComboArr);
 };
