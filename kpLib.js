@@ -140,6 +140,7 @@ module.exports = {
             thisRow.push(columns[j]);
           }
 
+          // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
           this.push(JSON.stringify(thisRow));
           this.push('\n');
           columns = [];
@@ -165,25 +166,22 @@ module.exports = {
     tStream2._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
-      // console.log('data:',data);
 
       var rows = data.split('\n');
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
-      // console.log('rows in second transform',rows);
       for(var i = 0; i < rows.length; i++) {
-        // console.log('rows[i]:',rows[i]);
         rows[i] = JSON.parse(rows[i]);
         for (var k = 0; k < rows[i].length; k++) {
-          // console.log('rows[i][k]:',rows[i][k]);
-          // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
           // TODO: make sure i'm calculating standard dev the right way
           var itemAsNum = parseFloat(rows[i][k]);
           if(itemAsNum.toString() !== 'NaN') {
             dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
           }
         }
+        // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
         this.push(JSON.stringify(rows[i]));
+        this.push('\n');
         columns = [];
       } 
       done();
@@ -229,7 +227,11 @@ module.exports = {
           // TODO: make sure i'm calculating standard dev the right way
           var itemAsNum = parseFloat(rows[i][k]);
           if(itemAsNum.toString() !== 'NaN') {
-            dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
+
+            // TODO: build out all logic here
+            // TODO: put more thought into how we handle the output
+              // it will likely be categorical
+              // we should tell the user to always make it the first column in our dataset?
           }
         }
         this.push(JSON.stringify(rows[i]));
@@ -280,6 +282,13 @@ module.exports = {
         console.log('dataSummary after standard deviation calculation:', dataSummary);
         var writeStream3 = fs.createWriteStream('formattingData3.txt', {encoding: 'utf8'});
         var readStream3 = fs.createReadStream('formattingData2.txt', {encoding: 'utf8'});
+
+        // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
+          // we would have to give the user the option of still writing to a file if their dataset is too large
+          // since we're only holding the dataset in memory once, we don't need to worry about RAM issues
+          // this will let us train much faster, since reading from RAM will be much faster than reading from a static file on our hard drive
+          // even if we can't officially stream from the db, we can fake it by just querying for 10 lines at a time and pushing each line individually into the trainStream
+          // yeah, that's definitely the way that we'll want to go. 
         readStream3.pipe(tStream3).pipe(writeStream3);
         
         writeStream3.on('finish', function() {
