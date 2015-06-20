@@ -47,9 +47,19 @@ module.exports = {
         // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
       // put it into our expected object format for brain.js
 
+    // tStream1: 
+      // read data from initial data file
+      // sum up numerical relevant data
+      // count number of data points
+      // make sure each row has the same number of data points
+      // count missing/absent data
+      // count strings vs. numbers
+
     var dataSummary = {};
     // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
     var createdSummary = false;
+
+
 
     var tStream1 = new stream.Transform({objectMode: true});
     tStream1._partialLineData = '';
@@ -83,11 +93,13 @@ module.exports = {
             dataSummary[j] = {
               sum: 0, //FUTURE: figure out how we want to handle negative numbers. 
               standardDeviationSum: 0,
+              standardDeviation: undefined,
               count: 0,
               nullOrMissing: 0,
               countOfZeros: 0,
               countOfStrings: 0,
-              median: undefined//FUTURE: this one will be more difficult to figure out. 
+              median: undefined, //FUTURE: this one will be more difficult to figure out. 
+              mean: undefined
             };
           }
           console.log('dataSummary at the start');
@@ -129,6 +141,7 @@ module.exports = {
           }
 
           this.push(JSON.stringify(thisRow));
+          this.push('\n');
           columns = [];
         } 
       }
@@ -144,23 +157,138 @@ module.exports = {
     };
 
 
+
+    // tStream2: calculate standard deviations of numeric data. 
+    var tStream2 = new stream.Transform({objectMode: true});
+    tStream2._partialLineData = '';
+
+    tStream2._transform = function (chunk, encoding, done) {
+      var data = chunk.toString();
+      data = this._partialLineData + data;
+      // console.log('data:',data);
+
+      var rows = data.split('\n');
+      this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+
+      // console.log('rows in second transform',rows);
+      for(var i = 0; i < rows.length; i++) {
+        // console.log('rows[i]:',rows[i]);
+        rows[i] = JSON.parse(rows[i]);
+        for (var k = 0; k < rows[i].length; k++) {
+          // console.log('rows[i][k]:',rows[i][k]);
+          // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
+          // TODO: make sure i'm calculating standard dev the right way
+          var itemAsNum = parseFloat(rows[i][k]);
+          if(itemAsNum.toString() !== 'NaN') {
+            dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
+          }
+        }
+        this.push(JSON.stringify(rows[i]));
+        columns = [];
+      } 
+      done();
+    };
+
+    tStream2._flush = function (done) {
+      if (this._partialLineData) {
+        this.push(this._partialLineData);
+      }
+      this._partialLineData = '';
+      done();
+    };
+
+
+
+    // tStream3: 
+      // normalize data 
+      // turn it into a number between 0 and 1
+      // binarize categorical data
+      // TODO: take square or cubic roots of exponential data
+      // overwrite missing data with median values
+        // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
+      // put it into our expected object format for brain.js
+
+    var tStream3 = new stream.Transform({objectMode: true});
+    tStream3._partialLineData = '';
+
+    tStream3._transform = function (chunk, encoding, done) {
+      var data = chunk.toString();
+      data = this._partialLineData + data;
+      // console.log('data:',data);
+
+      var rows = data.split('\n');
+      this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+
+      // console.log('rows in second transform',rows);
+      for(var i = 0; i < rows.length; i++) {
+        // console.log('rows[i]:',rows[i]);
+        rows[i] = JSON.parse(rows[i]);
+        for (var k = 0; k < rows[i].length; k++) {
+          // console.log('rows[i][k]:',rows[i][k]);
+          // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
+          // TODO: make sure i'm calculating standard dev the right way
+          var itemAsNum = parseFloat(rows[i][k]);
+          if(itemAsNum.toString() !== 'NaN') {
+            dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
+          }
+        }
+        this.push(JSON.stringify(rows[i]));
+        columns = [];
+      } 
+      done();
+    };
+
+    tStream3._flush = function (done) {
+      if (this._partialLineData) {
+        this.push(this._partialLineData);
+      }
+      this._partialLineData = '';
+      done();
+    };
+
+
+    // Set up the piping on each successive read and transform and write streams
+    
     readStream.pipe(tStream1).pipe(writeStream);
 
     writeStream.on('finish', function() {
+      // create the mean property on each dataSummary key
+      for (var column in dataSummary) {
+        // TODO: think if we want to divide by something else? 
+        if (dataSummary[column].count !== 0) {
+          dataSummary[column].mean = dataSummary[column].sum / dataSummary[column].count;
+          
+        }
+      }
+
       console.log('dataSummary:', dataSummary);
-      // TODO: create the next transformStream!
-      readStream2.pipe(transformStream2).pipe(writeStream2);
+      var writeStream2 = fs.createWriteStream('formattingData2.txt', {encoding: 'utf8'});
+      var readStream2 = fs.createReadStream('formattingData.txt', {encoding: 'utf8'});
+      readStream2.pipe(tStream2).pipe(writeStream2);
+      
       writeStream2.on('finish', function() {
+
         console.log('finished the second transform!');
-        readStream3.pipe(transformStream3).pipe(writeStream3);
+        for(var column in dataSummary) {
+          if (dataSummary[column].count !== 0) {
+            // TODO: this is just MVP for standard deviation calculations. make sure this math is right once i've got an internet connection again. in particular, should we be using a different denominator?
+            dataSummary[column].standardDeviation = dataSummary[column].standardDeviationSum / (dataSummary[column].count - dataSummary[column].nullOrMissing - dataSummary[column].countOfStrings);
+            
+          }
+
+        }
+        console.log('dataSummary after standard deviation calculation:', dataSummary);
+        var writeStream3 = fs.createWriteStream('formattingData3.txt', {encoding: 'utf8'});
+        var readStream3 = fs.createReadStream('formattingData2.txt', {encoding: 'utf8'});
+        readStream3.pipe(tStream3).pipe(writeStream3);
+        
         writeStream3.on('finish', function() {
-          console.log('finished the second transform!');
+          console.log('finished the third transform!');
+          // invoke multipleNetAlgo()?
         });
       })
     });
 
-    var writeStream2 = fs.createWriteStream('formattingData2.txt', {encoding: 'utf8'});
-    var readStream2 = fs.createReadStream('formattingData.txt', {encoding: 'utf8'});
 
 
 
