@@ -99,8 +99,15 @@ module.exports = {
               countOfZeros: 0,
               countOfStrings: 0,
               median: undefined, //FUTURE: this one will be more difficult to figure out. 
-              mean: undefined
+              mean: undefined,
+              max: rows[i+1].split(',')[j], //FUTURE: grab the first row's value for the coluumn as the max and min values
+              min: rows[i+1].split(',')[j],
+              range: undefined,
+              rangeAbove: undefined,
+              rangeBelow: undefined,
+              standardDeviationRange: undefined
             };
+
           }
           console.log('dataSummary at the start');
           console.log(dataSummary);
@@ -114,21 +121,21 @@ module.exports = {
           for (var j = 0; j < columns.length; j++) {
             dataSummary[j].count++;
             var item = columns[j];
-            if(item.toString() === 'NaN') {
-              console.log('the raw item is NaN');
-            }
             if(parseFloat(item, 10).toString() !== 'NaN') {
               item = parseFloat(item);
-              if(item.toString() === 'NaN') console.log('the parsed item is NaN');
             }
             if(typeof item === 'number') {
-              if(item.toString() === 'NaN') console.log('the item checked against number is NaN');
               dataSummary[j].sum += item;
-              if(dataSummary[j].sum.toString() === 'NaN') {
-                console.log('sum is NaN, j is:', j,"i is:", i);
-              }
+              // if(dataSummary[j].sum.toString() === 'NaN') {
+              //   console.log('sum is NaN, j is:', j,"i is:", i);
+              // }
               if(item === 0) {
                 dataSummary[j].countOfZeros++;
+              }
+              if(item < dataSummary[j].min) {
+                dataSummary[j].min = item;
+              } else if (item > dataSummary[j].max) {
+                dataSummary[j].max = item;
               }
             } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
               dataSummary[j].nullOrMissing++;
@@ -221,13 +228,30 @@ module.exports = {
       for(var i = 0; i < rows.length; i++) {
         // console.log('rows[i]:',rows[i]);
         rows[i] = JSON.parse(rows[i]);
+        var thisRow = {
+          input: {},
+          output: {}
+        };
+
         for (var k = 0; k < rows[i].length; k++) {
           // console.log('rows[i][k]:',rows[i][k]);
           // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
           // TODO: make sure i'm calculating standard dev the right way
-          var itemAsNum = parseFloat(rows[i][k]);
-          if(itemAsNum.toString() !== 'NaN') {
+          var item = parseFloat(rows[i][k]);
+          if(item.toString() !== 'NaN') {
+            var standardDeviationNormalized = (item - dataSummary[k].mean) / dataSummary[k].standardDeviation;
+            if(item > dataSummary[k].mean) {
+              // once we have the data pared down to how many standard deviations away from 0 it is
+              var minMaxNormalized = (standardDeviationNormalized / dataSummary[k].stdDevRangeAbove) / 2; 
+              //TODO figure out how to handle negative numbers once we're back from Gastown. 
+              var normalizedData = minMaxNormalized + .5
+            } else {
+              var minMaxNormalized = standardDeviationNormalized / dataSummary[k].stdDevRangeBelow; //TODO figure out how to handle negative numbers once we're back from Gastown. 
 
+            }
+            // we'll have an aboveRange and a belowRange. then we'll just handle each side differently
+            // TODO: i'm still not confident about how we're handling numbers that range from fractions to thousands, like our debt utilization ratio
+            thisRow.input[k] = 0;//TODO: build out the math for each item
             // TODO: build out all logic here
             // TODO: put more thought into how we handle the output
               // it will likely be categorical
@@ -272,9 +296,15 @@ module.exports = {
 
         console.log('finished the second transform!');
         for(var column in dataSummary) {
-          if (dataSummary[column].count !== 0) {
+          var columnObj = dataSummary[column];
+          if (columnObj.count !== 0) {
             // TODO: this is just MVP for standard deviation calculations. make sure this math is right once i've got an internet connection again. in particular, should we be using a different denominator?
-            dataSummary[column].standardDeviation = dataSummary[column].standardDeviationSum / (dataSummary[column].count - dataSummary[column].nullOrMissing - dataSummary[column].countOfStrings);
+            columnObj.standardDeviation = columnObj.standardDeviationSum / (columnObj.count - columnObj.nullOrMissing - columnObj.countOfStrings);
+            columnObj.range = columnObj.max - columnObj.min; //FUTURE: we don't actually need this yet. 
+            columnObj.standardDeviationRange = columnObj.range / columnObj.standardDeviation; //we calculate this once so that we don't need to calculate it again when iterating through each individual row. It's a minor optimization for large datasets. 
+            columnObj.stdDevRangeAbove = (columnObj.max - columnObj.mean) / columnObj.standardDeviation;
+            columnObj.stdDevRangeBelow = (columnObj.mean - columnObj.min) / columnObj.standardDeviation;
+
             
           }
 
