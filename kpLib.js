@@ -114,8 +114,6 @@ module.exports = {
         // ADVANCED: give them teh option of using other things as column separators, such as | or semicolon
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
-      // console.log('chunk:',chunk);
-      // console.log('rows:',rows);
       for(var i = 0; i < rows.length; i++) {
         var columns = rows[i].split(',');
 
@@ -157,8 +155,8 @@ module.exports = {
             };
 
           }
-          console.log('dataSummary at the start');
-          console.log(dataSummary);
+          // console.log('dataSummary at the start');
+          // console.log(dataSummary);
           columns = [];
         } else {
           // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
@@ -500,7 +498,7 @@ var parallelNets = function(allParamComboArr) {
     var child = child_process.fork('./brainChild',{cwd: '/Users/preston/ghLocal/machineLearningWork/kpComplete'});
     child.send(allParamComboArr[i]);
     child.on('message', function(message) {
-      console.log('parent received a message from its child:');
+      // console.log('parent received a message from its child:');
       // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
       // TODO: start a new child process after doing some logic
       // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)

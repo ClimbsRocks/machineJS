@@ -36,7 +36,7 @@ process.on('message', function(message) {
 
     transformStream._flush = function (done) {
       if (this._partialLineData) {
-        this.push(this._partialLineData);
+        this.push(JSON.parse(this._partialLineData));
       }
       this._partialLineData = '';
       done();
@@ -61,6 +61,7 @@ process.on('message', function(message) {
     // Write training data to the stream. Called on each training iteration.
     // Streams happen asynchronously. 
     floodCallback: function() {
+      // console.log('finished an iteration');
       startBrain();
     },
 
@@ -68,7 +69,7 @@ process.on('message', function(message) {
    doneTrainingCallback: function(obj) {
     var trainingTime = Date.now() - startTime;
     console.log("trained in " + obj.iterations + " iterations with error: "
-      + obj.error + "taking", trainingTime,"seconds.");
+      + obj.error + "taking", trainingTime / 1000,"seconds.");
     // TODO: invoke bestNetChecker here. Well, we can't, because this thread is actually in a different memory space. 
     // TODO: write the fully trained net to a file. Save a path to that file. Make it in the same location as our inputData.txt file. 
     returnData = obj;
