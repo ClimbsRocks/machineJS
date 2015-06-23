@@ -28,6 +28,7 @@ process.on('message', function(message) {
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
       for(var i = 0; i < rows.length; i++) {
+        // console.log('rows[i] inside brainChild transformStream:',JSON.parse(rows[i]));
         this.push(JSON.parse(rows[i]));
       }
       done();

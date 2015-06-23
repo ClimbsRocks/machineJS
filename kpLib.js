@@ -14,7 +14,7 @@ var bestNet = {
 
 module.exports = {
   readFile: function(pathToData) {
-    console.log('reading a file:',pathToData);
+    console.log('reading a file:', path.join(__dirname, pathToData));
     // FUTURE: give them the option to invoke this from within a larger program as a module, or to just invoke it straight from the command line??
     // TODO: allow the user to give us either a file path, or a fully formatted dataset in JS. Maybe give them both train and readFile as APIs, and readFile will invoke train();
     // TODO: again, figure out where we want to write this to the computer
@@ -26,7 +26,7 @@ module.exports = {
     var writeStream = fs.createWriteStream('formattingData.txt', {encoding: 'utf8'});
     // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
       // TODO: add in info on how to make sure your data is formatted using UTF-8
-    var readStream = fs.createReadStream(pathToData, {encoding: 'utf8'});
+    var readStream = fs.createReadStream(path.join(__dirname, pathToData), {encoding: 'utf8'});
     //tStream1: format as arrays; get the mean and median for each column
     // TODO: get summary stats
       // mode
@@ -60,22 +60,64 @@ module.exports = {
     var createdSummary = false;
 
 
-
     var tStream1 = new stream.Transform({objectMode: true});
     tStream1._partialLineData = '';
-    var countOfRows = 0;
-    var expectedRowLength = 0;
+    var countOfRows = 0; 
+    var expectedRowLength = 0; //we want this to be available for all of our transformStreams. could consider making it a variable on tStream1 later to make it slightly cleaner. 
+    tStream1.transformOneRow = function(columns) {
+      var thisRow = [];
+      if(columns.length !== expectedRowLength) {
+        console.log('this row appears to be a different length than expected:');
+        console.log(columns);
+      } else {
+        // iterate through the columns for this particular row. 
+        for (var j = 0; j < columns.length; j++) {
+          dataSummary[j].count++;
+          var item = columns[j];
+          if(parseFloat(item, 10).toString() !== 'NaN') {
+            item = parseFloat(item);
+          }
+          if(typeof item === 'number') {
+            dataSummary[j].sum += item;
+            // if(dataSummary[j].sum.toString() === 'NaN') {
+            //   console.log('sum is NaN, j is:', j,"i is:", i);
+            // }
+            if(item === 0) {
+              dataSummary[j].countOfZeros++;
+            }
+            if(item < dataSummary[j].min) {
+              dataSummary[j].min = item;
+            } else if (item > dataSummary[j].max) {
+              dataSummary[j].max = item;
+            }
+          } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
+            dataSummary[j].nullOrMissing++;
+          } else if (typeof item === 'string') {
+            dataSummary[j].countOfStrings++;
+          } else {
+            console.log('we do not know what to do with this value:',item, 'which is in column number:',j);
+          }
+          thisRow.push(columns[j]);
+        }
+      }
+      return thisRow;
+    }
 
     tStream1._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
 
-      var rows = data.split('\r\n');
+      var rowsToPush = '';
+
+      var rows = data.split('\n'); //TODO: go through and standardize the line endings of the input file. give the user the optoin of giving us any line endings they want, even crappy ones. it's not their fault their data arrived in a terrible format. 
+        // just go through and replace all "\r\n" or "\r" or any other common line ending with "\n", etc. then do our final split on just "\n"
+        // ADVANCED: give them teh option of using other things as column separators, such as | or semicolon
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
+      // console.log('chunk:',chunk);
+      // console.log('rows:',rows);
       for(var i = 0; i < rows.length; i++) {
         var columns = rows[i].split(',');
-        var thisRow = [];
 
         // Create the dataSummary object
         if( !createdSummary ) {
@@ -99,66 +141,43 @@ module.exports = {
               countOfZeros: 0,
               countOfStrings: 0,
               median: undefined, //FUTURE: this one will be more difficult to figure out. 
+                // sort the column, find the middle item
+                // sorting seems challenging with streams
+                  // happily, merge sort seems like the kind of thing we could do with a stream
+                  // or, just google around
+                  // hopefully there's a library for this. 
               mean: undefined,
               max: rows[i+1].split(',')[j], //FUTURE: grab the first row's value for the coluumn as the max and min values
-              min: rows[i+1].split(',')[j],
+              min: rows[i+1].split(',')[j], 
               range: undefined,
-              rangeAbove: undefined,
-              rangeBelow: undefined,
-              standardDeviationRange: undefined
+              rangeAbove: undefined, // we aren't using this at the moment
+              rangeBelow: undefined, //we aren't using this at the moment
+              standardDeviationRange: undefined,
+              categorical: undefined
             };
 
           }
           console.log('dataSummary at the start');
           console.log(dataSummary);
-        }
-
-        if(columns.length !== expectedRowLength) {
-          console.log('this row appears to be a different length than expected:');
-          console.log(columns);
-        } else {
-          // iterate through the columns for this particular row. 
-          for (var j = 0; j < columns.length; j++) {
-            dataSummary[j].count++;
-            var item = columns[j];
-            if(parseFloat(item, 10).toString() !== 'NaN') {
-              item = parseFloat(item);
-            }
-            if(typeof item === 'number') {
-              dataSummary[j].sum += item;
-              // if(dataSummary[j].sum.toString() === 'NaN') {
-              //   console.log('sum is NaN, j is:', j,"i is:", i);
-              // }
-              if(item === 0) {
-                dataSummary[j].countOfZeros++;
-              }
-              if(item < dataSummary[j].min) {
-                dataSummary[j].min = item;
-              } else if (item > dataSummary[j].max) {
-                dataSummary[j].max = item;
-              }
-            } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
-              dataSummary[j].nullOrMissing++;
-            } else if (typeof item === 'string') {
-              dataSummary[j].countOfStrings++;
-            } else {
-              console.log('we do not know what to do with this value:',item, 'which is in column number:',j);
-            }
-            thisRow.push(columns[j]);
-          }
-
-          // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
-          this.push(JSON.stringify(thisRow));
-          this.push('\n');
           columns = [];
+        } else {
+          // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
+          var transformedRow = this.transformOneRow(columns);
+          rowsToPush += JSON.stringify(transformedRow) + '\n';
+          // this.push(JSON.stringify(transformedRow));
+          // this.push('\n');
+          columns = []; //i'm not entirely sure if this is necessary, but it seems like it will be helpful in cases with errors. 
         } 
       }
+      this.push(rowsToPush);
       done();
     };
 
     tStream1._flush = function (done) {
       if (this._partialLineData) {
-        this.push(this._partialLineData);
+        var columns = this._partialLineData.split(',');
+        var transformedRow = this.transformOneRow(columns)
+        this.push(JSON.stringify(transformedRow));
       }
       this._partialLineData = '';
       done();
@@ -170,33 +189,42 @@ module.exports = {
     var tStream2 = new stream.Transform({objectMode: true});
     tStream2._partialLineData = '';
 
+    tStream2.processRow = function(row) {
+      row = JSON.parse(row);
+      for (var k = 0; k < row.length; k++) {
+        // TODO: make sure i'm calculating standard dev the right way
+        var itemAsNum = parseFloat(row[k]);
+        if(itemAsNum.toString() !== 'NaN') {
+          dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
+        }
+      }
+      return row;
+    }
+
     tStream2._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
+      var rowsToPush = '';
 
       var rows = data.split('\n');
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
       for(var i = 0; i < rows.length; i++) {
-        rows[i] = JSON.parse(rows[i]);
-        for (var k = 0; k < rows[i].length; k++) {
-          // TODO: make sure i'm calculating standard dev the right way
-          var itemAsNum = parseFloat(rows[i][k]);
-          if(itemAsNum.toString() !== 'NaN') {
-            dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
-          }
-        }
+        var processedRow = this.processRow(rows[i]);
+        
         // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
-        this.push(JSON.stringify(rows[i]));
-        this.push('\n');
-        columns = [];
+        rowsToPush += JSON.stringify(processedRow) + '\n';
+        // this.push(JSON.stringify(processedRow));
+        // this.push('\n');
       } 
+      this.push(rowsToPush);
       done();
     };
 
     tStream2._flush = function (done) {
       if (this._partialLineData) {
-        this.push(this._partialLineData);
+        var processedRow = this.processRow(this._partialLineData);
+        this.push(JSON.stringify(processedRow));
       }
       this._partialLineData = '';
       done();
@@ -216,57 +244,81 @@ module.exports = {
     var tStream3 = new stream.Transform({objectMode: true});
     tStream3._partialLineData = '';
 
+    tStream3.transformOneRow = function(row) {
+      var brainObj = {
+        input: {},
+        output: {}
+      };
+
+      if( dataSummary[0].categorical === true ) {
+        brainObj.output[row[0]] = 1; //if we have categorical data, we want to set that category to true
+      } else {
+        brainObj.output['numericOutput'] = row[0]; // if we have numerica data (we shouldn't, unless that number is simply a category, such as didDefault), we want to set the output equal to that number
+      }
+
+      for (var k = 1; k < row.length; k++) {
+        // console.log('row[k]:',row[k]);
+        // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
+        // TODO: make sure i'm calculating standard dev the right way
+        var item = row[k]
+        var itemParsed = parseFloat(item);
+        if(itemParsed.toString() !== 'NaN') {
+          // uses basic min-max normalization.
+          brainObj.input[k] = (itemParsed - dataSummary[k].min) / dataSummary[k].range;//TODO: build out the math for each item
+          // TODO: build out all logic here
+          // TODO: put more thought into how we handle the output
+            // it will likely be categorical
+            // we should tell the user to always make it the first column in our dataset?
+            // FUTURE: include regressions as well
+            // ADVANCED: give them the option to specify multiple output columns if we are predicting multiple output types (they are both a likeMatch and a messagingMatch, but not a phoneMatch). They'd have to label each output column with the word 'output' in the second row. 
+        } else {
+          if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {
+            brainObj.input[k] = 0 //FUTURE: make this equal to the median value if we have values for more than 70% of items. continue to make it equal to 0 if we have sparse input (if we have values for less than 70% of rows)
+            // ADVANCED: give them control of how to replace missing or null values
+            // ADVANCED: give them control of what is considered a missing or null value. particularly NA. but maybe for them -1 is considered a missing value. 
+          } else {
+            console.error('we have not yet figured out how to handle data for this column number:',k,'values:',item);
+            // TODO: handle categorical data
+          }
+          // TODO NEXT: handle string input
+          // TODO: handle msising values
+          // TODO: handle NA
+        }
+      }
+      return brainObj;
+    };
+
     tStream3._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
       // console.log('data:',data);
 
+      var rowsToPush = '';
       var rows = data.split('\n');
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
       // console.log('rows in second transform',rows);
       for(var i = 0; i < rows.length; i++) {
         // console.log('rows[i]:',rows[i]);
-        rows[i] = JSON.parse(rows[i]);
-        var thisRow = {
-          input: {},
-          output: {}
-        };
-
-        for (var k = 0; k < rows[i].length; k++) {
-          // console.log('rows[i][k]:',rows[i][k]);
-          // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
-          // TODO: make sure i'm calculating standard dev the right way
-          var item = parseFloat(rows[i][k]);
-          if(item.toString() !== 'NaN') {
-            var standardDeviationNormalized = (item - dataSummary[k].mean) / dataSummary[k].standardDeviation;
-            if(item > dataSummary[k].mean) {
-              // once we have the data pared down to how many standard deviations away from 0 it is
-              var minMaxNormalized = (standardDeviationNormalized / dataSummary[k].stdDevRangeAbove) / 2; 
-              //TODO figure out how to handle negative numbers once we're back from Gastown. 
-              var normalizedData = minMaxNormalized + .5
-            } else {
-              var minMaxNormalized = standardDeviationNormalized / dataSummary[k].stdDevRangeBelow; //TODO figure out how to handle negative numbers once we're back from Gastown. 
-
-            }
-            // we'll have an aboveRange and a belowRange. then we'll just handle each side differently
-            // TODO: i'm still not confident about how we're handling numbers that range from fractions to thousands, like our debt utilization ratio
-            thisRow.input[k] = 0;//TODO: build out the math for each item
-            // TODO: build out all logic here
-            // TODO: put more thought into how we handle the output
-              // it will likely be categorical
-              // we should tell the user to always make it the first column in our dataset?
-          }
-        }
-        this.push(JSON.stringify(rows[i]));
+        var row = JSON.parse(rows[i]);
+        var brainObj = this.transformOneRow(row);
+        
+        // console.log(brainObj);
+        rowsToPush += JSON.stringify(brainObj) + '\n';
+        // this.push(JSON.stringify(brainObj));
+        // this.push('\n');
         columns = [];
+        row = '';
+        brainObj = '';
       } 
+      this.push(rowsToPush);
       done();
     };
 
     tStream3._flush = function (done) {
       if (this._partialLineData) {
-        this.push(this._partialLineData);
+        var brainObj = this.transformOneRow(JSON.parse(this._partialLineData));
+        this.push(JSON.stringify(brainObj));
       }
       this._partialLineData = '';
       done();
@@ -274,7 +326,7 @@ module.exports = {
 
 
     // Set up the piping on each successive read and transform and write streams
-    
+    var t1Start = Date.now();
     readStream.pipe(tStream1).pipe(writeStream);
 
     writeStream.on('finish', function() {
@@ -287,7 +339,10 @@ module.exports = {
         }
       }
 
-      console.log('dataSummary:', dataSummary);
+      // console.log('dataSummary:', dataSummary);
+      var trainingTime = (Date.now() - t1Start) / 1000;
+      var t2Start = Date.now();
+      console.log('first transformStream took:',trainingTime);
       var writeStream2 = fs.createWriteStream('formattingData2.txt', {encoding: 'utf8'});
       var readStream2 = fs.createReadStream('formattingData.txt', {encoding: 'utf8'});
       readStream2.pipe(tStream2).pipe(writeStream2);
@@ -301,15 +356,20 @@ module.exports = {
             // TODO: this is just MVP for standard deviation calculations. make sure this math is right once i've got an internet connection again. in particular, should we be using a different denominator?
             columnObj.standardDeviation = columnObj.standardDeviationSum / (columnObj.count - columnObj.nullOrMissing - columnObj.countOfStrings);
             columnObj.range = columnObj.max - columnObj.min; //FUTURE: we don't actually need this yet. 
+            
+            // we aren't using any of this right now:
             columnObj.standardDeviationRange = columnObj.range / columnObj.standardDeviation; //we calculate this once so that we don't need to calculate it again when iterating through each individual row. It's a minor optimization for large datasets. 
             columnObj.stdDevRangeAbove = (columnObj.max - columnObj.mean) / columnObj.standardDeviation;
             columnObj.stdDevRangeBelow = (columnObj.mean - columnObj.min) / columnObj.standardDeviation;
 
-            
           }
 
         }
-        console.log('dataSummary after standard deviation calculation:', dataSummary);
+        var trainingTime = (Date.now() - t2Start) / 1000;
+        console.log('second transformStream took:',trainingTime);
+        var t3Start = Date.now();
+
+        // console.log('dataSummary after standard deviation calculation:', dataSummary);
         var writeStream3 = fs.createWriteStream('formattingData3.txt', {encoding: 'utf8'});
         var readStream3 = fs.createReadStream('formattingData2.txt', {encoding: 'utf8'});
 
@@ -323,7 +383,11 @@ module.exports = {
         
         writeStream3.on('finish', function() {
           console.log('finished the third transform!');
+          var trainingTime = (Date.now() - t2Start) / 1000;
+          console.log('third transformStream took:',trainingTime);
+
           // invoke multipleNetAlgo()?
+          multipleNetAlgo()
         });
       })
     });
@@ -420,7 +484,7 @@ module.exports = {
   }
 };
 
-module.exports.readFile('./kpComplete/kaggleTrainingData.csv');
+module.exports.readFile('./kaggle2.csv');
 
 
 var parallelNets = function(allParamComboArr) {
@@ -492,7 +556,7 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var currentPath = path.join(__dirname, '../inputData.txt');
+    var currentPath = path.join(__dirname, '../formattingData3.txt');
 
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: currentPath});
   }
