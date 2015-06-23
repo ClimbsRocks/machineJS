@@ -29,7 +29,10 @@ process.on('message', function(message) {
 
       for(var i = 0; i < rows.length; i++) {
         // console.log('rows[i] inside brainChild transformStream:',JSON.parse(rows[i]));
-        this.push(JSON.parse(rows[i]));
+        parsedRow = JSON.parse(rows[i]);
+        if(parsedRow.testingDataSet !== true) {
+          this.push(parsedRow);
+        }
       }
       done();
     };

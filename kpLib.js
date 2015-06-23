@@ -300,6 +300,11 @@ module.exports = {
         // console.log('rows[i]:',rows[i]);
         var row = JSON.parse(rows[i]);
         var brainObj = this.transformOneRow(row);
+
+        //split out 20% of our dataset for testing. 
+        if(Math.random() > 0.8) {
+          brainObj.testingDataSet = true;
+        }
         
         // console.log(brainObj);
         rowsToPush += JSON.stringify(brainObj) + '\n';
@@ -508,6 +513,10 @@ var parallelNets = function(allParamComboArr) {
 
 };
 
+var testOutput = function(net) {
+
+};
+
 var bestNetChecker = function(trainingResults,trainedNet) {
   console.log('checking if this is the best net');
   if(trainingResults.error < bestNet.errorRate) {
@@ -546,7 +555,7 @@ var multipleNetAlgo = function() {
     }
 
     var trainingObj = {
-      errorThresh: 0.052,  // error threshold to reach
+      errorThresh: 0.0015,  // error threshold to reach
       iterations: 1000,   // maximum training iterations
       log: true,           // console.log() progress periodically
       logPeriod: 1,       // number of iterations between logging
