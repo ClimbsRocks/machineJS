@@ -18,6 +18,7 @@ process.on('message', function(message) {
 
     // This variable accounts for what happens when the incoming buffer ends in the middle of a line
     transformStream._partialLineData = '';
+    var readStreamFinished = false;
 
     // transforms a giant chunk of buffer object into individual JS objects, which we pass one at at time into our brain training stream in objectMode
     transformStream._transform = function (chunk, encoding, done) {
@@ -30,10 +31,15 @@ process.on('message', function(message) {
       for(var i = 0; i < rows.length; i++) {
         // console.log('rows[i] inside brainChild transformStream:',JSON.parse(rows[i]));
         parsedRow = JSON.parse(rows[i]);
-        if(parsedRow.testingDataSet !== true) {
+        if(!parsedRow.testingDataSet) {
           this.push(parsedRow);
         }
       }
+      // TODO: check this out in conjunction with the readStream.on('end') note below. 
+      // if(readStreamFinished) {
+      //   transformStream._flush();
+      //   trainStream.write(null);
+      // }
       done();
     };
 
@@ -48,7 +54,9 @@ process.on('message', function(message) {
     // pipe our data from the file, into our transformStream, which turns it into a tidy stream of JS objects, into our trainStream (which we must leave open for the next iteration).
     readStream.pipe(transformStream).pipe(trainStream, {end: false});
 
+    // TODO: make sure that we've actually written all of our data to the trainStream. I have a feeling the readStream end emits before our transformStream has had a chance to process through everything. 
     readStream.on('end', function() {
+      // readStreamFinished = true;
       trainStream.write(null);  
     });
 

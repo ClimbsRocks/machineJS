@@ -4,6 +4,8 @@ var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 
+var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
+
 console.log('numCPUs:',numCPUs);
 
 var bestNet = {
@@ -14,7 +16,7 @@ var bestNet = {
 
 module.exports = {
   readFile: function(pathToData) {
-    console.log('reading a file:', path.join(__dirname, pathToData));
+    console.log('reading a file:', pathToData);
     // FUTURE: give them the option to invoke this from within a larger program as a module, or to just invoke it straight from the command line??
     // TODO: allow the user to give us either a file path, or a fully formatted dataset in JS. Maybe give them both train and readFile as APIs, and readFile will invoke train();
     // TODO: again, figure out where we want to write this to the computer
@@ -23,10 +25,10 @@ module.exports = {
     // TODO: warn the user about this. 
     // TODO: tell the user when we are done reading the data so that they can delete their .csv file if it's something that would normally be encrypted on their end. 
     // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
-    var writeStream = fs.createWriteStream('formattingData.txt', {encoding: 'utf8'});
+    var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
     // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
       // TODO: add in info on how to make sure your data is formatted using UTF-8
-    var readStream = fs.createReadStream(path.join(__dirname, pathToData), {encoding: 'utf8'});
+    var readStream = fs.createReadStream(pathToData, {encoding: 'utf8'});
     //tStream1: format as arrays; get the mean and median for each column
     // TODO: get summary stats
       // mode
@@ -346,8 +348,8 @@ module.exports = {
       var trainingTime = (Date.now() - t1Start) / 1000;
       var t2Start = Date.now();
       console.log('first transformStream took:',trainingTime);
-      var writeStream2 = fs.createWriteStream('formattingData2.txt', {encoding: 'utf8'});
-      var readStream2 = fs.createReadStream('formattingData.txt', {encoding: 'utf8'});
+      var writeStream2 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
+      var readStream2 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
       readStream2.pipe(tStream2).pipe(writeStream2);
       
       writeStream2.on('finish', function() {
@@ -373,8 +375,8 @@ module.exports = {
         var t3Start = Date.now();
 
         // console.log('dataSummary after standard deviation calculation:', dataSummary);
-        var writeStream3 = fs.createWriteStream('formattingData3.txt', {encoding: 'utf8'});
-        var readStream3 = fs.createReadStream('formattingData2.txt', {encoding: 'utf8'});
+        var writeStream3 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+        var readStream3 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
 
         // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
           // we would have to give the user the option of still writing to a file if their dataset is too large
@@ -487,7 +489,7 @@ module.exports = {
   }
 };
 
-module.exports.readFile('./kaggle2.csv');
+module.exports.readFile(path.join(kpCompleteLocation,'./kaggle2.csv'));
 
 
 var parallelNets = function(allParamComboArr) {
@@ -500,10 +502,12 @@ var parallelNets = function(allParamComboArr) {
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
     // KATRINA: change this directory to where your kpComplete folder is. 
-    var child = child_process.fork('./brainChild',{cwd: '/Users/preston/ghLocal/machineLearningWork/kpComplete'});
+    var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
     child.send(allParamComboArr[i]);
     child.on('message', function(message) {
-      // console.log('parent received a message from its child:');
+      // console.log('parent received a message from its child:', message);
+      var net = new brain.NeuralNetwork();
+      testOutput(net.fromJSON(message.net))
       // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
       // TODO: start a new child process after doing some logic
       // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)
@@ -515,6 +519,31 @@ var parallelNets = function(allParamComboArr) {
 
 var testOutput = function(net) {
 
+  var testSummary = {};
+  for (var i = 0; i <= 100; i++) {
+    testSummary[i * 100] = {
+      countOfPredictionsAtThisProbability: 0,
+      observedValues: 0
+    };
+  }
+  var readStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+  readStream.on('data', function(data) {
+    var rows = data.toString().split('\n');
+    for (var j = 0; j < rows.length; j++) {
+      if(rows[j].testingDataSet) {
+        var nnPrediction = net.run(rows[j].input);
+        testSummary[nnPrediction * 100].countOfPredictionsAtThisProbability++;
+        // TODO: make this work for categorical output too. right now it only works for numeric output. 
+        testSummary[nnPrediction * 100].observedValues = rows[j].output.numericOutput;
+      }
+    }
+  });
+
+  readStream.on('end', function() {
+    for(var key in testSummary) {
+      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'observed:',testSummary[key].observedValues);
+    }
+  });
 };
 
 var bestNetChecker = function(trainingResults,trainedNet) {
@@ -563,7 +592,7 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var currentPath = path.join(__dirname, '../formattingData3.txt');
+    var currentPath = path.join(kpCompleteLocation, '/formattingData3.txt');
 
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: currentPath});
   }
