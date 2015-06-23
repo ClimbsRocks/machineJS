@@ -497,7 +497,7 @@ var parallelNets = function(allParamComboArr) {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
 
   // create a new child_process for all but one of the cpus on this machine. 
-  for (var i = 0; i < numCPUs; i++) {
+  for (var i = 0; i < 1; i++) {
     // TODO: generalize this path!
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
@@ -521,20 +521,27 @@ var testOutput = function(net) {
 
   var testSummary = {};
   for (var i = 0; i <= 100; i++) {
-    testSummary[i * 100] = {
+    testSummary[i] = {
       countOfPredictionsAtThisProbability: 0,
       observedValues: 0
     };
   }
   var readStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+  readStream._partialLineData = '';
+
   readStream.on('data', function(data) {
+    data = this._partialLineData + data;
     var rows = data.toString().split('\n');
+    this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+
     for (var j = 0; j < rows.length; j++) {
-      if(rows[j].testingDataSet) {
-        var nnPrediction = net.run(rows[j].input);
-        testSummary[nnPrediction * 100].countOfPredictionsAtThisProbability++;
+      var row = JSON.parse(rows[j]);
+      if(row.testingDataSet) {
+        var nnPrediction = Math.round(net.run(row.input).numericOutput * 100);
+        // console.log('nnPrediction:',nnPrediction);
+        testSummary[nnPrediction].countOfPredictionsAtThisProbability++;
         // TODO: make this work for categorical output too. right now it only works for numeric output. 
-        testSummary[nnPrediction * 100].observedValues = rows[j].output.numericOutput;
+        testSummary[nnPrediction].observedValues += parseFloat(row.output.numericOutput, 10);
       }
     }
   });
