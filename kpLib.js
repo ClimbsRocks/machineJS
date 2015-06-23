@@ -108,6 +108,9 @@ module.exports = {
     tStream1._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
+      data = data.replace(/(\r\n|\n|\r)/gm,'\n');
+
+
 
       var rowsToPush = '';
 
@@ -497,7 +500,7 @@ var parallelNets = function(allParamComboArr) {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
 
   // create a new child_process for all but one of the cpus on this machine. 
-  for (var i = 0; i < 1; i++) {
+  for (var i = 0; i < numCPUs; i++) {
     // TODO: generalize this path!
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
@@ -591,7 +594,7 @@ var multipleNetAlgo = function() {
     }
 
     var trainingObj = {
-      errorThresh: 0.0015,  // error threshold to reach
+      errorThresh: 0.052,  // error threshold to reach
       iterations: 1000,   // maximum training iterations
       log: true,           // console.log() progress periodically
       logPeriod: 1,       // number of iterations between logging
