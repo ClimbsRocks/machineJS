@@ -581,7 +581,8 @@ var parallelNets = function(allParamComboArr) {
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
     // KATRINA: change this directory to where your kpComplete folder is. 
-    var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
+    // var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
+    var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
     var messageObj = {
       type: 'startBrain'
     };
@@ -690,7 +691,7 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var fileName = '/formattedData' + i + '.txt';
+    var fileName = '/formattedData' + (i - 1) + '.txt';
     var pathToData = path.join(kpCompleteLocation,fileName);
     // var pathToData = path.join('dev/shm', '/formattingData3.txt');
 
