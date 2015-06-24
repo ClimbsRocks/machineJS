@@ -6,14 +6,14 @@ var parentTime;
 var passRowsIntoTrainingStream = function() {
   // console.log(chunkedTrainingData.length);  
   for (var i = 0; i < chunkedTrainingData.length; i++) {
-    // trainStream.push(chunkedTrainingData.pop());
-    chunkedTrainingData.pop();
+    trainStream.write(chunkedTrainingData.pop());
+    // chunkedTrainingData.pop();
     totalRowsPassedThisIteration++;
   }
   if (totalRowsPassedThisIteration >= globalMessage.body.totalRows - 1) {
     console.log('wrote all the data!');
     console.log('totalRowsPassedThisIteration:',totalRowsPassedThisIteration);
-    // trainStream.write(null);
+    trainStream.write(null);
   } else {
     console.log('totalRowsPassedThisIteration:',totalRowsPassedThisIteration,'globalMessage.body.totalRows:',globalMessage.body.totalRows);
     var messageObj = {
@@ -27,6 +27,51 @@ var passRowsIntoTrainingStream = function() {
     
   }
 }
+
+var startNet = function() {
+
+  // we are intentionally putting all variables inside this function into the global scope
+  brain = require('brain');
+  net = new brain.NeuralNetwork(); 
+
+
+  trainStream = net.createTrainStream({
+    errorThresh: globalMessage.body.trainingObj.errorThresh,  // error threshold to reach
+    iterations: globalMessage.body.trainingObj.iterations,    // maximum training iterations
+    log: globalMessage.body.trainingObj.log,          // console.log() progress periodically
+    logPeriod: globalMessage.body.trainingObj.logPeriod,       // number of iterations between logging
+    learningRate: globalMessage.body.trainingObj.learningRate,   // learning rate
+    
+    // Write training data to the stream. Called on each training iteration.
+    // Streams happen asynchronously. 
+    floodCallback: function() {
+      console.log('finished an iteration');
+      passRowsIntoTrainingStream();
+    },
+
+   // Called when the network is done training.
+   doneTrainingCallback: function(obj) {
+    trainingTime = Date.now() - startTime;
+    console.log("trained in " + obj.iterations + " iterations with error: "
+      + obj.error + "taking", trainingTime / 1000,"seconds.");
+    // TODO: invoke bestNetChecker here. Well, we can't, because this thread is actually in a different memory space. 
+    // TODO: write the fully trained net to a file. Save a path to that file. Make it in the same location as our inputData.txt file. 
+    returnData = obj;
+    // TODO: add our net to returnData
+    returnData.net = net.toJSON();
+    returnData.trainingTime = trainingTime;
+    returnData.type = 'finishedTraining';
+
+    process.send(obj);
+    // self.close();
+
+    // TODO: write net to file
+    // TODO: self.close after some time
+      // Post MVP: set that time to be dependent on the size of the net
+    }
+  });
+}
+
 
 var startFirstBrain = function(message) {
 
@@ -57,6 +102,7 @@ var startFirstBrain = function(message) {
     var readStreamFinished = false;
 
     // transforms a giant chunk of buffer object into individual JS objects, which we pass one at at time into our brain training stream in objectMode
+    var transformStart = Date.now();
     transformStream._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
@@ -76,6 +122,7 @@ var startFirstBrain = function(message) {
       //   transformStream._flush();
       //   trainStream.write(null);
       // }
+
       done();
     };
 
@@ -88,11 +135,12 @@ var startFirstBrain = function(message) {
     };
 
     // pipe our data from the file, into our transformStream, which turns it into a tidy stream of JS objects, into our trainStream (which we must leave open for the next iteration).
-    readStream.pipe(transformStream).pipe(trainStream, {end: false});
+    readStream.pipe(transformStream) //.pipe(trainStream, {end: false});
 
     // TODO: make sure that we've actually written all of our data to the trainStream. I have a feeling the readStream end emits before our transformStream has had a chance to process through everything. 
     readStream.on('end', function() {
       // readStreamFinished = true;
+      console.log('transform Read Time:', Date.now() - transformStart);
       trainStream.write(null);  
     });
 
@@ -141,6 +189,7 @@ var startFirstBrain = function(message) {
 process.on('message', function(message) {
   if(message.type === 'startBrain') {
     globalMessage = message;
+    startNet();
     passRowsIntoTrainingStream();
     // startFirstBrain(message);
   } else /*if (message.type === 'newDataRows')*/ {
