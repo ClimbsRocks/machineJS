@@ -3,12 +3,6 @@ var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
-var memShm = require('mem-shm');
-var mem = new memShm('./','formattingDataMem.txt');
-// var Memcached = require('memcached');
-
-// var memcached = new Memcached('127.0.0.1:11211');
-
 
 var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
 
@@ -20,24 +14,11 @@ var bestNet = {
   trainingTime: Infinity
 };
 
-var memcachedChunkCount= 0;
-var chunkCount = 0;
-var totalRows = 0;
-
-process.env.memorizedTrainingData = [];
-var onlyInParent = 'this is declared in parent';
 var globalTrainingData = [];
 
 module.exports = {
   readFile: function(pathToData) {
     console.log('reading a file:', pathToData);
-    // FUTURE: give them the option to invoke this from within a larger program as a module, or to just invoke it straight from the command line??
-    // TODO: allow the user to give us either a file path, or a fully formatted dataset in JS. Maybe give them both train and readFile as APIs, and readFile will invoke train();
-    // TODO: again, figure out where we want to write this to the computer
-    // TODO: figure out how to write it securely (encryption, etc.)
-    // TODO: figure out how to delete it from the computer
-    // TODO: warn the user about this. 
-    // TODO: tell the user when we are done reading the data so that they can delete their .csv file if it's something that would normally be encrypted on their end. 
     // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
     var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
     // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
@@ -54,6 +35,7 @@ module.exports = {
       // present these to the user to make sure they know what their data looks like
       // give them options for how to format that data (remove all rows with outliers, overwrite outliers with median data, etc.)
     // tStream2: calculate standard deviation for each column
+      // We aren't using this at all anymore. 
     // tStream3: 
       // normalize data 
       // turn it into a number between 0 and 1
@@ -99,9 +81,6 @@ module.exports = {
           }
           if(typeof item === 'number') {
             dataSummary[j].sum += item;
-            // if(dataSummary[j].sum.toString() === 'NaN') {
-            //   console.log('sum is NaN, j is:', j,"i is:", i);
-            // }
             if(item === 0) {
               dataSummary[j].countOfZeros++;
             }
@@ -129,8 +108,6 @@ module.exports = {
 
       // replaces all line endings with just '\n'
       data = data.replace(/(\r\n|\n|\r)/gm,'\n');
-
-
 
       var rowsToPush = '';
 
@@ -180,15 +157,10 @@ module.exports = {
             };
 
           }
-          // console.log('dataSummary at the start');
-          // console.log(dataSummary);
           columns = [];
         } else {
-          // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
           var transformedRow = this.transformOneRow(columns);
           rowsToPush += JSON.stringify(transformedRow) + '\n';
-          // this.push(JSON.stringify(transformedRow));
-          // this.push('\n');
           columns = []; //i'm not entirely sure if this is necessary, but it seems like it will be helpful in cases with errors. 
         } 
       }
@@ -215,7 +187,6 @@ module.exports = {
     tStream2.processRow = function(row) {
       row = JSON.parse(row);
       for (var k = 0; k < row.length; k++) {
-        // TODO: make sure i'm calculating standard dev the right way
         var itemAsNum = parseFloat(row[k]);
         if(itemAsNum.toString() !== 'NaN') {
           dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
@@ -235,10 +206,7 @@ module.exports = {
       for(var i = 0; i < rows.length; i++) {
         var processedRow = this.processRow(rows[i]);
         
-        // FUTURE: do this in larger chunks. do 10 rows at a time before pushing to the stream. definitely combine the newline character. 
         rowsToPush += JSON.stringify(processedRow) + '\n';
-        // this.push(JSON.stringify(processedRow));
-        // this.push('\n');
       } 
       this.push(rowsToPush);
       done();
@@ -280,15 +248,12 @@ module.exports = {
       }
 
       for (var k = 1; k < row.length; k++) {
-        // console.log('row[k]:',row[k]);
-        // console.log('dataSummary[k]:', dataSummary[k], 'k:',k);
-        // TODO: make sure i'm calculating standard dev the right way
         var item = row[k]
         var itemParsed = parseFloat(item);
         if(itemParsed.toString() !== 'NaN') {
+          
           // uses basic min-max normalization.
-          brainObj.input[k] = (itemParsed - dataSummary[k].min) / dataSummary[k].range;//TODO: build out the math for each item
-          // TODO: build out all logic here
+          brainObj.input[k] = (itemParsed - dataSummary[k].min) / dataSummary[k].range;
           // TODO: put more thought into how we handle the output
             // it will likely be categorical
             // we should tell the user to always make it the first column in our dataset?
@@ -302,68 +267,37 @@ module.exports = {
           } else {
             console.error('we have not yet figured out how to handle data for this column number:',k,'values:',item);
             // TODO: handle categorical data
+            // TODO NEXT: handle string input
           }
-          // TODO NEXT: handle string input
-          // TODO: handle msising values
-          // TODO: handle NA
         }
       }
+
       //split out 20% of our dataset for testing. 
       if(Math.random() > 0.8) {
         brainObj.testingDataSet = true;
       }
-      // save the JS object to an array which we are making available on our process.env global variable. 
-      // console.log('process.env.memorizedTrainingData is:',process.env.memorizedTrainingData);
-      globalTrainingData.push(brainObj);
+      // globalTrainingData.push(brainObj);
 
       return brainObj;
     };
 
-    // var memcachedCallbackCount = 0;
-    // var memcachedFails = 0;
-    // var howLongToSaveInMemcached = 60*60*24 //24 hours
-    // var addToMemcached = function(chunkCount, rowObj, callback) {
-    //   memcached.set(chunkCount, JSON.stringify(rowObj), howLongToSaveInMemcached, function(err) {
-    //     if(err) {
-    //       console.log('memcached fails:',++memcachedFails)
-    //       console.error('err from memcached:',err);
-    //       // console.error(err);
-    //     } else {
-    //       console.log('successful memcachedCallbackCount:',++memcachedCallbackCount);
-    //       if(callback) {
-    //         callback();
-    //       }
-    //     }
-    //   });
-    // };
-
     tStream3._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
-      // console.log('data:',data);
 
       var rowsToPush = '';
       var rows = data.split('\n');
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
-      // console.log('rows in second transform',rows);
       for(var i = 0; i < rows.length; i++) {
-        // console.log('rows[i]:',rows[i]);
         var row = JSON.parse(rows[i]);
         var brainObj = this.transformOneRow(row);
         
-        // console.log(brainObj);
         rowsToPush += JSON.stringify(brainObj) + '\n';
-        // this.push(JSON.stringify(brainObj));
-        // this.push('\n');
         columns = [];
         row = '';
         brainObj = '';
       } 
-      // TODO: consider putting this.push and done into a callback to addToMemcached?
-        // I assume that writing to memcached will take less time than writing to a file, but i'm sure there will be edge cases. 
-      // addToMemcached(memcachedChunkCount++,rowsToPush);
-      mem.set('0',dataSummary.chunkCount.toString(),rowsToPush);
       dataSummary.chunkCount++
       this.push(rowsToPush);
       done();
@@ -372,31 +306,24 @@ module.exports = {
     tStream3._flush = function (done) {
       if (this._partialLineData) {
         var brainObj = this.transformOneRow(JSON.parse(this._partialLineData));
-        // memcached.append(memcachedChunkCount - 1, brainObj);
-        // FUTURE: just add this onto the previous item. 
-        mem.set(0,dataSummary.chunkCount++,brainObj);
         this.push(JSON.stringify(brainObj));
       }
       this._partialLineData = '';
       done();
     };
 
-
     // Set up the piping on each successive read and transform and write streams
     var t1Start = Date.now();
     readStream.pipe(tStream1).pipe(writeStream);
 
     writeStream.on('finish', function() {
-      // create the mean property on each dataSummary key
+      // set the average property on each dataSummary key
       for (var column in dataSummary) {
-        // TODO: think if we want to divide by something else? 
         if (dataSummary[column].count !== 0) {
           dataSummary[column].mean = dataSummary[column].sum / dataSummary[column].count;
-          
         }
       }
 
-      // console.log('dataSummary:', dataSummary);
       var trainingTime = (Date.now() - t1Start) / 1000;
       var t2Start = Date.now();
       console.log('first transformStream took:',trainingTime);
@@ -409,26 +336,18 @@ module.exports = {
         console.log('finished the second transform!');
         for(var column in dataSummary) {
           var columnObj = dataSummary[column];
+          
           if (columnObj.count !== 0) {
-            // TODO: this is just MVP for standard deviation calculations. make sure this math is right once i've got an internet connection again. in particular, should we be using a different denominator?
             columnObj.standardDeviation = columnObj.standardDeviationSum / (columnObj.count - columnObj.nullOrMissing - columnObj.countOfStrings);
-            columnObj.range = columnObj.max - columnObj.min; //FUTURE: we don't actually need this yet. 
-            
-            // we aren't using any of this right now:
-            columnObj.standardDeviationRange = columnObj.range / columnObj.standardDeviation; //we calculate this once so that we don't need to calculate it again when iterating through each individual row. It's a minor optimization for large datasets. 
-            columnObj.stdDevRangeAbove = (columnObj.max - columnObj.mean) / columnObj.standardDeviation;
-            columnObj.stdDevRangeBelow = (columnObj.mean - columnObj.min) / columnObj.standardDeviation;
-
+            columnObj.range = columnObj.max - columnObj.min; //FUTURE: we don't actually need this yet.             
           }
-
         }
+
         var trainingTime = (Date.now() - t2Start) / 1000;
         console.log('second transformStream took:',trainingTime);
         var t3Start = Date.now();
 
-        // console.log('dataSummary after standard deviation calculation:', dataSummary);
         var writeStream3 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
-        // var writeStream3 = fs.createWriteStream(path.join('/dev/shm','/formattingData3.txt'), {encoding: 'utf8'});
         var readStream3 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
 
         // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
@@ -437,14 +356,17 @@ module.exports = {
           // this will let us train much faster, since reading from RAM will be much faster than reading from a static file on our hard drive
           // even if we can't officially stream from the db, we can fake it by just querying for 10 lines at a time and pushing each line individually into the trainStream
           // yeah, that's definitely the way that we'll want to go. 
+          // I think what we're going to have to do for that is set up a separate node.js server
+            // that server will just hold in it's own memory the whole array
+            // we'll make requests to that server for each new batch of 10k items we want
         readStream3.pipe(tStream3).pipe(writeStream3);
         
         writeStream3.on('finish', function() {
-          // process.env.memorizedTrainingData = globalTrainingData
           console.log('finished the third transform!');
           var trainingTime = (Date.now() - t2Start) / 1000;
           console.log('third transformStream took:',trainingTime);
 
+          // creates one copy of the dataset for each child process
           var copyTime = Date.now();
           var readCopyStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding:'utf8'});
           readCopyStream.pause();
@@ -456,6 +378,7 @@ module.exports = {
               readCopyStream.pipe(writeCopyStream);
             })(i);
           }
+          //just in case the writeStreams take some extra time to set up:
           setTimeout(function() {
             readCopyStream.resume();
           }, 100);
@@ -464,65 +387,15 @@ module.exports = {
             console.log('finished copying in:', (Date.now() - copyTime) / 1000, 'seconds');
             totalRows = dataSummary.totalRows;
             chunkCount = dataSummary.chunkCount;
-            // console.log('mem.count(0):',mem.count(0));
-            // console.log('mem.count():',mem.count());
-
-            // invoke multipleNetAlgo()?
             multipleNetAlgo()
             
           });
-
         });
       })
     });
-
-
-
-
-    // Pseudocode:
-    // figure out formatting with commas
-      // likely, each row gets made into an array
-      // each item in that array will be the next column's data
-    // Along the way:
-      // gather number of values (what did i mean by this??)
-      // gather information like averages and standard deviations (for things like normalization)
-
-    // NOTE: we are not creating features for you; we are just turning the features you've already created into data that brain.js expects to see*
-      // *we are creating one set of features for whether or not a value is missing from the dataset
-
-    // Then, create another transformStream
-    // this one will 
-      // normalize our data
-      // then turn it into a value between 0 and 1
-      // turn categorical into booleans
-      // turn it into an object that brainjs expects to see
-    //  along the way, we need to replace rows with missing information with either:
-      // that column's median value
-      // 0
-        // Maybe over time experiment with randomly replacing a given row with either one?
-        // if we're missing few values, replace with the median
-        // if we're missing many values, replace with 0
-      // if categorical, a category stating that it was a missing value
-    // When we replace information: 
-      // create a new column of data saying that we've replaced data for this row
-    // i'm not going to worry about sparse arrays for now, though i have a feeling the object-based-approach i have in mind will be somewhat efficient at dealing with the problem sparse arrays are trying to solve. 
-
-
-    // PROBLEM AREAS: 
-      // something like height should be normalized according to gender
-      // how do we handle something like loan utilization rate (numbers from .01 to 1000, lower is better)?
-      // I did a bunch of cube rooting. does normalization with standard deviations handle this, or should we continue to do something like this?
-        // maybe only in cases where the curve of data is exponential. what i'm picturing is a curve where the largest numbers are relatively rare, but are notably higher than anything else. distance in the DilMil dataset is the example i'm thinking of at the moment. we're really interested in the difference between people who are 5 vs. 50 vs. 200 miles away from each other, but the dataset includes people who are 5,000 miles away so those differences are going to be hard to see. 
-        // we can probably run it through a program to figure out if our data is roughly linear, random, or exponential in it's distribution. then, if it's exponential, we can potentially measure "how" exponential, and take the square or cube or quadratic root of it from there. 
-      // Matching: DilMil: does User A's preference match User B's observed value? Does user A's category X match user b's category X
-
-    // dealing with properties that only are present in a tiny portion of the rows (if city is a categorical column, we'd want to keep Chicago, but not always Akron, and rarely Bath or Fairlawn). 
-    // We could potentially make two different versions of the dataset, one that incldues all the sparse features, one with fewer sparse features, test both, and see if either is more predictive (or trains notably faster). 
-
   },
 
   train: function(trainingData) {
-    // TODO: make this more secure. Ideally write to an encrypted database or sqlite file that we could then delete the whole file. 
     // open a writeStream
     var writeStream = fs.createWriteStream('inputData.txt',{encoding: 'utf8'});
 
@@ -554,21 +427,8 @@ module.exports = {
       multipleNetAlgo();
 
     });
-
-    //   // TODO: Write to a memcached or sqlite DB. sqlite might take it out of memory entirely, which would be nice! Then, once we've written to that DB, delete the object. Or at least overwrite it's properties to be null. 
-    //   // Yeah, overwrite the data stored at each property to just be an empty string after we've saved to a db. Later we can work on deleting the object itself by deleting all references to it, which will kick in JS's auto garbage collection.       
-
-    // return the net itself
-    // var net = kpComplete.train(trainingData); should be something they can type in. 
-    // and then we'd return the fully trained net. 
-    // because we can get a net from JSON. so let's do that and then return it. 
-    // TODO: investigate if we need to give them a callback. Probably.
-    // return net.fromJSON(bestNet.jsonBackup);
-    // TODO: return asynchronously. Maybe promisify multipleNetAlgo??
   }
 };
-
-module.exports.readFile(path.join(kpCompleteLocation,'./kaggle2.csv'));
 
 
 var parallelNets = function(allParamComboArr) {
@@ -577,10 +437,8 @@ var parallelNets = function(allParamComboArr) {
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
-    // TODO: generalize this path!
-    // TODO: point this to wherever kpComplete is on your computer. 
-    // start this by booting up 
-    // KATRINA: change this directory to where your kpComplete folder is. 
+
+    // TODO: this might be the only place we need to make a change between streaming and passing in the whole dataset
     // var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
     var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
     var messageObj = {
@@ -591,7 +449,6 @@ var parallelNets = function(allParamComboArr) {
     child.on('message', function(message) {
       if(message.type === 'finishedTraining') {
 
-        // console.log('parent received a message from its child:', message);
         var net = new brain.NeuralNetwork();
         testOutput(net.fromJSON(message.net));
         // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
@@ -599,6 +456,8 @@ var parallelNets = function(allParamComboArr) {
         // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)
         // TODO: have some way of timeboxing each experiment??
         
+        // trying to share data between parent and child efficiently here by sending it as messages. 
+        // this was slow, but as long as it's predictably slow, we can work around it (grab new data when only half drained, etc.)
       } else if (message.type === 'getNewData') {
         child.send(globalTrainingData.slice(message.rowsSoFar, message.rowsSoFar + 10000));
       } else {
@@ -618,7 +477,7 @@ var testOutput = function(net) {
       observedValues: 0
     };
   }
-  var readStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+  var readStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattedData0.txt'), {encoding: 'utf8'});
   readStream._partialLineData = '';
 
   readStream.on('data', function(data) {
@@ -630,7 +489,6 @@ var testOutput = function(net) {
       var row = JSON.parse(rows[j]);
       if(row.testingDataSet) {
         var nnPrediction = Math.round(net.run(row.input).numericOutput * 100);
-        // console.log('nnPrediction:',nnPrediction);
         testSummary[nnPrediction].countOfPredictionsAtThisProbability++;
         // TODO: make this work for categorical output too. right now it only works for numeric output. 
         testSummary[nnPrediction].observedValues += parseFloat(row.output.numericOutput, 10);
@@ -648,7 +506,7 @@ var testOutput = function(net) {
 var bestNetChecker = function(trainingResults,trainedNet) {
   console.log('checking if this is the best net');
   if(trainingResults.error < bestNet.errorRate) {
-    //TODO: make this the best net
+    // make this the best net
     bestNet.jsonBackup = trainedNet.toJSON();
     bestNet.errorRate = trainingResults.error;
   }
@@ -673,7 +531,6 @@ var multipleNetAlgo = function() {
     // That'll be a ton of fun for her :)
 
   //create logic for training as many nets as we need. 
-  // TODO: refactor this to use map instead
   var allParamComboArr = [];
   for(var i = numCPUs; i > 0; i--) {
 
@@ -690,14 +547,15 @@ var multipleNetAlgo = function() {
       learningRate: 0.6    // learning rate
     };
 
-    // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
     var fileName = '/formattedData' + (i - 1) + '.txt';
     var pathToData = path.join(kpCompleteLocation,fileName);
-    // var pathToData = path.join('dev/shm', '/formattingData3.txt');
 
-    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: totalRows, memcachedChunkCount: memcachedChunkCount});
+    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: totalRows});
   }
-  // console.log('allParamComboArr:',allParamComboArr);
 
   parallelNets(allParamComboArr);
 };
+
+// Here is where we invoke the method with the path to the data
+module.exports.readFile(path.join(kpCompleteLocation,'./kaggle2.csv'));
+
