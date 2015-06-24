@@ -2,6 +2,10 @@ var chunkedTrainingData = [];
 var totalRowsPassedThisIteration = 0;
 var globalMessage;
 var parentTime;
+var memShm = require('mem-shm');
+var mem = new memShm('newDirectory','formattingDataMem.txt');
+var tmp = mem.get('0');
+console.log('tmp from within child',tmp);
 
 var passRowsIntoTrainingStream = function() {
   // console.log(chunkedTrainingData.length);  
@@ -135,7 +139,7 @@ var startFirstBrain = function(message) {
     };
 
     // pipe our data from the file, into our transformStream, which turns it into a tidy stream of JS objects, into our trainStream (which we must leave open for the next iteration).
-    readStream.pipe(transformStream) //.pipe(trainStream, {end: false});
+    readStream.pipe(transformStream).pipe(trainStream, {end: false});
 
     // TODO: make sure that we've actually written all of our data to the trainStream. I have a feeling the readStream end emits before our transformStream has had a chance to process through everything. 
     readStream.on('end', function() {
@@ -189,9 +193,9 @@ var startFirstBrain = function(message) {
 process.on('message', function(message) {
   if(message.type === 'startBrain') {
     globalMessage = message;
-    startNet();
-    passRowsIntoTrainingStream();
-    // startFirstBrain(message);
+    // startNet();
+    // passRowsIntoTrainingStream();
+    startFirstBrain(message);
   } else /*if (message.type === 'newDataRows')*/ {
     // console.log('message with new data:', message);
     // console.log('heard a new message from parent');

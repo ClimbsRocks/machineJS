@@ -3,6 +3,8 @@ var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
+var memShm = require('mem-shm');
+var mem = new memShm('./','formattingDataMem.txt');
 // var Memcached = require('memcached');
 
 // var memcached = new Memcached('127.0.0.1:11211');
@@ -19,6 +21,7 @@ var bestNet = {
 };
 
 var memcachedChunkCount= 0;
+var chunkCount = 0;
 var totalRows = 0;
 
 process.env.memorizedTrainingData = [];
@@ -69,7 +72,8 @@ module.exports = {
       // count strings vs. numbers
 
     var dataSummary = {
-      totalRows: 0
+      totalRows: 0,
+      chunkCount: 0
     };
     // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
     var createdSummary = false;
@@ -359,6 +363,8 @@ module.exports = {
       // TODO: consider putting this.push and done into a callback to addToMemcached?
         // I assume that writing to memcached will take less time than writing to a file, but i'm sure there will be edge cases. 
       // addToMemcached(memcachedChunkCount++,rowsToPush);
+      mem.set('0',dataSummary.chunkCount.toString(),rowsToPush);
+      dataSummary.chunkCount++
       this.push(rowsToPush);
       done();
     };
@@ -367,6 +373,8 @@ module.exports = {
       if (this._partialLineData) {
         var brainObj = this.transformOneRow(JSON.parse(this._partialLineData));
         // memcached.append(memcachedChunkCount - 1, brainObj);
+        // FUTURE: just add this onto the previous item. 
+        mem.set(0,dataSummary.chunkCount++,brainObj);
         this.push(JSON.stringify(brainObj));
       }
       this._partialLineData = '';
@@ -420,6 +428,7 @@ module.exports = {
 
         // console.log('dataSummary after standard deviation calculation:', dataSummary);
         var writeStream3 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+        // var writeStream3 = fs.createWriteStream(path.join('/dev/shm','/formattingData3.txt'), {encoding: 'utf8'});
         var readStream3 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
 
         // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
@@ -435,10 +444,34 @@ module.exports = {
           console.log('finished the third transform!');
           var trainingTime = (Date.now() - t2Start) / 1000;
           console.log('third transformStream took:',trainingTime);
-          totalRows = dataSummary.totalRows;
 
-          // invoke multipleNetAlgo()?
-          multipleNetAlgo()
+          var copyTime = Date.now();
+          var readCopyStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding:'utf8'});
+          readCopyStream.pause();
+          readCopyStream.setMaxListeners(100);
+          for (var i = 0; i < numCPUs; i++) {
+            (function(idNum){
+              var fileName = 'formattedData' + idNum + '.txt'
+              var writeCopyStream = fs.createWriteStream(path.join(kpCompleteLocation,fileName), {encoding: 'utf8'});
+              readCopyStream.pipe(writeCopyStream);
+            })(i);
+          }
+          setTimeout(function() {
+            readCopyStream.resume();
+          }, 100);
+
+          readCopyStream.on('end', function() {
+            console.log('finished copying in:', (Date.now() - copyTime) / 1000, 'seconds');
+            totalRows = dataSummary.totalRows;
+            chunkCount = dataSummary.chunkCount;
+            // console.log('mem.count(0):',mem.count(0));
+            // console.log('mem.count():',mem.count());
+
+            // invoke multipleNetAlgo()?
+            multipleNetAlgo()
+            
+          });
+
         });
       })
     });
@@ -543,7 +576,7 @@ var parallelNets = function(allParamComboArr) {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
 
   // create a new child_process for all but one of the cpus on this machine. 
-  for (var i = 0; i < 1/*numCPUs*/; i++) {
+  for (var i = 0; i < numCPUs; i++) {
     // TODO: generalize this path!
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
@@ -606,7 +639,7 @@ var testOutput = function(net) {
 
   readStream.on('end', function() {
     for(var key in testSummary) {
-      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'rate:', Math.round(testSummary[key].observedValues / testSummary[key].countOfPredictionsAtThisProbability * 100) + '%', 'observed:', testSummary[key].observedValues);
+      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'rate:', Math.round(testSummary[key].observedValues / testSummary[key].countOfPredictionsAtThisProbability * 100) + '%');
     }
   });
 };
@@ -657,11 +690,13 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var pathToData = path.join(kpCompleteLocation, '/formattingData3.txt');
+    var fileName = '/formattedData' + i + '.txt';
+    var pathToData = path.join(kpCompleteLocation,fileName);
+    // var pathToData = path.join('dev/shm', '/formattingData3.txt');
 
     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: totalRows, memcachedChunkCount: memcachedChunkCount});
   }
-  console.log('allParamComboArr:',allParamComboArr);
+  // console.log('allParamComboArr:',allParamComboArr);
 
   parallelNets(allParamComboArr);
 };
