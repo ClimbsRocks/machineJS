@@ -1,10 +1,40 @@
-process.on('message', function(message) {
+var chunkedTrainingData = [];
+var totalRowsPassedThisIteration = 0;
+var globalMessage;
+var parentTime;
+
+var passRowsIntoTrainingStream = function() {
+  // console.log(chunkedTrainingData.length);  
+  for (var i = 0; i < chunkedTrainingData.length; i++) {
+    // trainStream.push(chunkedTrainingData.pop());
+    chunkedTrainingData.pop();
+    totalRowsPassedThisIteration++;
+  }
+  if (totalRowsPassedThisIteration >= globalMessage.body.totalRows - 1) {
+    console.log('wrote all the data!');
+    console.log('totalRowsPassedThisIteration:',totalRowsPassedThisIteration);
+    // trainStream.write(null);
+  } else {
+    console.log('totalRowsPassedThisIteration:',totalRowsPassedThisIteration,'globalMessage.body.totalRows:',globalMessage.body.totalRows);
+    var messageObj = {
+      type: 'getNewData',
+      rowsSoFar: totalRowsPassedThisIteration
+    };
+    console.log('this iteration took:',(Date.now() - parentTime) ,'seconds');
+
+    parentTime = Date.now();
+    process.send(messageObj);
+    
+  }
+}
+
+var startFirstBrain = function(message) {
+
   var startTime = Date.now();
   var path = require('path');
   var fs = require('fs');
   var brain = require('brain');
   console.log('inside a child_process');
-  console.log('onlyInParent:',onlyInParent);
   var stream = require('stream');
 
   // console.log('items in process.env.memorizedTrainingData:',process.env.memorizedTrainingData.length);
@@ -12,14 +42,9 @@ process.on('message', function(message) {
   //   console.log('i:',i,'process.env.memorizedTrainingData[i]:',process.env.memorizedTrainingData[i]);
   // }
 
-  console.log('items in globalTrainingData:',globalTrainingData.length);
-  for(var i = 0; i < globalTrainingData.length; i++) {
-    console.log('i:',i,'globalTrainingData[i]:',globalTrainingData[i]);
-  }
-
   var net = new brain.NeuralNetwork(); 
 
-  var currentPath = message.pathToData;
+  var currentPath = message.body.pathToData;
 
   // create all the right streams to start an iteration of our brain. 
   var startBrain = function() {
@@ -74,11 +99,11 @@ process.on('message', function(message) {
   };
 
   var trainStream = net.createTrainStream({
-    errorThresh: message.trainingObj.errorThresh,  // error threshold to reach
-    iterations: message.trainingObj.iterations,    // maximum training iterations
-    log: message.trainingObj.log,          // console.log() progress periodically
-    logPeriod: message.trainingObj.logPeriod,       // number of iterations between logging
-    learningRate: message.trainingObj.learningRate,   // learning rate
+    errorThresh: message.body.trainingObj.errorThresh,  // error threshold to reach
+    iterations: message.body.trainingObj.iterations,    // maximum training iterations
+    log: message.body.trainingObj.log,          // console.log() progress periodically
+    logPeriod: message.body.trainingObj.logPeriod,       // number of iterations between logging
+    learningRate: message.body.trainingObj.learningRate,   // learning rate
     
     // Write training data to the stream. Called on each training iteration.
     // Streams happen asynchronously. 
@@ -98,6 +123,7 @@ process.on('message', function(message) {
     // TODO: add our net to returnData
     returnData.net = net.toJSON();
     returnData.trainingTime = trainingTime;
+    returnData.type = 'finishedTraining';
 
     process.send(obj);
     // self.close();
@@ -109,5 +135,19 @@ process.on('message', function(message) {
   });
 
   startBrain();
+};
 
+
+process.on('message', function(message) {
+  if(message.type === 'startBrain') {
+    globalMessage = message;
+    passRowsIntoTrainingStream();
+    // startFirstBrain(message);
+  } else /*if (message.type === 'newDataRows')*/ {
+    // console.log('message with new data:', message);
+    // console.log('heard a new message from parent');
+    // console.log('message.length:',message.length);
+    chunkedTrainingData = chunkedTrainingData.concat(message);
+    passRowsIntoTrainingStream();
+  }
 });

@@ -3,9 +3,9 @@ var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
-var Memcached = require('memcached');
+// var Memcached = require('memcached');
 
-var memcached = new Memcached('127.0.0.1:11211');
+// var memcached = new Memcached('127.0.0.1:11211');
 
 
 var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
@@ -19,6 +19,7 @@ var bestNet = {
 };
 
 var memcachedChunkCount= 0;
+var totalRows = 0;
 
 process.env.memorizedTrainingData = [];
 var onlyInParent = 'this is declared in parent';
@@ -314,23 +315,23 @@ module.exports = {
       return brainObj;
     };
 
-    var memcachedCallbackCount = 0;
-    var memcachedFails = 0;
-    var howLongToSaveInMemcached = 60*60*24 //24 hours
-    var addToMemcached = function(chunkCount, rowObj, callback) {
-      memcached.set(chunkCount, JSON.stringify(rowObj), howLongToSaveInMemcached, function(err) {
-        if(err) {
-          console.log('memcached fails:',++memcachedFails)
-          console.error('err from memcached:',err);
-          // console.error(err);
-        } else {
-          console.log('successful memcachedCallbackCount:',++memcachedCallbackCount);
-          if(callback) {
-            callback();
-          }
-        }
-      });
-    };
+    // var memcachedCallbackCount = 0;
+    // var memcachedFails = 0;
+    // var howLongToSaveInMemcached = 60*60*24 //24 hours
+    // var addToMemcached = function(chunkCount, rowObj, callback) {
+    //   memcached.set(chunkCount, JSON.stringify(rowObj), howLongToSaveInMemcached, function(err) {
+    //     if(err) {
+    //       console.log('memcached fails:',++memcachedFails)
+    //       console.error('err from memcached:',err);
+    //       // console.error(err);
+    //     } else {
+    //       console.log('successful memcachedCallbackCount:',++memcachedCallbackCount);
+    //       if(callback) {
+    //         callback();
+    //       }
+    //     }
+    //   });
+    // };
 
     tStream3._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
@@ -357,7 +358,7 @@ module.exports = {
       } 
       // TODO: consider putting this.push and done into a callback to addToMemcached?
         // I assume that writing to memcached will take less time than writing to a file, but i'm sure there will be edge cases. 
-      addToMemcached(memcachedChunkCount++,rowsToPush);
+      // addToMemcached(memcachedChunkCount++,rowsToPush);
       this.push(rowsToPush);
       done();
     };
@@ -365,7 +366,7 @@ module.exports = {
     tStream3._flush = function (done) {
       if (this._partialLineData) {
         var brainObj = this.transformOneRow(JSON.parse(this._partialLineData));
-        memcached.append(memcachedChunkCount - 1, brainObj);
+        // memcached.append(memcachedChunkCount - 1, brainObj);
         this.push(JSON.stringify(brainObj));
       }
       this._partialLineData = '';
@@ -434,6 +435,7 @@ module.exports = {
           console.log('finished the third transform!');
           var trainingTime = (Date.now() - t2Start) / 1000;
           console.log('third transformStream took:',trainingTime);
+          totalRows = dataSummary.totalRows;
 
           // invoke multipleNetAlgo()?
           multipleNetAlgo()
@@ -541,21 +543,33 @@ var parallelNets = function(allParamComboArr) {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
 
   // create a new child_process for all but one of the cpus on this machine. 
-  for (var i = 0; i < numCPUs; i++) {
+  for (var i = 0; i < 1/*numCPUs*/; i++) {
     // TODO: generalize this path!
     // TODO: point this to wherever kpComplete is on your computer. 
     // start this by booting up 
     // KATRINA: change this directory to where your kpComplete folder is. 
     var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
-    child.send(allParamComboArr[i]);
+    var messageObj = {
+      type: 'startBrain'
+    };
+    messageObj.body = allParamComboArr[i];
+    child.send(messageObj);
     child.on('message', function(message) {
-      // console.log('parent received a message from its child:', message);
-      var net = new brain.NeuralNetwork();
-      testOutput(net.fromJSON(message.net))
-      // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
-      // TODO: start a new child process after doing some logic
-      // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)
-      // TODO: have some way of timeboxing each experiment??
+      if(message.type === 'finishedTraining') {
+
+        // console.log('parent received a message from its child:', message);
+        var net = new brain.NeuralNetwork();
+        testOutput(net.fromJSON(message.net));
+        // KATRINA: we have completed training on a new net. here's where you'll invoke a functoin to check those results against our current results, and then spin up a new new to test. 
+        // TODO: start a new child process after doing some logic
+        // TODO: send training data back to the parent on each iteration (ideally, every 100 iterations or every 10 minutes)
+        // TODO: have some way of timeboxing each experiment??
+        
+      } else if (message.type === 'getNewData') {
+        child.send(globalTrainingData.slice(message.rowsSoFar, message.rowsSoFar + 10000));
+      } else {
+        console.log('heard a message in parent and did not know what to do with it:',message);
+      }
     });
   }
 
@@ -645,7 +659,7 @@ var multipleNetAlgo = function() {
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
     var pathToData = path.join(kpCompleteLocation, '/formattingData3.txt');
 
-    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, memcachedChunkCount: memcachedChunkCount});
+    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: totalRows, memcachedChunkCount: memcachedChunkCount});
   }
   console.log('allParamComboArr:',allParamComboArr);
 
