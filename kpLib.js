@@ -3,6 +3,10 @@ var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
+var Memcached = require('memcached');
+
+var memcached = new Memcached('127.0.0.1:11211');
+
 
 var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
 
@@ -13,6 +17,8 @@ var bestNet = {
   errorRate: 1,
   trainingTime: Infinity
 };
+
+var memcachedChunkCount= 0;
 
 module.exports = {
   readFile: function(pathToData) {
@@ -57,7 +63,9 @@ module.exports = {
       // count missing/absent data
       // count strings vs. numbers
 
-    var dataSummary = {};
+    var dataSummary = {
+      totalRows: 0
+    };
     // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
     var createdSummary = false;
 
@@ -72,6 +80,7 @@ module.exports = {
         console.log('this row appears to be a different length than expected:');
         console.log(columns);
       } else {
+        dataSummary.totalRows++;
         // iterate through the columns for this particular row. 
         for (var j = 0; j < columns.length; j++) {
           dataSummary[j].count++;
@@ -108,18 +117,20 @@ module.exports = {
     tStream1._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
+
+      // replaces all line endings with just '\n'
       data = data.replace(/(\r\n|\n|\r)/gm,'\n');
 
 
 
       var rowsToPush = '';
 
-      var rows = data.split('\n'); //TODO: go through and standardize the line endings of the input file. give the user the optoin of giving us any line endings they want, even crappy ones. it's not their fault their data arrived in a terrible format. 
-        // just go through and replace all "\r\n" or "\r" or any other common line ending with "\n", etc. then do our final split on just "\n"
-        // ADVANCED: give them teh option of using other things as column separators, such as | or semicolon
+      var rows = data.split('\n');
+      // it would be unusual for the readStream to break perfectly at a line ending each time, so we assume the final thing it gives us is a partial line, whihc we'll need to add onto the data it gives us on the next read. 
       this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
       for(var i = 0; i < rows.length; i++) {
+        // ADVANCED: give them the option of using other things as column separators, such as | or semicolon
         var columns = rows[i].split(',');
 
         // Create the dataSummary object
@@ -291,6 +302,24 @@ module.exports = {
       return brainObj;
     };
 
+    var memcachedCallbackCount = 0;
+    var memcachedFails = 0;
+    var howLongToSaveInMemcached = 60*60*24 //24 hours
+    var addToMemcached = function(chunkCount, rowObj, callback) {
+      memcached.set(chunkCount, JSON.stringify(rowObj), howLongToSaveInMemcached, function(err) {
+        if(err) {
+          console.log('memcached fails:',++memcachedFails)
+          console.error('err from memcached:',err);
+          // console.error(err);
+        } else {
+          console.log('successful memcachedCallbackCount:',++memcachedCallbackCount);
+          if(callback) {
+            callback();
+          }
+        }
+      });
+    };
+
     tStream3._transform = function (chunk, encoding, done) {
       var data = chunk.toString();
       data = this._partialLineData + data;
@@ -319,6 +348,9 @@ module.exports = {
         row = '';
         brainObj = '';
       } 
+      // TODO: consider putting this.push and done into a callback to addToMemcached?
+        // I assume that writing to memcached will take less time than writing to a file, but i'm sure there will be edge cases. 
+      addToMemcached(memcachedChunkCount++,rowsToPush);
       this.push(rowsToPush);
       done();
     };
@@ -326,6 +358,7 @@ module.exports = {
     tStream3._flush = function (done) {
       if (this._partialLineData) {
         var brainObj = this.transformOneRow(JSON.parse(this._partialLineData));
+        memcached.append(memcachedChunkCount - 1, brainObj);
         this.push(JSON.stringify(brainObj));
       }
       this._partialLineData = '';
@@ -551,7 +584,7 @@ var testOutput = function(net) {
 
   readStream.on('end', function() {
     for(var key in testSummary) {
-      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'observed:',testSummary[key].observedValues);
+      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'rate:', Math.round(testSummary[key].observedValues / testSummary[key].countOfPredictionsAtThisProbability * 100) + '%', 'observed:', testSummary[key].observedValues);
     }
   });
 };
@@ -602,9 +635,9 @@ var multipleNetAlgo = function() {
     };
 
     // TODO: make sure this path works always. Probably just capture the path where we write the file to (and log that for our user so they know where to look to delete it), and pass that through as a variable. 
-    var currentPath = path.join(kpCompleteLocation, '/formattingData3.txt');
+    var pathToData = path.join(kpCompleteLocation, '/formattingData3.txt');
 
-    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: currentPath});
+    allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, memcachedChunkCount: memcachedChunkCount});
   }
   console.log('allParamComboArr:',allParamComboArr);
 

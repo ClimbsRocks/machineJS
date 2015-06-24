@@ -41,6 +41,7 @@
     "bluebird": "^2.9.27",
     "brain": "^0.7.0",
     "byline": "^4.2.1",
+    "memcached": "^2.1.0",
     "paralleljs": "^0.2.1",
     "q": "^1.4.1",
     "webworker-threads": "^0.5.6"
