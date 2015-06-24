@@ -20,6 +20,10 @@ var bestNet = {
 
 var memcachedChunkCount= 0;
 
+process.env.memorizedTrainingData = [];
+var onlyInParent = 'this is declared in parent';
+var globalTrainingData = [];
+
 module.exports = {
   readFile: function(pathToData) {
     console.log('reading a file:', pathToData);
@@ -299,6 +303,14 @@ module.exports = {
           // TODO: handle NA
         }
       }
+      //split out 20% of our dataset for testing. 
+      if(Math.random() > 0.8) {
+        brainObj.testingDataSet = true;
+      }
+      // save the JS object to an array which we are making available on our process.env global variable. 
+      // console.log('process.env.memorizedTrainingData is:',process.env.memorizedTrainingData);
+      globalTrainingData.push(brainObj);
+
       return brainObj;
     };
 
@@ -334,11 +346,6 @@ module.exports = {
         // console.log('rows[i]:',rows[i]);
         var row = JSON.parse(rows[i]);
         var brainObj = this.transformOneRow(row);
-
-        //split out 20% of our dataset for testing. 
-        if(Math.random() > 0.8) {
-          brainObj.testingDataSet = true;
-        }
         
         // console.log(brainObj);
         rowsToPush += JSON.stringify(brainObj) + '\n';
@@ -423,6 +430,7 @@ module.exports = {
         readStream3.pipe(tStream3).pipe(writeStream3);
         
         writeStream3.on('finish', function() {
+          // process.env.memorizedTrainingData = globalTrainingData
           console.log('finished the third transform!');
           var trainingTime = (Date.now() - t2Start) / 1000;
           console.log('third transformStream took:',trainingTime);

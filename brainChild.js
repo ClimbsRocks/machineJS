@@ -4,7 +4,18 @@ process.on('message', function(message) {
   var fs = require('fs');
   var brain = require('brain');
   console.log('inside a child_process');
+  console.log('onlyInParent:',onlyInParent);
   var stream = require('stream');
+
+  // console.log('items in process.env.memorizedTrainingData:',process.env.memorizedTrainingData.length);
+  // for(var i = 0; i < process.env.memorizedTrainingData.length; i++) {
+  //   console.log('i:',i,'process.env.memorizedTrainingData[i]:',process.env.memorizedTrainingData[i]);
+  // }
+
+  console.log('items in globalTrainingData:',globalTrainingData.length);
+  for(var i = 0; i < globalTrainingData.length; i++) {
+    console.log('i:',i,'globalTrainingData[i]:',globalTrainingData[i]);
+  }
 
   var net = new brain.NeuralNetwork(); 
 
