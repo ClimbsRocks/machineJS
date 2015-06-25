@@ -11,7 +11,6 @@ process.on('message', function(message) {
       var mostRecentPostcardHome = Date.now();
 
       var trainingIterationCallback = function(errObj) {
-        console.log('inside training callback!');
         var timeSinceLastMessage = (Date.now() - mostRecentPostcardHome) / 1000 //this gives us the time in seconds
         // if(timeSinceLastMessage > 30 || errObj.iterations % 10 === 0) {
           var messageObj = {
@@ -34,6 +33,7 @@ process.on('message', function(message) {
         rows[i] = JSON.parse(rows[i]);
       }
 
+      // this entire process of training the net happens synchronously. yeah, i know, it's weird dealing with synchronous code inside node.js :)
       var net = new brain.NeuralNetwork(message.trainingObj);
       var trainingResults = net.train(rows, message.trainingObj);
 
@@ -43,8 +43,10 @@ process.on('message', function(message) {
 
       returnData = trainingResults;
       returnData.net = net.toJSON();
+      returnData.errorRate = trainingResults.error;
       returnData.trainingTime = trainingTime;
       returnData.type = 'finishedTraining';
+      returnData.brainID = message.brainID;
 
       process.send(returnData);
     }
