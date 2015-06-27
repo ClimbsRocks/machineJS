@@ -2,8 +2,9 @@ var fs = require('fs');
 var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
-var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
+var kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
+var dataFile = process.argv[2];
 
 console.log('numCPUs:',numCPUs);
 
@@ -330,7 +331,9 @@ function makeTrainingObj (hlArray) {
 // };
 
 // Here is where we invoke the method with the path to the data
-readAndFormatData(path.join(kpCompleteLocation,'./kaggle2.csv'), function(formattingSummary) {
+// we pass in a callback function that will make the dataSummary a global variable 
+  // and invoke parallelNets once formatting the data is done. 
+readAndFormatData(path.join(kpCompleteLocation,dataFile), function(formattingSummary) {
   dataSummary = formattingSummary;
   parallelNets();
 });
