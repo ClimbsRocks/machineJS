@@ -2,10 +2,6 @@ var chunkedTrainingData = [];
 var totalRowsPassedThisIteration = 0;
 var globalMessage;
 var parentTime;
-var memShm = require('mem-shm');
-var mem = new memShm('newDirectory','formattingDataMem.txt');
-var tmp = mem.get('0');
-console.log('tmp from within child',tmp);
 
 var passRowsIntoTrainingStream = function() {
   // console.log(chunkedTrainingData.length);  

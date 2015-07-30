@@ -282,14 +282,14 @@ function makeTrainingObj (hlArray) {
   var brainID = ++totalRunningNets;
 
   var fileName = '/formattedData' + (brainID % numCPUs) + '.txt';
-  var pathToData = path.join(kpCompleteLocation,fileName);
+  var pathToChildData = path.join(kpCompleteLocation,fileName);
 
   var totalMessageObj = {
     type: 'startBrain',
     brainID: brainID,
     hiddenLayers: hlArray, 
     trainingObj: trainingObj, 
-    pathToData: pathToData, 
+    pathToData: pathToChildData, 
     totalRows: totalRows
   };
 
@@ -336,7 +336,8 @@ function makeTrainingObj (hlArray) {
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
   // and invoke parallelNets once formatting the data is done. 
-readAndFormatData(path.join(kpCompleteLocation,dataFile), function(formattingSummary) {
+console.log('pathToData before invoking readAndFormatData:')
+readAndFormatData(kpCompleteLocation, dataFile, function(formattingSummary) {
   dataSummary = formattingSummary;
   parallelNets();
 });

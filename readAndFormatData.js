@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
-var kpCompleteLocation = '/Users/preston/ghLocal/machineLearningWork/kpComplete'
+var kpCompleteLocation;
 
 // we are intentionally putting this into the global scope
 var dataSummary = {
@@ -13,13 +13,14 @@ var dataSummary = {
 // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
 var createdSummary = false;
 
-module.exports = function(pathToData, callback) {
-  console.log('reading a file:', pathToData);
+module.exports = function(kpCompleteLocation, dataFileName, callback) {
+  console.log('reading a file:', kpCompleteLocation);
   // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
   var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
-  var readStream = fs.createReadStream(pathToData, {encoding: 'utf8'});
+  var readStream = fs.createReadStream(path.join(kpCompleteLocation, dataFileName), {encoding: 'utf8'});
+  console.log('we have created the write and read streams to format our data')
   //tStream1: format as arrays; get the mean and median for each column
   // TODO: get summary stats
     // mode
