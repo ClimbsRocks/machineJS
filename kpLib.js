@@ -5,19 +5,23 @@ var numCPUs  = require('os').cpus().length;
 var kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
 var dataFile = process.argv[2];
+var advancedOptions = process.argv[3] || {};
 
 console.log('numCPUs:',numCPUs);
 
-var bestNet = {
-  jsonBackup: '',
-  errorRate: 1,
-  trainingTime: Infinity
+var bestNetObj = {
+  trainingBestAsJSON: '',
+  testingBestAsJSON: '',
+  trainingError: 1,
+  testingError: 1,
+  trainingBestTrainingTime: Infinity,
+  testingBestTrainingTime: Infinity
 };
 
 var globalTrainingData = [];
 
 var dataSummary; // this will eventually be set equal to what readAndFormatData gives us.
-var fullyTrained = false;
+var readyToMakePredictions = false;
 
 module.exports = {
 
@@ -58,7 +62,7 @@ module.exports = {
 
   makePrediction: function(inputRow) {
     // TODO: format the inputRow the exact same way we formatted our training data
-    if(!fullyTrained) {
+    if(!readyToMakePredictions) {
       console.log('The nets are still training. Do you wish to make a prediction with the best net we have so far?');
       // ADVANCED: let them make predictions while the net is still training. 
     } else {
@@ -107,15 +111,7 @@ function createParamsToTest(maxLayers, maxNodesMultiplier) {
       allParamsToTest.push(createOneParamArray(i,j));
     }
   }
-}
-
-// TODO: this is incomplete. 
-var netCheckup = function() {
-  // if all nets have reached 100 iterations
-    // start a new series of nets with different params to canvas the space
-    // if we have X many nets over 100 iterations:
-      // figure out which one is best, and then create new nets that are smaller iterations from there
-
+  numOfNetsToTest = allParamsToTest.length;
 }
 
 var updateNetStatus = function(message) {
@@ -129,9 +125,11 @@ var updateNetStatus = function(message) {
 var createChild = function() {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
   // TODO: this might be the only place we need to make a change between streaming and passing in the whole dataset
-  // var child = child_process.fork('./brainChild',{cwd: kpCompleteLocation});
-  var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
-  // TODO: this is not removing any items from allParamsToTest, or we are adding new params each time. 
+  if(advancedOptions.useStreams) {
+    var child = child_process.fork('./brainChildStream',{cwd: kpCompleteLocation});
+  } else {
+    var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
+  }
   var messageObj = makeTrainingObj( allParamsToTest.shift() );
 
   child.send(messageObj);
@@ -156,27 +154,33 @@ var createChild = function() {
   return child;
 }
 
+var completedNets = 0;
+var numOfNetsToTest;
+
 function attachListeners(child) {
   child.on('message', function(message) {
     var id = message.brainID;
     if(message.type === 'finishedTraining') {
       updateNetStatus(message);
       neuralNetResults[id].running = false;
+      completedNets++;
       // Or maybe we don't have to kill it, we can just send it new information to train on?!
       child.kill();
-      fullyTrained = true;
+      //TODO: send over a better message to bestNetChecker. 
+      bestNetChecker(message); 
 
       // var net = new brain.NeuralNetwork();
       // testOutput(net.fromJSON(message.net));
       // TODO: have some way of timeboxing each experiment??
 
       if(allParamsToTest.length > 0) {
-        console.log('trained',totalRunningNets,'so far,',allParamsToTest.length,'to go');
+        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'to go');
         var newChild = createChild();
         attachListeners(newChild);
         referencesToChildren.push(newChild);
-      } else {
+      } else if (completedNets === numOfNetsToTest) {
         console.log('done training all the neural nets you could conjure up!');
+        readyToMakePredictions = true;
         console.log(neuralNetResults);
       }
       
@@ -252,16 +256,15 @@ var testOutput = function(net) {
 };
 
 var bestNetChecker = function(trainingResults,trainedNet) {
-  console.log('checking if this is the best net');
-  if(trainingResults.error < bestNet.errorRate) {
+  // console.log('checking if this is the best net:',trainingResults);
+  if(trainingResults.error < bestNetObj.trainingErrorRate) {
     // make this the best net
-    bestNet.jsonBackup = trainedNet.toJSON();
-    bestNet.errorRate = trainingResults.error;
+    bestNetObj.trainingBestAsJSON = trainingResults.net;
+    bestNetObj.trainingErrorRate = trainingResults.error;
+    bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
   }
   //check against our global bestNet
-  console.log('bestNet now is:',bestNet);
-  // TODO: build in logic to see if we've trained all the nets
-  // TODO: more logging, perhaps? Let the user know once every 5 nets that something's going on?
+  // console.log('bestNet now is:',bestNet);
   // TODO: write each new bestNet to a file. 
     // TODO: figure out how to not fail if the user stops the program mid-file-write
       // I'm thinking we write to a backup file first, then overwrite the main file, or rename the backup file to be the same name as the main file. 
@@ -269,7 +272,7 @@ var bestNetChecker = function(trainingResults,trainedNet) {
 
 function makeTrainingObj (hlArray) {
   var trainingObj = {
-    errorThresh: 0.053,  // error threshold to reach
+    errorThresh: 0.052,  // error threshold to reach
     iterations: 1000,   // maximum training iterations
     log: true,           // console.log() progress periodically
     logPeriod: 1,       // number of iterations between logging
