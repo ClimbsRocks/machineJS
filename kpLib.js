@@ -95,6 +95,11 @@ var neuralNetResults = {};
 var allParamsToTest = [];
 // we will invoke this when we call parallelNets for the first time
 function createParamsToTest(maxLayers, maxNodesMultiplier) {
+  // TODO: only have 1,2,3,6,and 10 hidden layers. not 1-10 continuous as we have now.
+  // TODO: have 1,2,5,10,50,100 times the number of features as the nodes for each hidden layer
+  // TODO: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
+    // e.g., DilMil where we pruned out any feature that wasn't present in at least 1% of the dataset. 
+      // technically, I grouped all those features together into something like "column5RareFeature = 1"
 
   function createOneParamArray(numLayers,numNodes) {
     var outputArr = [];
@@ -180,6 +185,7 @@ function attachListeners(child) {
         referencesToChildren.push(newChild);
       } else if (completedNets === numOfNetsToTest) {
         console.log('done training all the neural nets you could conjure up!');
+        // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
         console.log(neuralNetResults);
       }
@@ -213,9 +219,12 @@ var parallelNets = function() {
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
-    var child = createChild();
-    attachListeners(child);
-    referencesToChildren.push(child);
+    // wrapping this in an IIFE so each child is available in it's own scope
+    (function() {
+      var child = createChild();
+      attachListeners(child);
+      referencesToChildren.push(child);
+    })();
   }
 
 };
@@ -229,6 +238,8 @@ var testOutput = function(net) {
       observedValues: 0
     };
   }
+  // right now we're just reading in the entire training set. 
+  // TODO: test on only the held-back portion of the input data.
   var readStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattedData0.txt'), {encoding: 'utf8'});
   readStream._partialLineData = '';
 
@@ -248,6 +259,7 @@ var testOutput = function(net) {
     }
   });
 
+  // TODO: turn this into a single error number, rather than the human-readable output below.
   readStream.on('end', function() {
     for(var key in testSummary) {
       console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'rate:', Math.round(testSummary[key].observedValues / testSummary[key].countOfPredictionsAtThisProbability * 100) + '%');
