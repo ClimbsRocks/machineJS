@@ -38,7 +38,15 @@
   },
   "homepage": "https://github.com/kuychaco/kpComplete",
   "dependencies": {
+    "bluebird": "^2.9.27",
     "brain": "^0.7.0",
-    "paralleljs": "^0.2.1"
+    "byline": "^4.2.1",
+    "hiredis": "^0.4.0",
+    "mem-shm": "^0.2.6",
+    "memcached": "^2.1.0",
+    "paralleljs": "^0.2.1",
+    "q": "^1.4.1",
+    "redis": "^0.12.1",
+    "webworker-threads": "^0.5.6"
   }
 }
