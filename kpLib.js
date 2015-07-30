@@ -163,11 +163,15 @@ var completedNets = 0;
 var numOfNetsToTest;
 
 function attachListeners(child) {
+  child.running = true;
+  child.startTime = Date.now();
   child.on('message', function(message) {
     var id = message.brainID;
     if(message.type === 'finishedTraining') {
       updateNetStatus(message);
       neuralNetResults[id].running = false;
+      child.running = false;
+      child.endTime = Date.now();
       completedNets++;
       // Or maybe we don't have to kill it, we can just send it new information to train on?!
       child.kill();
@@ -227,6 +231,23 @@ var parallelNets = function() {
     })();
   }
 
+};
+
+var maxChildTrainingTime = advancedOptions.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
+// ADVANCED: let them specify a total training time, and then we'll guesstimate how long each child has to train from there
+
+var timeLimitKiller = function() {
+  for (var i = 0; i < referencesToChildren.length; i++) {
+    var child = referencesToChildren[i];
+    if(child.running) {
+      var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
+      if(elapsedTrainingTime > maxChildTrainingTime) {
+        // get the latest data from the child
+        // kill the child
+        // follow the same steps as we would when the child finishes training naturally.
+      }
+    }
+  }
 };
 
 var testOutput = function(net) {
