@@ -243,6 +243,12 @@ var timeLimitKiller = function() {
       var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
       if(elapsedTrainingTime > maxChildTrainingTime) {
         // get the latest data from the child
+        // this will send a message to the child. the child will then, as soon as it has time, send off a finishedTraining message back to the parent. This will then be handled up above by the standard event handlers for when we finish training a net. 
+        // part of that process involves killing the child process.
+        child.send({
+          type: 'killProcess'
+        });
+
         // kill the child
         // follow the same steps as we would when the child finishes training naturally.
       }
