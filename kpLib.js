@@ -5,7 +5,9 @@ var numCPUs  = require('os').cpus().length;
 var kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
 var dataFile = process.argv[2];
-var advancedOptions = process.argv[3] || {};
+// var advancedOptions = process.argv[3] || {};
+var argv = require('minimist')(process.argv.slice(2));
+console.log(argv);
 
 console.log('numCPUs:',numCPUs);
 
@@ -130,7 +132,9 @@ var updateNetStatus = function(message) {
 var createChild = function() {
   var child_process = require('child_process'); //this is node's built in module for creating new processes. 
   // TODO: this might be the only place we need to make a change between streaming and passing in the whole dataset
-  if(advancedOptions.useStreams) {
+  // FUTURE: see if we can increase the max memory size for each child process, as we would with node "--max-old-space-size= 4000" to signify a ~4GB RAM limit. 
+    // NOTE: different computers handle that command as either bytes or megabytes. be careful. 
+  if(argv.useStreams) {
     var child = child_process.fork('./brainChildStream',{cwd: kpCompleteLocation});
   } else {
     var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
@@ -233,18 +237,23 @@ var parallelNets = function() {
 
 };
 
-var maxChildTrainingTime = advancedOptions.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
+var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
+// console.log('advancedOptions:',advancedOptions);
+var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
 // ADVANCED: let them specify a total training time, and then we'll guesstimate how long each child has to train from there
 
-var timeLimitKiller = function() {
+var trainingCuller = function() {
+  // console.log('referencesToChildren:', referencesToChildren);
   for (var i = 0; i < referencesToChildren.length; i++) {
     var child = referencesToChildren[i];
     if(child.running) {
       var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
-      if(elapsedTrainingTime > maxChildTrainingTime) {
+      console.log('maxChildTrainingTime is:',maxChildTrainingTime,'elapsedTrainingTime is:',elapsedTrainingTime);
+      if(elapsedTrainingTime > maxChildTrainingTime ) {
         // get the latest data from the child
         // this will send a message to the child. the child will then, as soon as it has time, send off a finishedTraining message back to the parent. This will then be handled up above by the standard event handlers for when we finish training a net. 
         // part of that process involves killing the child process.
+        console.log('sent a kill message');
         child.send({
           type: 'killProcess'
         });
@@ -255,6 +264,13 @@ var timeLimitKiller = function() {
     }
   }
 };
+
+// ADVANCED: kill off some nets more quickly if we see that they're behind where other nets were after 200 iterations, and the delta between their iterations is smaller than other nets. 
+
+// TODO: run this once every minute, or on some less-frequent basis. 
+var killNetChildInterval = setInterval(function() {
+  trainingCuller();
+}, 1000);
 
 var testOutput = function(net) {
 
@@ -299,6 +315,7 @@ var bestNetChecker = function(trainingResults,trainedNet) {
   if(trainingResults.error < bestNetObj.trainingErrorRate) {
     // make this the best net
     bestNetObj.trainingBestAsJSON = trainingResults.net;
+    fs.writeFile('bestNet' + Date.now(), bestNetObj.trainingBestAsJSON);
     bestNetObj.trainingErrorRate = trainingResults.error;
     bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
   }

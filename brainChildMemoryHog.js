@@ -9,7 +9,7 @@ process.on('message', function(message) {
     var brain = require('brain');
 
     // CLEAN: fs.readFile should be an asynch operation, so saving it's results into trainingData doesn't make any sense. 
-    var trainingData = fs.readFile(message.pathToData, {encoding: 'utf8'}, function(err, data) {
+    fs.readFile(message.pathToData, {encoding: 'utf8'}, function(err, data) {
       if(err) {
         console.error(err);
       } else {
@@ -26,7 +26,7 @@ process.on('message', function(message) {
               errorRate: errObj.error,
               net: net.toJSON(),
               trainingParams: message,
-              trainingTime = Date.now() - startTime
+              trainingTime: Date.now() - startTime
             };
             if(heardKillMessage) {
               messageObj.type = 'finishedTraining';
@@ -62,6 +62,7 @@ process.on('message', function(message) {
       }
     });
   } else if (message.type === 'killProcess') {
+    console.log('heard a kill message');
     heardKillMessage = true;
   }
 
