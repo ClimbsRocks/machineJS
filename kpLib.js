@@ -96,12 +96,14 @@ var neuralNetResults = {};
 
 var allParamsToTest = [];
 // we will invoke this when we call parallelNets for the first time
-function createParamsToTest(maxLayers, maxNodesMultiplier) {
+function createParamsToTest() {
   // TODO: only have 1,2,3,6,and 10 hidden layers. not 1-10 continuous as we have now.
   // TODO: have 1,2,5,10,50,100 times the number of features as the nodes for each hidden layer
   // TODO: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
     // e.g., DilMil where we pruned out any feature that wasn't present in at least 1% of the dataset. 
       // technically, I grouped all those features together into something like "column5RareFeature = 1"
+  var layersArray = [1,2,3,6,10];
+  var nodesArray = [1,2,5,10,50,100];
 
   function createOneParamArray(numLayers,numNodes) {
     var outputArr = [];
@@ -111,13 +113,14 @@ function createParamsToTest(maxLayers, maxNodesMultiplier) {
     return outputArr;
   };
 
-  // create nets with up to maxLayers hidden layers
-  for (var i = 1; i <= maxLayers; i++) {
-    // create nets with up to maxNodesMultiplier * the number of features in the dataset
-    for (var j = 1; j <= maxNodesMultiplier; j++) {
-      allParamsToTest.push(createOneParamArray(i,j));
+  // creates nodesArray.length nets for each item in layersArray
+  for (var i = 0; i < layersArray.length; i++) {
+    // create nets with up to nodesArray[i] * the number of features in the dataset
+    for (var j = 0; j < nodesArray.length; j++) {
+      allParamsToTest.push(createOneParamArray(layersArray[i],nodesArray[j]));
     }
   }
+  console.log('allParamsToTest:',allParamsToTest);
   numOfNetsToTest = allParamsToTest.length;
 }
 
