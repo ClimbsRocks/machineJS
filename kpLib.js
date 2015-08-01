@@ -242,35 +242,34 @@ var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each chil
 var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
 // ADVANCED: let them specify a total training time, and then we'll guesstimate how long each child has to train from there
 
-var trainingCuller = function() {
-  // console.log('referencesToChildren:', referencesToChildren);
-  for (var i = 0; i < referencesToChildren.length; i++) {
-    var child = referencesToChildren[i];
-    if(child.running) {
-      var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
-      console.log('maxChildTrainingTime is:',maxChildTrainingTime,'elapsedTrainingTime is:',elapsedTrainingTime);
-      if(elapsedTrainingTime > maxChildTrainingTime ) {
-        // get the latest data from the child
-        // this will send a message to the child. the child will then, as soon as it has time, send off a finishedTraining message back to the parent. This will then be handled up above by the standard event handlers for when we finish training a net. 
-        // part of that process involves killing the child process.
-        console.log('sent a kill message');
-        child.send({
-          type: 'killProcess'
-        });
+// var trainingCuller = function() {
+//   // console.log('referencesToChildren:', referencesToChildren);
+//   for (var i = 0; i < referencesToChildren.length; i++) {
+//     var child = referencesToChildren[i];
+//     if(child.running) {
+//       var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
+//       if(elapsedTrainingTime > maxChildTrainingTime *1.2) {
+//         // we are having the child auto-kill itself when it reaches a good stopping point (the next iteration)
+//         // however, in the case that the iteration is taking too long, we are back-stopping it here by killing the child if it's been running 20% longer than the max allowed time. 
+//         // there's a whole shutdown process to follow. 
+//         // TODO: modularize the child shutdown process and then include it here.
+//         child.running = false;
+//         console.log('sent a kill message');
+//         child.kill();
 
-        // kill the child
-        // follow the same steps as we would when the child finishes training naturally.
-      }
-    }
-  }
-};
+//         // kill the child
+//         // follow the same steps as we would when the child finishes training naturally.
+//       }
+//     }
+//   }
+// };
 
 // ADVANCED: kill off some nets more quickly if we see that they're behind where other nets were after 200 iterations, and the delta between their iterations is smaller than other nets. 
 
 // TODO: run this once every minute, or on some less-frequent basis. 
-var killNetChildInterval = setInterval(function() {
-  trainingCuller();
-}, 1000);
+// var killNetChildInterval = setInterval(function() {
+//   trainingCuller();
+// }, 1000);
 
 var testOutput = function(net) {
 
@@ -346,7 +345,9 @@ function makeTrainingObj (hlArray) {
     hiddenLayers: hlArray, 
     trainingObj: trainingObj, 
     pathToData: pathToChildData, 
-    totalRows: totalRows
+    totalRows: totalRows,
+    maxTrainingTime: maxChildTrainingTime,
+    maxTrainingIterations: maxChildTrainingIterations
   };
 
   return totalMessageObj;

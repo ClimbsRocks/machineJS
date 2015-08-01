@@ -28,7 +28,10 @@ process.on('message', function(message) {
               trainingParams: message,
               trainingTime: Date.now() - startTime
             };
-            if(heardKillMessage) {
+
+            // console.log('trainingTime:',messageObj.trainingTime,'maxTime:',message.maxTrainingTime,'iterations:',messageObj.iterations,'maxIterations:',message.maxTrainingIterations);
+            // see if we've exceeded our alotted trainingTime
+            if(messageObj.trainingTime/1000 >= message.maxTrainingTime || messageObj.iterations >= message.maxTrainingIterations) {
               messageObj.type = 'finishedTraining';
             }
             process.send(messageObj);
