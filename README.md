@@ -1,13 +1,17 @@
 # kpComplete
 > a library for optimizing your ML algorithms
 
-How to invoke:
-`node kpLib.js <DATA FILE>.csv`
+NOTE: This is still under active development. It is not yet user-friendly. If you want to add in a feature or two, or add a few commits to make it more user-friendly, I'd love to accelerate it's progression. Otherwise, the core functionality is there and getting better by the day, as long as you're ok doing a little bit of work figuring out how to access it.
 
-Format of data:
+How to use:
+1. `git clone https://github.com/ClimbsRocks/ppComplete.git` (I'll launch on npm once it's ready for a public debut)
+2. npm install
+3. `node kpLib.js <PATH TO DATA FILE>.csv`
+
+Format of Data File:
 1. .csv file
 2. First row holds the column names
-3. The first column holds the output data
+3. The first column holds the output data (what you want the net to make a prediction about)
 4. Make sure there are no empty rows!
 5. Make sure each row has the same number of columns (even if those columns are blank, they must exist)
 
