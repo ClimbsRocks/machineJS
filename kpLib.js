@@ -10,6 +10,7 @@ var dataFile = process.argv[2];
 var argv = globals.argv = require('minimist')(process.argv.slice(2));
 console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
+var makeKagglePredictions = require('./makeKagglePredictions.js');
 
 console.log('numCPUs:',numCPUs);
 
@@ -215,6 +216,10 @@ var parallelNets = function() {
 
 };
 
+// FUTURE: stop training once the deltas between iterations have decreased to be only x% of what they were for the first three iterations. 
+  // say the error for the first three iterations decreases from .065 to .055, that would be a delta of -.010. That means an average delta of roughly -.003 for each of those iterations.
+  // as soon as we reach a point where each training iteration is only giving us a delta of, say, one tenth of that, or -.0003, we stop the training, basically saying it's inefficient. 
+  // The great part about this is that it's all relative. So we wouldn't hold a net with a training rate of .3 to the same absolute standard as a net with a trainingRate of .9. 
 var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
 // console.log('advancedOptions:',advancedOptions);
 var maxChildTrainingIterations = argv.maxTrainingIterations || 100;

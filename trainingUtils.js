@@ -1,7 +1,8 @@
 module.exports = {
   createParamsToTest: function (numFeatures) {
     var allParamsToTest = [];
-  // TODO: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
+    // TODO: double this and have it for a variety of trainingRates. 
+  // ADVANCED: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
     // e.g., DilMil where we pruned out any feature that wasn't present in at least 1% of the dataset. 
       // technically, I grouped all those features together into something like "column5RareFeature = 1"
     var layersArray = [1,2,3,6,10];
