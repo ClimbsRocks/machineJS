@@ -22,28 +22,28 @@ module.exports = {
         console.log('this row appears to be a different length than expected:');
         console.log(columns);
       } else {
-        dataSummary.totalRows++;
+        module.exports.dataSummary.totalRows++;
         // iterate through the columns for this particular row. 
         for (var j = 0; j < columns.length; j++) {
-          dataSummary[j].count++;
+          module.exports.dataSummary[j].count++;
           var item = columns[j];
           if(parseFloat(item, 10).toString() !== 'NaN') {
             item = parseFloat(item);
           }
           if(typeof item === 'number') {
-            dataSummary[j].sum += item;
+            module.exports.dataSummary[j].sum += item;
             if(item === 0) {
-              dataSummary[j].countOfZeros++;
+              module.exports.dataSummary[j].countOfZeros++;
             }
-            if(item < dataSummary[j].min) {
-              dataSummary[j].min = item;
-            } else if (item > dataSummary[j].max) {
-              dataSummary[j].max = item;
+            if(item < module.exports.dataSummary[j].min) {
+              module.exports.dataSummary[j].min = item;
+            } else if (item > module.exports.dataSummary[j].max) {
+              module.exports.dataSummary[j].max = item;
             }
           } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
-            dataSummary[j].nullOrMissing++;
+            module.exports.dataSummary[j].nullOrMissing++;
           } else if (typeof item === 'string') {
-            dataSummary[j].countOfStrings++;
+            module.exports.dataSummary[j].countOfStrings++;
           } else {
             console.log('we do not know what to do with this value:',item, 'which is in column number:',j);
           }
@@ -82,9 +82,9 @@ module.exports = {
           // this is probably an area we'd have to give the user some control over. usernames would normally be strings, but we might occasionally have a username that is a number (represented as a string). we could go through and do a majority rules type of thing, but then, i'd be worried about sparse data (we're missing bank account info for most customers, but we have it for a few, so therefore, it's going to look lifke the majority are not numbers). we could possibly work around this by utilizing the nullOrMissing count in this calculation. 
           // no it's simpler than that. let's just be strict. number columns must be numbers. FUTURE: we could build in some flexibility here (if 98% of the values present in a column- excluding missing- are numbers, then we'll assume it's a numerical column and just ignore the random strings). 
           module.exports.dataSummary.expectedRowLength = columns.length;
-          dataSummary.numFeatures = columns.length -1; // we subtract one so that we do not include the output column as a feature of the input. 
+          module.exports.dataSummary.numFeatures = columns.length -1; // we subtract one so that we do not include the output column as a feature of the input. 
           for (var j = 0; j < columns.length; j++) {
-            dataSummary[j] = {
+            module.exports.dataSummary[j] = {
               sum: 0, //FUTURE: figure out how we want to handle negative numbers. 
               standardDeviationSum: 0,
               standardDeviation: undefined,
@@ -129,6 +129,7 @@ module.exports = {
       this._partialLineData = '';
       done();
     };
+    return tStream1;
   },
 
   // TODO: this was just copy/pasted in. it is not refactored.
@@ -143,7 +144,7 @@ module.exports = {
       for (var k = 0; k < row.length; k++) {
         var itemAsNum = parseFloat(row[k]);
         if(itemAsNum.toString() !== 'NaN') {
-          dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
+          module.exports.dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - module.exports.dataSummary[k].mean);
         }
       }
       return row;
@@ -174,6 +175,8 @@ module.exports = {
       this._partialLineData = '';
       done();
     };
+
+    return tStream2;
 
   }
 
