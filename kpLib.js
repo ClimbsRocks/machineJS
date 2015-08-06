@@ -163,6 +163,9 @@ function attachListeners(child) {
       // testOutput(net.fromJSON(message.net));
       // TODO: have some way of timeboxing each experiment??
 
+      // TODO: hunt down the bug that doesn't recognize the end of training all the nets. 
+      console.log('heard a finishedTraining message from the child');
+      console.log('allParamsToTest.length:',allParamsToTest.length);
       if(allParamsToTest.length > 0) {
         console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'to go');
         var newChild = createChild();
@@ -220,6 +223,8 @@ var parallelNets = function() {
   // say the error for the first three iterations decreases from .065 to .055, that would be a delta of -.010. That means an average delta of roughly -.003 for each of those iterations.
   // as soon as we reach a point where each training iteration is only giving us a delta of, say, one tenth of that, or -.0003, we stop the training, basically saying it's inefficient. 
   // The great part about this is that it's all relative. So we wouldn't hold a net with a training rate of .3 to the same absolute standard as a net with a trainingRate of .9. 
+
+// CLEAN: I don't think we need any of the following code anymore, now that we're just sending in maxChildTrainingTime and maxChildTrainingIterations as parameters to the child process. 
 var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
 // console.log('advancedOptions:',advancedOptions);
 var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
