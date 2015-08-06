@@ -1,16 +1,37 @@
+var dataSummary = require('./dataSummary.js');
+var stream = require('stream');
+
+//tStream1: format as arrays; get the mean and median for each column
+// TODO: get summary stats
+  // mode
+  // highest
+  // lowest
+  // distribution
+  // how many outliers
+  // etc. 
+  // present these to the user to make sure they know what their data looks like
+  // give them options for how to format that data (remove all rows with outliers, overwrite outliers with median data, etc.)
+// tStream2: calculate standard deviation for each column
+  // We aren't using this at all anymore. 
+// tStream3: 
+  // normalize data 
+  // turn it into a number between 0 and 1
+  // binarize categorical data
+  // TODO: take square or cubic roots of exponential data
+  // overwrite missing data with median values
+    // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
+  // put it into our expected object format for brain.js
+
 module.exports = {
-  dataSummary: {
-    totalRows: 0,
-    chunkCount: 0,
-    numFeatures: 0,
-    countOfRows: 0,
-    expectedRowLength: 0
-  },
-  // TODO: access countOfRows from module.exports.dataSummary
-  // TODO: access expectedRowLength from module.exports.dataSummary
-  // TODO: access dataSummary from module.exports.dataSummary
 
   // This stream simply summarizes the data. It does not modify the data in any way.
+  // tStream1: 
+    // read data from initial data file
+    // sum up numerical relevant data
+    // count number of data points
+    // make sure each row has the same number of data points
+    // count missing/absent data
+    // count strings vs. numbers
   summarizeDataTransformStream: function () {
     var tStream1 = new stream.Transform({objectMode: true});
     tStream1._partialLineData = '';
@@ -18,32 +39,32 @@ module.exports = {
     // var expectedRowLength = 0; //we want this to be available for all of our transformStreams. could consider making it a variable on tStream1 later to make it slightly cleaner. 
     tStream1.transformOneRow = function(columns) {
       var thisRow = [];
-      if(columns.length !== module.exports.dataSummary.expectedRowLength) {
+      if(columns.length !== dataSummary.expectedRowLength) {
         console.log('this row appears to be a different length than expected:');
         console.log(columns);
       } else {
-        module.exports.dataSummary.totalRows++;
+        dataSummary.totalRows++;
         // iterate through the columns for this particular row. 
         for (var j = 0; j < columns.length; j++) {
-          module.exports.dataSummary[j].count++;
+          dataSummary[j].count++;
           var item = columns[j];
           if(parseFloat(item, 10).toString() !== 'NaN') {
             item = parseFloat(item);
           }
           if(typeof item === 'number') {
-            module.exports.dataSummary[j].sum += item;
+            dataSummary[j].sum += item;
             if(item === 0) {
-              module.exports.dataSummary[j].countOfZeros++;
+              dataSummary[j].countOfZeros++;
             }
-            if(item < module.exports.dataSummary[j].min) {
-              module.exports.dataSummary[j].min = item;
-            } else if (item > module.exports.dataSummary[j].max) {
-              module.exports.dataSummary[j].max = item;
+            if(item < dataSummary[j].min) {
+              dataSummary[j].min = item;
+            } else if (item > dataSummary[j].max) {
+              dataSummary[j].max = item;
             }
           } else if (item === undefined || item === null || item === "N/A" || item === "NA" || item === '') {//FUTURE: revisit what we include as missing values. NA could be one, but NA could also stand for North America. Do we really want to include empty strings as missing values? 
-            module.exports.dataSummary[j].nullOrMissing++;
+            dataSummary[j].nullOrMissing++;
           } else if (typeof item === 'string') {
-            module.exports.dataSummary[j].countOfStrings++;
+            dataSummary[j].countOfStrings++;
           } else {
             console.log('we do not know what to do with this value:',item, 'which is in column number:',j);
           }
@@ -71,8 +92,8 @@ module.exports = {
         var columns = rows[i].split(',');
 
         // Create the dataSummary object
-        if( !createdSummary ) {
-          createdSummary = true;
+        if( !dataSummary.createdSummary ) {
+          dataSummary.createdSummary = true;
           // change this to be the names of each column
           // change this to include the categorical flag from row 2 (which is rows[1]). 
           // or actually, can we just assume that anything that's not a number is a string, and is therefore categorical? 
@@ -81,10 +102,10 @@ module.exports = {
           // we might have to force string representations of numbers to be actual numbers. 
           // this is probably an area we'd have to give the user some control over. usernames would normally be strings, but we might occasionally have a username that is a number (represented as a string). we could go through and do a majority rules type of thing, but then, i'd be worried about sparse data (we're missing bank account info for most customers, but we have it for a few, so therefore, it's going to look lifke the majority are not numbers). we could possibly work around this by utilizing the nullOrMissing count in this calculation. 
           // no it's simpler than that. let's just be strict. number columns must be numbers. FUTURE: we could build in some flexibility here (if 98% of the values present in a column- excluding missing- are numbers, then we'll assume it's a numerical column and just ignore the random strings). 
-          module.exports.dataSummary.expectedRowLength = columns.length;
-          module.exports.dataSummary.numFeatures = columns.length -1; // we subtract one so that we do not include the output column as a feature of the input. 
+          dataSummary.expectedRowLength = columns.length;
+          dataSummary.numFeatures = columns.length -1; // we subtract one so that we do not include the output column as a feature of the input. 
           for (var j = 0; j < columns.length; j++) {
-            module.exports.dataSummary[j] = {
+            dataSummary[j] = {
               sum: 0, //FUTURE: figure out how we want to handle negative numbers. 
               standardDeviationSum: 0,
               standardDeviation: undefined,
@@ -132,7 +153,7 @@ module.exports = {
     return tStream1;
   },
 
-  // TODO: figure out what the inputs and outputs are.
+  // tStream2: calculate standard deviations of numeric data. 
   calculateStandardDeviationTStream: function() {
     // tStream2: calculate standard deviations of numeric data. 
     var tStream2 = new stream.Transform({objectMode: true});
@@ -143,7 +164,7 @@ module.exports = {
       for (var k = 0; k < row.length; k++) {
         var itemAsNum = parseFloat(row[k]);
         if(itemAsNum.toString() !== 'NaN') {
-          module.exports.dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - module.exports.dataSummary[k].mean);
+          dataSummary[k].standardDeviationSum+= Math.abs(itemAsNum - dataSummary[k].mean);
         }
       }
       return row;
@@ -179,15 +200,15 @@ module.exports = {
 
   },
 
+  // tStream3: 
+    // normalize data 
+    // turn it into a number between 0 and 1
+    // binarize categorical data
+    // TODO: take square or cubic roots of exponential data
+    // overwrite missing data with median values
+      // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
+    // put it into our expected object format for brain.js
   formatDataTransformStream: function() {
-    // tStream3: 
-      // normalize data 
-      // turn it into a number between 0 and 1
-      // binarize categorical data
-      // TODO: take square or cubic roots of exponential data
-      // overwrite missing data with median values
-        // add in new columns as a binary to note that data is missing. columnOneDataMissing: 0, columnTwoDataMissing: 1, etc.
-      // put it into our expected object format for brain.js
 
     var tStream3 = new stream.Transform({objectMode: true});
     tStream3._partialLineData = '';
@@ -198,7 +219,7 @@ module.exports = {
         output: {}
       };
 
-      if( module.exports.dataSummary[0].categorical === true ) {
+      if( dataSummary[0].categorical === true ) {
         brainObj.output[row[0]] = 1; //if we have categorical data, we want to set that category to true
       } else {
         brainObj.output['numericOutput'] = row[0]; // if we have numerica data (we shouldn't, unless that number is simply a category, such as didDefault), we want to set the output equal to that number
@@ -211,7 +232,7 @@ module.exports = {
         if(itemParsed.toString() !== 'NaN') {
           
           // uses basic min-max normalization.
-          brainObj.input[k] = (itemParsed - module.exports.dataSummary[k].min) / module.exports.dataSummary[k].range;
+          brainObj.input[k] = (itemParsed - dataSummary[k].min) / dataSummary[k].range;
           // TODO: put more thought into how we handle the output
             // it will likely be categorical
             // we should tell the user to always make it the first column in our dataset?
@@ -227,11 +248,11 @@ module.exports = {
           var featureName = item + k;
           brainObj.input[featureName] = 1;
           // if that feature does not exist in our dataSummary obj yet:
-          if(!module.exports.dataSummary[k].features[featureName]) {
-            module.exports.dataSummary[k].features = 1;
-            module.exports.dataSummary.numFeatures++;
+          if(!dataSummary[k].features[featureName]) {
+            dataSummary[k].features = 1;
+            dataSummary.numFeatures++;
           } else {
-            module.exports.dataSummary[k].features[featureName]++;
+            dataSummary[k].features[featureName]++;
           }
         } else {
           console.error('we have not yet figured out how to handle data for this column number:',k,'values:',item);
@@ -267,7 +288,7 @@ module.exports = {
         row = '';
         brainObj = '';
       } 
-      module.exports.dataSummary.chunkCount++
+      dataSummary.chunkCount++
       this.push(rowsToPush);
       done();
     };
