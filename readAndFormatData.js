@@ -4,7 +4,7 @@ var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 var kpCompleteLocation;
 var formatDataStreams = require('./formatDataStreams.js');
-var dataSummary = require('./dataSummary.js');
+var dataSummary = require('./globals.js').dataSummary;
 
 // FUTURE: build out the dataSummary object more quickly, rather than making a check on each individual row as we are now. 
 var createdSummary = false;

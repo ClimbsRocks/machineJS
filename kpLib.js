@@ -1,18 +1,19 @@
 var fs = require('fs');
 var brain = require('brain');
 var path = require('path');
+var globals = require('./globals.js');
 var numCPUs  = require('os').cpus().length;
-var kpCompleteLocation = path.dirname(__filename);
+var kpCompleteLocation = globals.kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
-var argv = require('minimist')(process.argv.slice(2));
+var argv = globals.argv = require('minimist')(process.argv.slice(2));
 console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 
 console.log('numCPUs:',numCPUs);
 
-var bestNetObj = {
+var bestNetObj = globals.bestNetObj = {
   trainingBestAsJSON: '',
   testingBestAsJSON: '',
   trainingError: 1,
@@ -23,8 +24,8 @@ var bestNetObj = {
 
 var globalTrainingData = [];
 
-var dataSummary; // this will eventually be set equal to what readAndFormatData gives us.
-var readyToMakePredictions = false;
+var dataSummary = globals.dataSummary; 
+var readyToMakePredictions = globals.readyToMakePredictions = false;
 
 module.exports = {
 
@@ -93,7 +94,7 @@ var createEnsemble = function() {
 }
 
 var totalRunningNets = 0;
-var neuralNetResults = {};
+var neuralNetResults = globals.neuralNetResults = {};
 
 
 var updateNetStatus = function(message) {

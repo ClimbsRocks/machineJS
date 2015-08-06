@@ -1,4 +1,4 @@
-var dataSummary = require('./dataSummary.js');
+var dataSummary = require('./globals.js').dataSummary;
 var stream = require('stream');
 
 //tStream1: format as arrays; get the mean and median for each column
@@ -233,6 +233,14 @@ module.exports = {
           
           // uses basic min-max normalization.
           brainObj.input[k] = (itemParsed - dataSummary[k].min) / dataSummary[k].range;
+
+          // these checks are in place for our testData, which might have slightly more extreme values than our trainingData. 
+          // FUTURE: see if there's a better way to handle this 
+          if(brainObj.input[k] > 1) {
+            brainObj.input[k] = 1;
+          } else if(brainObj.input[k] < 0) {
+            brainObj.input[k] = 0;
+          }
           // TODO: put more thought into how we handle the output
             // it will likely be categorical
             // we should tell the user to always make it the first column in our dataset?
