@@ -179,7 +179,7 @@ module.exports = {
 
   },
 
-  formatDataTransformStream = function() {
+  formatDataTransformStream: function() {
     // tStream3: 
       // normalize data 
       // turn it into a number between 0 and 1

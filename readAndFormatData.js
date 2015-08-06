@@ -3,13 +3,15 @@ var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 var kpCompleteLocation;
+var formatDataStreams = require('./formatDataStreams.js');
+var dataSummary = require('./dataSummary.js');
 
 // we are intentionally putting this into the global scope
-var dataSummary = {
-  totalRows: 0,
-  chunkCount: 0,
-  numFeatures: 0
-};
+// var dataSummary = {
+//   totalRows: 0,
+//   chunkCount: 0,
+//   numFeatures: 0
+// };
 // FUTURE: build out this object more quickly, rather than making a check on each individual row as we are now. 
 var createdSummary = false;
 
