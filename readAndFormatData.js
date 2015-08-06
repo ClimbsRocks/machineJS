@@ -16,6 +16,10 @@ var createdSummary = false;
 module.exports = function(kpCompleteLocation, dataFileName, callback) {
   console.log('reading a file:', kpCompleteLocation);
   // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
+  // ADVANCED: allow the user to pass in an encrypted file
+    // take in the encryption key for that file
+    // write encrypted files to disk
+    // read from the encrypted files. It will be slower, but more secure.
   var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
@@ -243,6 +247,7 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
     for (var k = 1; k < row.length; k++) {
       var item = row[k]
       var itemParsed = parseFloat(item);
+      // if the item is a number:
       if(itemParsed.toString() !== 'NaN') {
         
         // uses basic min-max normalization.
@@ -258,9 +263,10 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
           // ADVANCED: give them control of what is considered a missing or null value. particularly NA. but maybe for them -1 is considered a missing value. 
       } else if (typeof item === 'string') {
         // handles categorical data
-        // we include the column name in the feature name so that we don't have collisions (e.g. both the city and county are San Francisco)
+        // we include the column name in the feature name so that we don't have collisions (for example, a school might have different columns for different classes, and might fill each cell with "Passed","Withdrew",etc. If we just included "Passed", rather than "Grade12Passed", it would be meaningless).
         var featureName = item + k;
         brainObj.input[featureName] = 1;
+        // if that feature does not exist in our dataSummary obj yet:
         if(!dataSummary[k].features[featureName]) {
           dataSummary[k].features = 1;
           dataSummary.numFeatures++;
@@ -273,7 +279,7 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
       }
     }
 
-    //split out 20% of our dataset for testing. 
+    //earmark 20% of our dataset for testing. 
     if(Math.random() > 0.8) {
       brainObj.testingDataSet = true;
     }
@@ -295,6 +301,8 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
       var brainObj = this.transformOneRow(row);
       
       rowsToPush += JSON.stringify(brainObj) + '\n';
+      // reset columns, row, and brainObj
+      // CLEAN: This is probably not necessary anymore, since it looks like those variables have been modularized out into their own scope.
       columns = [];
       row = '';
       brainObj = '';
