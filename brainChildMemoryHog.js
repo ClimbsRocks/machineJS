@@ -29,6 +29,8 @@ process.on('message', function(message) {
               trainingTime: Date.now() - startTime
             };
 
+            // FUTURE: add in a check to see how much we're decreasing the error rate by on each iteration, and kill the net if it's no longer decreasing the error rate on a useful trajectory
+
             // console.log('trainingTime:',messageObj.trainingTime,'maxTime:',message.maxTrainingTime,'iterations:',messageObj.iterations,'maxIterations:',message.maxTrainingIterations);
             // see if we've exceeded our alotted trainingTime
             if(messageObj.trainingTime/1000 >= message.maxTrainingTime || messageObj.iterations >= message.maxTrainingIterations) {
