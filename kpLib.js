@@ -176,6 +176,9 @@ function attachListeners(child) {
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
         console.log(neuralNetResults);
+      } else {
+        console.log('no params left to test, but not done yet either');
+        console.log('completedNets:',completedNets,'numOfNetsToTest:',numOfNetsToTest);
       }
       
     } else if (message.type === 'getNewData') {
@@ -206,6 +209,7 @@ var parallelNets = function() {
     // most likely, we'll settle on something like 1-3 hidden layers, but it's fun to try them all
   // 2. nodes per hidden layer: (0.5 - 100) * numFeatures
   allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures);
+  numOfNetsToTest = allParamsToTest.length;
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
