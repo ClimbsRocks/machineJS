@@ -163,9 +163,6 @@ function attachListeners(child) {
       // testOutput(net.fromJSON(message.net));
       // TODO: have some way of timeboxing each experiment??
 
-      // TODO: hunt down the bug that doesn't recognize the end of training all the nets. 
-      console.log('heard a finishedTraining message from the child');
-      console.log('allParamsToTest.length:',allParamsToTest.length);
       if(allParamsToTest.length > 0) {
         console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'to go');
         var newChild = createChild();
@@ -176,10 +173,11 @@ function attachListeners(child) {
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
         console.log(neuralNetResults);
-      } else {
-        console.log('no params left to test, but not done yet either');
-        console.log('completedNets:',completedNets,'numOfNetsToTest:',numOfNetsToTest);
-      }
+        if(argv.kagglePredict) {
+          makeKagglePredictions( argv.kagglePredict);
+          
+        }
+      } 
       
     } else if (message.type === 'getNewData') {
       // trying to share data between parent and child efficiently here by sending it as messages. 

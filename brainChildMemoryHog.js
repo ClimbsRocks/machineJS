@@ -41,7 +41,7 @@ process.on('message', function(message) {
         }
 
         message.trainingObj.callback = trainingIterationCallback;
-        message.trainingObj.callbackPeriod = 10;
+        message.trainingObj.callbackPeriod = 2;
 
         var rows = data.split('\n');
         for (var i = 0; i < rows.length; i++) {
