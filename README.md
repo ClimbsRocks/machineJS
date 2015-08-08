@@ -8,8 +8,22 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 2. npm install
 3. `node kpLib.js <PATH TO DATA FILE>.csv`
 
-#### NOTE: This library is designed to run across all but one cores on the host machine. What this means for you:
+Format of Data File:
+1. .csv file
+2. First row holds the column names
+3. The first column holds the output data (what you want the net to make a prediction about)
+4. Make sure there are no empty rows!
+5. Make sure each row has the same number of columns (even if those columns are blank, they must exist)
+6. Make sure any strings are formatted using UTF-8. 
+<!-- TODO: add in directions on how to make sure their data is formatted in UTF-8. -->
+<!-- TODO: add in error messages letting the user know their data isn't formatted in UTF-8. -->
 
+Format of Prediction File:
+1. Make sure the columns all have the exact same names as they do in the input file. 
+2. Make the first column the one that needs a prediction. And leave it empty. 
+3. We have a kagglePredict function all ready to go! use the `--kagglePredict` flag and pass in the path to the test data file: `node kpLib.js giveCredit.csv --kagglePredict kaggleTestData.csv`. (in-progress)
+
+#### NOTE: This library is designed to run across all but one cores on the host machine. What this means for you:
 1. Please plug in
 2. Close all programs and restart right before invoking (this will clear out as much RAM as possible)
 3. Expect some noise from your fan- you're finally putting your computer to use!
