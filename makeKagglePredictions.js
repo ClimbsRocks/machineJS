@@ -1,11 +1,15 @@
 var fs = require('fs');
+var brain = require('brain');
 var stream = require('stream');
 var globals = require('./globals.js');
 var formatDataStreams = require('./formatDataStreams.js');
 
+
 module.exports = function(pathToKaggleData) {
   console.log('inside module.exports function from makeKagglePredictions');
   console.log('dataSummary is:',globals.dataSummary);
+  var net = new brain.NeuralNetwork();
+  console.log('globals.bestNetObj:',globals.bestNetObj);
   var bestNet = net.fromJSON(globals.bestNetObj);
   var trainingResults = {};
 
