@@ -1,6 +1,6 @@
 node_modules
 npm-debug.log
 kaggleTrainingData.csv
-formattingData.txt
+formattingData*.txt
+formattedData*.txt
 *.csv
-*.txt
