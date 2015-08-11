@@ -1,20 +1,20 @@
 var fs = require('fs');
 var brain = require('brain');
 var path = require('path');
-var globals = require('./globals.js');
+// var globals = require('./globals.js');
 var numCPUs  = require('os').cpus().length;
-var kpCompleteLocation = globals.kpCompleteLocation = path.dirname(__filename);
+var kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
-var argv = globals.argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2));
 console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 
 console.log('numCPUs:',numCPUs);
 
-var bestNetObj = globals.bestNetObj = {
+var bestNetObj = {
   trainingBestAsJSON: '',
   testingBestAsJSON: '',
   trainingError: 1,
@@ -25,8 +25,9 @@ var bestNetObj = globals.bestNetObj = {
 
 var globalTrainingData = [];
 
-var dataSummary = globals.dataSummary; 
-var readyToMakePredictions = globals.readyToMakePredictions = false;
+// we will get dataSummary from readAndFormatData()
+var dataSummary; 
+var readyToMakePredictions = false;
 
 module.exports = {
 
@@ -95,7 +96,7 @@ var createEnsemble = function() {
 }
 
 var totalRunningNets = 0;
-var neuralNetResults = globals.neuralNetResults = {};
+var neuralNetResults = {};
 
 
 var updateNetStatus = function(message) {
@@ -326,7 +327,13 @@ function makeTrainingObj (hlArray) {
 
   var brainID = ++totalRunningNets;
 
-  var fileName = '/formattedData' + (brainID % numCPUs) + '.txt';
+  // TODO TODO: Finish making argv.copyData functional
+  if(argv.copyData) {
+    var fileName = '/formattedData' + (brainID % numCPUs) + '.txt';
+  } else {
+    // TODO: rename this file to make it more user-friendly
+    var fileName = 'formattingData3.txt';
+  }
   var pathToChildData = path.join(kpCompleteLocation,fileName);
 
   var totalMessageObj = {
@@ -335,7 +342,7 @@ function makeTrainingObj (hlArray) {
     hiddenLayers: hlArray, 
     trainingObj: trainingObj, 
     pathToData: pathToChildData, 
-    totalRows: totalRows,
+    totalRows: dataSummary.totalRows,
     maxTrainingTime: maxChildTrainingTime,
     maxTrainingIterations: maxChildTrainingIterations
   };
@@ -374,7 +381,7 @@ function makeTrainingObj (hlArray) {
 //     var fileName = '/formattedData' + (i - 1) + '.txt';
 //     var pathToData = path.join(kpCompleteLocation,fileName);
 
-//     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: totalRows});
+//     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: dataSummary.totalRows});
 //   }
 
 //   parallelNets(allParamComboArr);
