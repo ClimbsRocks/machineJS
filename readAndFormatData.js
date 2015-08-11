@@ -3,8 +3,16 @@ var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 var kpCompleteLocation;
+var argv = require('minimist')(process.argv.slice(2));
 var formatDataStreams = require('./formatDataStreams.js');
-var dataSummary = require('./globals.js').dataSummary;
+var dataSummary = {
+  createdSummary: false,
+  totalRows: 0,
+  chunkCount: 0,
+  numFeatures: 0,
+  countOfRows: 0,
+  expectedRowLength: 0
+};
 
 // FUTURE: build out the dataSummary object more quickly, rather than making a check on each individual row as we are now. 
 var createdSummary = false;
@@ -23,15 +31,17 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
   console.log('we have created the write and read streams to format our data')
 
 
-  var tStream1 = formatDataStreams.summarizeDataTransformStream();
-  var tStream2 = formatDataStreams.calculateStandardDeviationTStream();
-  var tStream3 = formatDataStreams.formatDataTransformStream();
+  var tStream1 = formatDataStreams.summarizeDataTransformStream(dataSummary);
+  // we need to only invoke these once we have a dataSummary object ready, on the previous stream's .'end' event
+  // TODO TODO: pick the process back up here again. I'm in the middle of refactoring how we pass around the dataSummary object. The fact that we're doing it asynch means we can't just take it in as an argument to the functions we export from module.exports and then return it from that function. Instead, we're attaching it to the stream object itself, which is passed around, and then grabbing it on end events. 
 
   // Set up the piping on each successive read and transform and write streams
   var t1Start = Date.now();
   readStream.pipe(tStream1).pipe(writeStream);
 
   writeStream.on('finish', function() {
+    // to deal with asynch issues, we are attaching the dataSummary object to tStream1 itself. 
+    dataSummary = tStream1.dataSummary;
     // set the average property on each dataSummary key
     for (var column in dataSummary) {
       if (dataSummary[column].count !== 0) {
@@ -43,10 +53,13 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
     var t2Start = Date.now();
     console.log('first transformStream took:',trainingTime);
     var writeStream2 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
+    var tStream2 = formatDataStreams.calculateStandardDeviationTStream(dataSummary);
     var readStream2 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData.txt'), {encoding: 'utf8'});
     readStream2.pipe(tStream2).pipe(writeStream2);
     
     writeStream2.on('finish', function() {
+      // again, dealing with asynch issues by attaching dataSummary as a property of the transform streams themselves.
+      dataSummary = tStream2.dataSummary;
 
       console.log('finished the second transform!');
       for(var column in dataSummary) {
@@ -63,6 +76,7 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
       var t3Start = Date.now();
 
       var writeStream3 = fs.createWriteStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding: 'utf8'});
+      var tStream3 = formatDataStreams.formatDataTransformStream(dataSummary);
       var readStream3 = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData2.txt'), {encoding: 'utf8'});
 
       // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
@@ -77,34 +91,43 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
       readStream3.pipe(tStream3).pipe(writeStream3);
       
       writeStream3.on('finish', function() {
+        dataSummary = tStream3.dataSummary;
         console.log('finished the third transform!');
         var trainingTime = (Date.now() - t2Start) / 1000;
         console.log('third transformStream took:',trainingTime);
 
-        // creates one copy of the dataset for each child process
-        var copyTime = Date.now();
-        var readCopyStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding:'utf8'});
-        readCopyStream.pause();
-        readCopyStream.setMaxListeners(100);
-        for (var i = 0; i < numCPUs; i++) {
-          (function(idNum){
-            var fileName = 'formattedData' + idNum + '.txt'
-            var writeCopyStream = fs.createWriteStream(path.join(kpCompleteLocation,fileName), {encoding: 'utf8'});
-            readCopyStream.pipe(writeCopyStream);
-          })(i);
-        }
-        //just in case the writeStreams take some extra time to set up:
-        setTimeout(function() {
-          readCopyStream.resume();
-        }, 100);
+        if(argv.copyData) {
+          // creates one copy of the dataset for each child process
+          var copyTime = Date.now();
+          var readCopyStream = fs.createReadStream(path.join(kpCompleteLocation,'/formattingData3.txt'), {encoding:'utf8'});
+          readCopyStream.pause();
+          readCopyStream.setMaxListeners(100);
+          for (var i = 0; i < numCPUs; i++) {
+            (function(idNum){
+              var fileName = 'formattedData' + idNum + '.txt'
+              var writeCopyStream = fs.createWriteStream(path.join(kpCompleteLocation,fileName), {encoding: 'utf8'});
+              readCopyStream.pipe(writeCopyStream);
+            })(i);
+          }
+          console.log('after creating readCopyStream');
+          //just in case the writeStreams take some extra time to set up:
+          setTimeout(function() {
+            console.log('resuming readCopyStream');
+            readCopyStream.resume();
+          }, 100);
 
-        readCopyStream.on('end', function() {
-          console.log('finished copying in:', (Date.now() - copyTime) / 1000, 'seconds');
-          totalRows = dataSummary.totalRows;
-          chunkCount = dataSummary.chunkCount;
-          callback(dataSummary);
+          readCopyStream.on('end', function() {
+            console.log('finished copying in:', (Date.now() - copyTime) / 1000, 'seconds');
+            // totalRows = dataSummary.totalRows;
+            // chunkCount = dataSummary.chunkCount;
+            callback(dataSummary);
+            
+          });
           
-        });
+        } else {
+          callback(dataSummary);
+
+        }
       });
     })
   });

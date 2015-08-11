@@ -44,3 +44,5 @@ Format of Prediction File:
 3. useStreams: whether to feed data into the net via a stream, or load up all the data at once and feed it in as one big block. Streams have a HUGE advantage in terms of the memory they take up, so if RAM is your limiting factor, use streams. However, at the moment (until I can refactor to use child_processes' stdio), streams have a significant disadvantage in training time. So if your dataset is small, don't use streams. If your dataset is large enough to possibly run out of memory, pass in true for useStream. 
 3 Default: false
 3 NOTE: this is not fully implemented yet. The code is all there, I just haven't made sure it's all still working properly. This would be an easy PR to contribute :)
+4. --copyData: if you are training from streams, you are going to be IO bound from reading from the data file. One possible way to speed this up is to create copies of the data set so each net is reading from it's own file, preventing any blocking collisions from taking place. This will, of course, take up substantially more storage on disk, but since you're probably using streams at this point, streams take up substantially less RAM. 
+
