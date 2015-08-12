@@ -46,5 +46,9 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 3 NOTE: this is not fully implemented yet. The code is all there, I just haven't made sure it's all still working properly. This would be an easy PR to contribute :)
 4. `--copyData`: if you are training from streams, you are going to be IO bound from reading from the data file. One possible way to speed this up is to create copies of the data set so each net is reading from it's own file, preventing any blocking collisions from taking place. This will, of course, take up substantially more storage on disk, but since you're probably using streams at this point, streams take up substantially less RAM. 
 5. `--kagglePredict`: see above (Format of Prediction File).
-
+6. `--dev`: This flag indicates that you are doing engineering work on ppComplete itself. It does things like:
+  a) set the number of iterations to 1
+  b) set the number of nets trained to 2
+  c) if no data is passed in, automatically use the kaggleGiveCredit.csv dataset
+7. `--devKaggle`: Does all the same things as `--dev`, but also runs `--kagglePredict` on the default dataset kaggleGiveCreditTest.csv
 

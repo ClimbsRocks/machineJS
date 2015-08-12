@@ -1,5 +1,5 @@
 module.exports = {
-  createParamsToTest: function (numFeatures) {
+  createParamsToTest: function (numFeatures, argv) {
     var allParamsToTest = [];
     // TODO: double this and have it for a variety of trainingRates. 
   // ADVANCED: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
@@ -23,8 +23,16 @@ module.exports = {
         allParamsToTest.push(createOneParamArray(layersArray[i],nodesArray[j]));
       }
     }
-    console.log('allParamsToTest:',allParamsToTest);
     numOfNetsToTest = allParamsToTest.length;
+    // if this is dev or devKaggle, we only want to test the largest and smallest nets (2 total)
+    console.log('argv.dev inside createParamsToTest:',argv.dev);
+    if(argv.dev || argv.devKaggle) {
+      var tempParamsToTest = [];
+      tempParamsToTest.push(allParamsToTest.shift());
+      tempParamsToTest.push(allParamsToTest.pop());
+      allParamsToTest = tempParamsToTest;
+    }
+    console.log('allParamsToTest:',allParamsToTest);
     return allParamsToTest;
   }
 }

@@ -12,6 +12,18 @@ console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 
+// setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
+if(argv.dev || argv.devKaggle) {
+  console.log('we are inside argv.dev')
+  if (dataFile.slice(-4) !== '.csv') {
+    dataFile = 'kaggleGiveCredit.csv'
+  }
+  if (argv.devKaggle && !argv.kagglePredict) {
+    argv.kagglePredict = 'kaggleGiveCreditTest.csv';
+  }
+
+}
+
 console.log('numCPUs:',numCPUs);
 
 var bestNetObj = {
@@ -117,6 +129,8 @@ var createChild = function() {
   } else {
     var child = child_process.fork('./brainChildMemoryHog',{cwd: kpCompleteLocation});
   }
+
+  // if this is a dev run, we only want to train two nets (the smallest and largest configurations). otherwise, we want to test all configurations. 
   var messageObj = makeTrainingObj( allParamsToTest.shift() );
 
   child.send(messageObj);
@@ -175,7 +189,7 @@ function attachListeners(child) {
         readyToMakePredictions = true;
         console.log(neuralNetResults);
         if(argv.kagglePredict) {
-          makeKagglePredictions( argv.kagglePredict);
+          makeKagglePredictions( argv.kagglePredict, dataSummary, kpCompleteLocation );
           
         }
       } 
@@ -207,17 +221,21 @@ var parallelNets = function() {
   // 1. hidden layers: 1 - 10
     // most likely, we'll settle on something like 1-3 hidden layers, but it's fun to try them all
   // 2. nodes per hidden layer: (0.5 - 100) * numFeatures
-  allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures);
+  allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures, argv);
   numOfNetsToTest = allParamsToTest.length;
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
     // wrapping this in an IIFE so each child is available in it's own scope
-    (function() {
-      var child = createChild();
-      attachListeners(child);
-      referencesToChildren.push(child);
-    })();
+    // if we still have something left to test, create a new child!
+    if(allParamsToTest.length) {
+      (function() {
+        var child = createChild();
+        attachListeners(child);
+        referencesToChildren.push(child);
+      })();
+      
+    }
   }
 
 };
@@ -231,6 +249,9 @@ var parallelNets = function() {
 var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
 // console.log('advancedOptions:',advancedOptions);
 var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
+if(argv.dev || argv.devKaggle) {
+  maxChildTrainingIterations = 1;
+}
 // ADVANCED: let them specify a total training time, and then we'll guesstimate how long each child has to train from there
 
 // var trainingCuller = function() {

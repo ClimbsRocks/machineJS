@@ -1,20 +1,19 @@
 var fs = require('fs');
 var brain = require('brain');
 var stream = require('stream');
-var globals = require('./globals.js');
 var formatDataStreams = require('./formatDataStreams.js');
 
 
-module.exports = function(pathToKaggleData) {
+module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation) {
   console.log('inside module.exports function from makeKagglePredictions');
-  console.log('dataSummary is:',globals.dataSummary);
+  console.log('dataSummary is:', dataSummary);
   var net = new brain.NeuralNetwork();
-  console.log('globals.bestNetObj:',globals.bestNetObj);
-  var bestNet = net.fromJSON(globals.bestNetObj);
+  console.log(' bestNetObj:', bestNetObj);
+  var bestNet = net.fromJSON( bestNetObj);
   var trainingResults = {};
 
-  var readFileStream = fs.createReadStream(path.join(globals.kpCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
-  var tStream = formatDataStreams.formatDataTransformStream();
+  var readFileStream = fs.createReadStream(path.join( kpCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
+  var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
 
   var testStream = new stream.Writable();
   testStream._write = function(chunk, encoding, done) {
@@ -24,12 +23,15 @@ module.exports = function(pathToKaggleData) {
     this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
 
     for(var i = 0; i < rows.length; i++) {
+      console.log('inside writable streams chunk for loop, and row is:',rows[i]);
       var row = JSON.parse(rows[i]);
+
       var results = bestNet.run(row);
       console.log('results from testing!',results);
     }
 
-    // TODO: invoke net.run on each object we pull from the chunk
+    // TODO: figure out what to do with the predictions from the net
+      // add them to a giant chunk, then write that chunk to a file. 
     done();
   };
   testStream._partialLineData = '';
@@ -42,8 +44,7 @@ module.exports = function(pathToKaggleData) {
     done();
   };
 
-
-
+  readFileStream.pipe(tStream).pipe(testStream);
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
 
