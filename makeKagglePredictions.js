@@ -7,12 +7,14 @@ var path = require('path');
 
 module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bestNetObj) {
   console.log('inside module.exports function from makeKagglePredictions');
+  dataSummary.isTesting = true;
   var net = new brain.NeuralNetwork();
   console.log(' bestNetObj:', bestNetObj);
   var bestNet = net.fromJSON( JSON.parse(bestNetObj.trainingBestAsJSON));
   var trainingResults = {};
 
   var readFileStream = fs.createReadStream(path.join( kpCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
+  var firstTransformForTesting = formatDataStreams.firstTransformForTesting(dataSummary);
   var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
 
   var testStream = new stream.Writable();
@@ -26,7 +28,9 @@ module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bes
       console.log('inside writable streams chunk for loop, and row is:',rows[i]);
       var row = JSON.parse(rows[i]);
 
-      var results = bestNet.run(row);
+      // TODO TODO: we are getting output back that looks correct, but I think we have to pass in row.input, now the whole row. 
+      // TODO: Potentially submit this as a PR to brainjs- the ability to pass in the entire row object to net.run, and then I'll check to see if there's an output value already, and if not, run it? 
+      var results = bestNet.run(row.input);
       console.log('results from testing!',results);
     }
 
@@ -44,7 +48,7 @@ module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bes
     done();
   };
 
-  readFileStream.pipe(tStream).pipe(testStream);
+  readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream);
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
 

@@ -161,6 +161,68 @@ module.exports = {
     return tStream1;
   },
 
+  firstTransformForTesting: function (dataSummary) {
+    var tStream1 = new stream.Transform({objectMode: true});
+    tStream1._partialLineData = '';
+    tStream1.dataSummary = dataSummary;
+    // var countOfRows = 0; 
+    // var expectedRowLength = 0; //we want this to be available for all of our transformStreams. could consider making it a variable on tStream1 later to make it slightly cleaner. 
+    tStream1.transformOneRow = function(columns) {
+      var thisRow = [];
+      if(columns.length !== tStream1.dataSummary.expectedRowLength) {
+        console.log('this row appears to be a different length than expected:');
+        console.log(columns);
+      } else {
+        // iterate through the columns for this particular row. 
+        for (var j = 0; j < columns.length; j++) {
+          var item = columns[j];
+          if(parseFloat(item, 10).toString() !== 'NaN') {
+            item = parseFloat(item);
+          }
+          thisRow.push(item);
+        }
+      }
+      return thisRow;
+    }
+
+    tStream1._transform = function (chunk, encoding, done) {
+      var data = chunk.toString();
+      data = this._partialLineData + data;
+
+      // replaces all line endings with just '\n'
+      data = data.replace(/(\r\n|\n|\r)/gm,'\n');
+
+      var rowsToPush = '';
+
+      var rows = data.split('\n');
+      // it would be unusual for the readStream to break perfectly at a line ending each time, so we assume the final thing it gives us is a partial line, whihc we'll need to add onto the data it gives us on the next read. 
+      this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+
+      for(var i = 0; i < rows.length; i++) {
+        // ADVANCED: give them the option of using other things as column separators, such as | or semicolon
+        var columns = rows[i].split(',');
+
+        // Create the tStream1.dataSummary object
+        var transformedRow = this.transformOneRow(columns);
+        rowsToPush += JSON.stringify(transformedRow) + '\n';
+        columns = []; //i'm not entirely sure if this is necessary, but it seems like it will be helpful in cases with errors. 
+      }
+      this.push(rowsToPush);
+      done();
+    };
+
+    tStream1._flush = function (done) {
+      if (this._partialLineData) {
+        var columns = this._partialLineData.split(',');
+        var transformedRow = this.transformOneRow(columns)
+        this.push(JSON.stringify(transformedRow));
+      }
+      this._partialLineData = '';
+      done();
+    };
+    return tStream1;
+  },
+
   // tStream2: calculate standard deviations of numeric data. 
   calculateStandardDeviationTStream: function(dataSummary) {
     // tStream2: calculate standard deviations of numeric data. 
@@ -265,12 +327,16 @@ module.exports = {
           // we include the column name in the feature name so that we don't have collisions (for example, a school might have different columns for different classes, and might fill each cell with "Passed","Withdrew",etc. If we just included "Passed", rather than "Grade12Passed", it would be meaningless).
           var featureName = item + k;
           brainObj.input[featureName] = 1;
-          // if that feature does not exist in our tStream3.dataSummary obj yet:
-          if(!tStream3.dataSummary[k].features[featureName]) {
-            tStream3.dataSummary[k].features = 1;
-            tStream3.dataSummary.numFeatures++;
-          } else {
-            tStream3.dataSummary[k].features[featureName]++;
+          // TODO: figure out some way of making sure we only use the same features for testing that we did for training. 
+          if(!tStream3.dataSummary.isTesting) {
+            // if that feature does not exist in our tStream3.dataSummary obj yet:
+            if(!tStream3.dataSummary[k].features[featureName]) {
+              tStream3.dataSummary[k].features = 1;
+              tStream3.dataSummary.numFeatures++;
+            } else {
+              tStream3.dataSummary[k].features[featureName]++;
+            }
+
           }
         } else {
           console.error('we have not yet figured out how to handle data for this column number:',k,'values:',item);

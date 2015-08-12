@@ -3,4 +3,5 @@ npm-debug.log
 kaggleTrainingData.csv
 formattingData*.txt
 formattedData*.txt
+bestNet*.txt
 *.csv
