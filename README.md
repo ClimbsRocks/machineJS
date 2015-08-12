@@ -8,7 +8,7 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 2. npm install
 3. `node kpLib.js <PATH TO DATA FILE>.csv`
 
-Format of Data File:
+### Format of Data File:
 1. .csv file
 2. First row holds the column names
 3. The first column holds the output data (what you want the net to make a prediction about)
@@ -18,7 +18,7 @@ Format of Data File:
 <!-- TODO: add in directions on how to make sure their data is formatted in UTF-8. -->
 <!-- TODO: add in error messages letting the user know their data isn't formatted in UTF-8. -->
 
-Format of Prediction File:
+### Format of Prediction File:
 1. Make sure the columns all have the exact same names as they do in the input file. 
 2. Make the first column the one that needs a prediction. And leave it empty. 
 3. We have a kagglePredict function all ready to go! use the `--kagglePredict` flag and pass in the path to the test data file: `node kpLib.js giveCredit.csv --kagglePredict kaggleTestData.csv`. (in-progress)
@@ -37,12 +37,14 @@ Format of Prediction File:
 5. Make sure each row has the same number of columns (even if those columns are blank, they must exist)
 
 ## The Current State Of Advanced Options: 
-1. maxTrainingTime: the maximum amount of time (in seconds) to let any child process train one individual neural net. 
+1. `--maxTrainingTime`: the maximum amount of time (in seconds) to let any child process train one individual neural net. 
 1 Default: 600 (5 minutes)
-2. maxTrainingIterations: the maximum number of iterations to let any child process train one individual neural net.
+2. `--maxTrainingIterations`: the maximum number of iterations to let any child process train one individual neural net.
 2 Default: 100
-3. useStreams: whether to feed data into the net via a stream, or load up all the data at once and feed it in as one big block. Streams have a HUGE advantage in terms of the memory they take up, so if RAM is your limiting factor, use streams. However, at the moment (until I can refactor to use child_processes' stdio), streams have a significant disadvantage in training time. So if your dataset is small, don't use streams. If your dataset is large enough to possibly run out of memory, pass in true for useStream. 
+3. `--useStreams`: whether to feed data into the net via a stream, or load up all the data at once and feed it in as one big block. Streams have a HUGE advantage in terms of the memory they take up, so if RAM is your limiting factor, use streams. However, at the moment (until I can refactor to use child_processes' stdio), streams have a significant disadvantage in training time. So if your dataset is small, don't use streams. If your dataset is large enough to possibly run out of memory, pass in true for useStream. 
 3 Default: false
 3 NOTE: this is not fully implemented yet. The code is all there, I just haven't made sure it's all still working properly. This would be an easy PR to contribute :)
-4. --copyData: if you are training from streams, you are going to be IO bound from reading from the data file. One possible way to speed this up is to create copies of the data set so each net is reading from it's own file, preventing any blocking collisions from taking place. This will, of course, take up substantially more storage on disk, but since you're probably using streams at this point, streams take up substantially less RAM. 
+4. `--copyData`: if you are training from streams, you are going to be IO bound from reading from the data file. One possible way to speed this up is to create copies of the data set so each net is reading from it's own file, preventing any blocking collisions from taking place. This will, of course, take up substantially more storage on disk, but since you're probably using streams at this point, streams take up substantially less RAM. 
+5. `--kagglePredict`: see above (Format of Prediction File).
+
 
