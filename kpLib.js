@@ -21,15 +21,17 @@ if(argv.dev || argv.devKaggle) {
   if (argv.devKaggle && !argv.kagglePredict) {
     argv.kagglePredict = 'kaggleGiveCreditTest.csv';
   }
-
 }
+
+// TODO: nest most console logs inside a check for --dev (or --verbose?)
+// TODO: build out --devKaggle
 
 console.log('numCPUs:',numCPUs);
 
 var bestNetObj = {
   trainingBestAsJSON: '',
   testingBestAsJSON: '',
-  trainingError: 1,
+  trainingErrorRate: 1,
   testingError: 1,
   trainingBestTrainingTime: Infinity,
   testingBestTrainingTime: Infinity
@@ -187,10 +189,8 @@ function attachListeners(child) {
         console.log('done training all the neural nets you could conjure up!');
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
-        console.log(neuralNetResults);
-        if(argv.kagglePredict) {
-          makeKagglePredictions( argv.kagglePredict, dataSummary, kpCompleteLocation );
-          
+        if(argv.kagglePredict || argv.devKaggle) {
+          makeKagglePredictions( argv.kagglePredict, dataSummary, kpCompleteLocation, bestNetObj );
         }
       } 
       
@@ -321,13 +321,17 @@ var testOutput = function(net) {
   });
 };
 
-var bestNetChecker = function(trainingResults,trainedNet) {
-  // console.log('checking if this is the best net:',trainingResults);
-  if(trainingResults.error < bestNetObj.trainingErrorRate) {
+var bestNetChecker = function(trainingResults) {
+  console.log('checking if this is the best net:',trainingResults);
+  console.log('trainingResults.errorRate:',trainingResults.errorRate,'bestNetObj.trainingErrorRate:',bestNetObj.trainingErrorRate);
+  if(trainingResults.errorRate < bestNetObj.trainingErrorRate) {
+    console.log('this is the best net!');
+    console.log('trainingResults:',trainingResults);
+    console.log('trainingResults.net:',trainingResults.net);
     // make this the best net
-    bestNetObj.trainingBestAsJSON = trainingResults.net;
-    fs.writeFile('bestNet' + Date.now(), bestNetObj.trainingBestAsJSON);
-    bestNetObj.trainingErrorRate = trainingResults.error;
+    bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
+    fs.writeFile('bestNet' + Date.now() + '.txt', bestNetObj.trainingBestAsJSON);
+    bestNetObj.trainingErrorRate = trainingResults.errorRate;
     bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
   }
   //check against our global bestNet

@@ -2,14 +2,14 @@ var fs = require('fs');
 var brain = require('brain');
 var stream = require('stream');
 var formatDataStreams = require('./formatDataStreams.js');
+var path = require('path');
 
 
-module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation) {
+module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bestNetObj) {
   console.log('inside module.exports function from makeKagglePredictions');
-  console.log('dataSummary is:', dataSummary);
   var net = new brain.NeuralNetwork();
   console.log(' bestNetObj:', bestNetObj);
-  var bestNet = net.fromJSON( bestNetObj);
+  var bestNet = net.fromJSON( JSON.parse(bestNetObj.trainingBestAsJSON));
   var trainingResults = {};
 
   var readFileStream = fs.createReadStream(path.join( kpCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
