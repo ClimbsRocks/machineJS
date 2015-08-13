@@ -23,6 +23,15 @@ if(argv.dev || argv.devKaggle) {
   }
 }
 
+// TODO: graph the error rates! 
+  // on each iteration, push the error rate into an array for that net. 
+  // then, simply go through and graph them all. 
+  // over time, we can build in a nice dashboard (select the num of hidden layers, select the num of nodes per hidden layer, etc.)
+  // goal: to see if there's much of a difference between the different nets
+    // to see if we should keep training the nets for longer
+    // to see if we should have killed off training a certain net even more quickly
+    // because it's cool :) and it will give the user something to look at while their nets are training. it's a good status update. 
+
 // TODO: nest most console logs inside a check for --dev (or --verbose?)
 // TODO: build out --devKaggle
 
