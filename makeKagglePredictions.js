@@ -17,38 +17,68 @@ module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bes
   var firstTransformForTesting = formatDataStreams.firstTransformForTesting(dataSummary);
   var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
 
-  var testStream = new stream.Writable();
-  testStream._write = function(chunk, encoding, done) {
+  var testStream = new stream.Transform({objectMode: true});
+
+  // the first column just contains the row names. 
+  var hasRemovedColumnHeaders = false;
+
+  testStream._transform = function(chunk, encoding, done) {
     var data = chunk.toString();
     data = this._partialLineData + data;
     var rows = data.split('\n');
     this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
+    var resultsToPush = '';
+
+    if(!hasRemovedColumnHeaders) {
+      rows.shift();
+    }
 
     for(var i = 0; i < rows.length; i++) {
-      console.log('inside writable streams chunk for loop, and row is:',rows[i]);
+      // console.log('inside writable streams chunk for loop, and row is:',rows[i]);
       var row = JSON.parse(rows[i]);
 
       // TODO TODO: we are getting output back that looks correct, but I think we have to pass in row.input, now the whole row. 
       // TODO: Potentially submit this as a PR to brainjs- the ability to pass in the entire row object to net.run, and then I'll check to see if there's an output value already, and if not, run it? 
       var results = bestNet.run(row.input);
-      console.log('results from testing!',results);
+      // row.output = results;
+      // TODO: generalize away from assuming we just have a single numericOutput value
+      // console.log('row:',row);
+      var rowResults = row.rowID + ',' + results.numericOutput + '\n';
+      // resultsToPush += JSON.stringify(row) + '\n';
+      console.log('results from testing!',rowResults);
+      resultsToPush += rowResults;
     }
 
     // TODO: figure out what to do with the predictions from the net
       // add them to a giant chunk, then write that chunk to a file. 
+    this.push(resultsToPush);
     done();
   };
+
   testStream._partialLineData = '';
   testStream._flush = function (done) {
     if (this._partialLineData) {
-      console.log('we have partial data in our testStream');
-      var results = net.run(JSON.parse(this._partialLineData));
+      var row = JSON.parse(this._partialLineData)
+      var results = net.run(row);
+      var rowResults = row.rowID + ',' + results.numericOutput + '\n';
+      this.push(rowResults);
     }
     this._partialLineData = '';
     done();
   };
 
-  readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream);
+  var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/kagglePredictions' + Date.now() + '.txt'), {encoding: 'utf8'});
+
+  // TODO: better variable naming
+  readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream).pipe(writeStream);
+
+// Deprecated:
+//   // TODO TODO: create a new write stream that will write to file 
+//   //   that will have to translate what is currently an object into a comma-separated string
+//   //     the difficulty will be ensuring we keep the order. 
+//   //     the output will be the first column, then i think we have everything stored into keys that are just numeric indices, so we should be able to treat it like a pseudo-array
+//   //     we have the number of columns from dataSummary, so just iterate through it. 
+
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
 

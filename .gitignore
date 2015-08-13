@@ -4,4 +4,5 @@ kaggleTrainingData.csv
 formattingData*.txt
 formattedData*.txt
 bestNet*.txt
+kagglePredictions*.txt
 *.csv

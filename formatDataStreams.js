@@ -337,12 +337,15 @@ module.exports = {
               tStream3.dataSummary[k].features[featureName]++;
             }
 
-          }
+          } 
         } else {
           console.error('we have not yet figured out how to handle data for this column number:',k,'values:',item);
           
         }
       }
+
+      // for now, we are assuming that the second column contains an ID for that row. This is important for makeKagglePredictions (and likely won't mess anything up if we are not doing a kagglePrediction and we don't have a rowID). 
+      brainObj.rowID = row[1];
 
       //earmark 20% of our dataset for testing. 
       if(Math.random() > 0.8) {
