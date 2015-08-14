@@ -40,7 +40,7 @@ console.log('numCPUs:',numCPUs);
 var bestNetObj = {
   trainingBestAsJSON: '',
   testingBestAsJSON: '',
-  trainingErrorRate: 1,
+  trainingErrorRate: [Infinity],
   testingError: 1,
   trainingBestTrainingTime: Infinity,
   testingBestTrainingTime: Infinity
@@ -126,7 +126,7 @@ var updateNetStatus = function(message) {
   // console.log('message inside updateNetStatus',message);
   var id = message.brainID;
   neuralNetResults[id].iterations = message.iterations;
-  neuralNetResults[id].trainingErrorRate = message.errorRate;
+  neuralNetResults[id].trainingErrorRate.push(message.errorRate);
   neuralNetResults[id].net = message.net;
 }
 
@@ -150,7 +150,7 @@ var createChild = function() {
     hiddenLayers: messageObj.hiddenLayers,
     learningRate: messageObj.trainingObj.learningRate,
     iterations: 0,
-    trainingErrorRate: Infinity,
+    trainingErrorRate: [],
     net: undefined,
     testingErrorRate: Infinity,
     running: true
@@ -214,6 +214,7 @@ function attachListeners(child) {
         // TODO: we're going to have to generalize this
         netCheckup();
       }
+      bestNetChecker(message);
     } else {
       console.log('heard a message in parent and did not know what to do with it:',message);
     }
@@ -331,17 +332,20 @@ var testOutput = function(net) {
 };
 
 var bestNetChecker = function(trainingResults) {
-  console.log('checking if this is the best net:',trainingResults);
-  console.log('trainingResults.errorRate:',trainingResults.errorRate,'bestNetObj.trainingErrorRate:',bestNetObj.trainingErrorRate);
-  if(trainingResults.errorRate < bestNetObj.trainingErrorRate) {
+  // console.log('checking if this is the best net:',trainingResults);
+  // bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
+  console.log('trainingResults.errorRate:',trainingResults.errorRate,'bestNetObj.trainingErrorRate:',bestNetObj.trainingErrorRate[bestNetObj.trainingErrorRate.length -1]);
+  if(trainingResults.errorRate < bestNetObj.trainingErrorRate[bestNetObj.trainingErrorRate.length -1]) {
     console.log('this is the best net!');
-    console.log('trainingResults:',trainingResults);
-    console.log('trainingResults.net:',trainingResults.net);
+    // console.log('trainingResults:',trainingResults);
+    // console.log('trainingResults.net:',trainingResults.net);
     // make this the best net
     bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
     fs.writeFile('bestNet' + Date.now() + '.txt', bestNetObj.trainingBestAsJSON);
-    bestNetObj.trainingErrorRate = trainingResults.errorRate;
+    // TODO: grab the entire array
+    bestNetObj.trainingErrorRate = neuralNetResults[trainingResults.brainID].trainingErrorRate;
     bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
+    bestNetObj.iterations = trainingResults.iterations;
   }
   //check against our global bestNet
   // console.log('bestNet now is:',bestNet);
@@ -352,7 +356,7 @@ var bestNetChecker = function(trainingResults) {
 
 function makeTrainingObj (hlArray) {
   var trainingObj = {
-    errorThresh: 0.052,  // error threshold to reach
+    errorThresh: 0.05,  // error threshold to reach
     iterations: 1000,   // maximum training iterations
     log: true,           // console.log() progress periodically
     logPeriod: 1,       // number of iterations between logging
