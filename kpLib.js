@@ -12,6 +12,8 @@ console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 
+// TODO TODO: kill off all childNets if the parent process exits for any reason (particularly if it errors out). 
+
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
 if(argv.dev || argv.devKaggle) {
   console.log('we are inside argv.dev')
@@ -350,8 +352,7 @@ var bestNetChecker = function(trainingResults) {
       var bestNetFileName = 'bestNet' + Date.now() + '.txt';
       namesOfWrittenNets.push(bestNetFileName);
       fs.writeFile(bestNetFileName, bestNetObj.trainingBestAsJSON, function() {
-        // TODO TODO: fs.unlink the previously saved files containing now outdated bestNets. they should all be saved into an array. 
-        console.log('we have successfully written the new best net');
+        // delete the previously written bestNet file(s), now that we have a new one written to disk successfully. 
         while(namesOfWrittenNets.length > 1) {
           fs.unlink(namesOfWrittenNets.shift());
         }
@@ -448,5 +449,23 @@ console.log('pathToData before invoking readAndFormatData:')
 readAndFormatData(kpCompleteLocation, dataFile, function(formattingSummary) {
   dataSummary = formattingSummary;
   parallelNets();
+});
+
+// kills off all the child processes if the parent process faces an uncaught exception and crashes. 
+// this prevents you from having zombie child processes running indefinitely.
+// lifted directly from: https://www.exratione.com/2013/05/die-child-process-die/
+// This is a somewhat ugly approach, but it has the advantage of working
+// in conjunction with most of what third parties might choose to do with
+// uncaughtException listeners, while preserving whatever the exception is.
+process.once("uncaughtException", function (error) {
+  // If this was the last of the listeners, then shut down the child and rethrow.
+  // Our assumption here is that any other code listening for an uncaught
+  // exception is going to do the sensible thing and call process.exit().
+  if (process.listeners("uncaughtException").length === 0) {
+    for(var i = 0; i < referencesToChildren.length; i++) {
+      referencesToChildren[i].kill();
+    }
+    throw error;
+  }
 });
 
