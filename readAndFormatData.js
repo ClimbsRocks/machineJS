@@ -96,6 +96,8 @@ module.exports = function(kpCompleteLocation, dataFileName, callback) {
         var trainingTime = (Date.now() - t2Start) / 1000;
         console.log('third transformStream took:',trainingTime);
 
+        fs.unlink(path.join(kpCompleteLocation,'/formattingData.txt'));
+        fs.unlink(path.join(kpCompleteLocation,'/formattingData2.txt'));
         if(argv.copyData) {
           // creates one copy of the dataset for each child process
           var copyTime = Date.now();
