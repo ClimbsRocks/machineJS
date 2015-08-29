@@ -331,6 +331,7 @@ var testOutput = function(net) {
   });
 };
 
+var mostRecentWrittenNet = Date.now();
 var bestNetChecker = function(trainingResults) {
   // console.log('checking if this is the best net:',trainingResults);
   // bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
@@ -341,7 +342,15 @@ var bestNetChecker = function(trainingResults) {
     // console.log('trainingResults.net:',trainingResults.net);
     // make this the best net
     bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
-    fs.writeFile('bestNet' + Date.now() + '.txt', bestNetObj.trainingBestAsJSON);
+    // we will have many new bestNets on our first training round. This prevents us from having too many new files created
+    // Admittedly, this is potentially still creating a new net every three seconds, which is a lot.
+    // The risk we're running right now is simply that we lose three seconds worth of work. The worst case scenario is that we write the most recent net to file, and then 2.9 seconds later, we simultaneously get a new best net, don't write it to file, and then close out the server for some reason, forever losing that last net. This seems a small risk. 
+    if(completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
+      fs.writeFile('bestNet' + Date.now() + '.txt', bestNetObj.trainingBestAsJSON, function() {
+        // TODO TODO: fs.unlink the previously saved files containing now outdated bestNets. they should all be saved into an array. 
+      });
+      mostRecentWrittenNet = Date.now();
+    }
     // TODO: grab the entire array
     bestNetObj.trainingErrorRate = neuralNetResults[trainingResults.brainID].trainingErrorRate;
     bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
