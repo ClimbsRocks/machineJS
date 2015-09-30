@@ -19,7 +19,7 @@ fullPathToDataFile = sys.argv[1]
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'pythonOutputVect' to the filename the user gave us
 outputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect' + fileName)
-outputFileName2 = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect2' + fileName)
+inputFileName2 = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect2' + fileName)
 inputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect' + fileName)
 
 with open(fullPathToDataFile, 'rU') as csvInput:
@@ -27,13 +27,17 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     # create new files for our output column and input columns
     outputFile = open(outputFileName, 'w+')
     csvProcessedOutputFile = csv.writer(outputFile)
+    takenOutputLabelOff = False
     with open(inputFileName, 'w+') as inputFile:
         csvProcessedInputFile = csv.writer(inputFile)
 
 
         for row in csvRows:
             # write the output column to the output file
-            csvProcessedOutputFile.writerow( [row.pop(0)] )
+            if takenOutputLabelOff:
+                csvProcessedOutputFile.writerow( [row.pop(0)] )
+            else:
+                takenOutputLabelOff = True
             # remove all 'NA' from the input, then write it to a file
             newRow = []
             for value in row:
@@ -44,8 +48,9 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     outputFile.close()
     
 
+# TODO TODO: we are getting a number of 'nan' values- sort this out!
 with open(inputFileName, 'rU') as csvInputToVectorize:
-    with open(outputFileName2, 'w+') as outputFile2:
+    with open(inputFileName2, 'w+') as outputFile2:
         csvProcessedOutputFile2 = csv.writer(outputFile2)
 
         inputRows = csv.DictReader(csvInputToVectorize)
