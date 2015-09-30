@@ -9,6 +9,7 @@
 import sys
 import csv
 import os
+import math
 import sklearn
 from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
@@ -27,23 +28,27 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     # create new files for our output column and input columns
     outputFile = open(outputFileName, 'w+')
     csvProcessedOutputFile = csv.writer(outputFile)
-    takenOutputLabelOff = False
+    firstRow = False
     with open(inputFileName, 'w+') as inputFile:
         csvProcessedInputFile = csv.writer(inputFile)
 
 
         for row in csvRows:
             # write the output column to the output file
-            if takenOutputLabelOff:
-                csvProcessedOutputFile.writerow( [row.pop(0)] )
-            else:
-                takenOutputLabelOff = True
-            # remove all 'NA' from the input, then write it to a file
             newRow = []
-            for value in row:
-                if value == 'NA':
-                    value = 0
-                newRow.append(value)
+            if firstRow:
+                csvProcessedOutputFile.writerow( [row.pop(0)] )
+
+                for value in row:
+                    if value == 'NA':
+                        value = 0
+                    newRow.append(value)
+            else:
+                firstRow = True
+                # we want to push the labels in directly, after taking out the output label
+                row.pop(0)
+                newRow = row
+            # remove all 'NA' from the input, then write it to a file
             csvProcessedInputFile.writerow( newRow )
     outputFile.close()
     
