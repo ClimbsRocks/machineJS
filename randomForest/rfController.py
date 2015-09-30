@@ -18,8 +18,8 @@ inputDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomF
 with open(inputDataFileName, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)
     for row in inputRows:
-        for value in row:
-            if value == 'nan'
+        # for value in row:
+        #     if value == 'nan'
 
         trainingData.append(row)
 
@@ -36,8 +36,6 @@ print trainingData
 
 
 rf = RandomForestClassifier(n_estimators=150)
-# TODO:
-  # load in the two datasets
 
 rf.fit(trainingData, targetData)
 
