@@ -27,41 +27,40 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     # create new files for our output column and input columns
     outputFile = open(outputFileName, 'w+')
     csvProcessedOutputFile = csv.writer(outputFile)
-    inputFile = open(inputFileName, 'w+')
-    csvProcessedInputFile = csv.writer(inputFile)
+    with open(inputFileName, 'w+') as inputFile:
+        csvProcessedInputFile = csv.writer(inputFile)
 
 
-    for row in csvRows:
-        # write the output column to the output file
-        csvProcessedOutputFile.writerow( [row.pop(0)] )
-        # remove all 'NA' from the input, then write it to a file
-        newRow = []
-        for value in row:
-            if value == 'NA':
-                value = 0
-            newRow.append(value)
-        csvProcessedInputFile.writerow( newRow )
+        for row in csvRows:
+            # write the output column to the output file
+            csvProcessedOutputFile.writerow( [row.pop(0)] )
+            # remove all 'NA' from the input, then write it to a file
+            newRow = []
+            for value in row:
+                if value == 'NA':
+                    value = 0
+                newRow.append(value)
+            csvProcessedInputFile.writerow( newRow )
+    outputFile.close()
     
 
 with open(inputFileName, 'rU') as csvInputToVectorize:
-    outputFile2 = open(outputFileName2, 'w+')
-    csvProcessedOutputFile2 = csv.writer(outputFile2)
+    with open(outputFileName2, 'w+') as outputFile2:
+        csvProcessedOutputFile2 = csv.writer(outputFile2)
 
-    inputRows = csv.DictReader(csvInputToVectorize)
-    inputList = []
-    for row in inputRows:
-        newDict = {}
-        for key in row:
-            try:
-                print row[key]
-                float(row[key])
-                newDict[key] = float(row[key])
-            except:
-                newDict[key] = row[key]
-        inputList.append(newDict)
-    print 'we have correctly built up the input list'
-    print inputList
-    vectorizedInput = dictVectorizer1.fit_transform(inputList)
-    print 'we have vectorized the input'
-    print vectorizedInput.toarray().shape
-    csvProcessedOutputFile2.writerows(vectorizedInput.toarray())
+        inputRows = csv.DictReader(csvInputToVectorize)
+        inputList = []
+        for row in inputRows:
+            newDict = {}
+            for key in row:
+                try:
+                    float(row[key])
+                    newDict[key] = float(row[key])
+                except:
+                    newDict[key] = row[key]
+            inputList.append(newDict)
+        print 'we have correctly built up the input list'
+        vectorizedInput = dictVectorizer1.fit_transform(inputList)
+        print 'we have vectorized the input'
+        print vectorizedInput.toarray().shape
+        csvProcessedOutputFile2.writerows(vectorizedInput.toarray())
