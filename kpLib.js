@@ -1,7 +1,6 @@
 var fs = require('fs');
 var brain = require('brain');
 var path = require('path');
-// var globals = require('./globals.js');
 var numCPUs  = require('os').cpus().length;
 var kpCompleteLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(kpCompleteLocation,'readAndFormatData.js'));
@@ -11,8 +10,9 @@ var argv = require('minimist')(process.argv.slice(2));
 console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
+var PythonShell = require('python-shell');
 
-// TODO TODO: kill off all childNets if the parent process exits for any reason (particularly if it errors out). 
+
 
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
 if(argv.dev || argv.devKaggle) {
@@ -364,11 +364,6 @@ var bestNetChecker = function(trainingResults) {
     bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
     bestNetObj.iterations = trainingResults.iterations;
   }
-  //check against our global bestNet
-  // console.log('bestNet now is:',bestNet);
-  // TODO: write each new bestNet to a file. 
-    // TODO: figure out how to not fail if the user stops the program mid-file-write
-      // I'm thinking we write to a backup file first, then overwrite the main file, or rename the backup file to be the same name as the main file. 
 };
 
 function makeTrainingObj (hlArray) {
@@ -404,43 +399,6 @@ function makeTrainingObj (hlArray) {
 
   return totalMessageObj;
 }
-
-// var multipleNetAlgo = function() {
-//   // TODO: 
-//     // nest everything inside a recursive function
-//     // that function will recurse until we've covered the entire space and converged on an answer
-//     // each iteration will create a new set of params we want to test against
-//     // we will then invoke parallelNets, which will take in an array of params we want to try, and return a promise. 
-//     // once we get the promise back, we'll invoke the recursive function again
-//     // that recursive function will then perform some logic, find a new set of params to train against, and then invoke parallelNets...
-//     // Yeah, Katrina for sure gets the challenging part. 
-//     // That'll be a ton of fun for her :)
-
-//   //create logic for training as many nets as we need. 
-//   var allParamComboArr = [];
-//   for(var i = numCPUs; i > 0; i--) {
-
-//     var hlArray = [];
-//     for (var j = 0; j < i; j++) {
-//       hlArray.push(10);
-//     }
-
-//     var trainingObj = {
-//       errorThresh: 0.053,  // error threshold to reach
-//       iterations: 1000,   // maximum training iterations
-//       log: true,           // console.log() progress periodically
-//       logPeriod: 1,       // number of iterations between logging
-//       learningRate: 0.6    // learning rate
-//     };
-
-//     var fileName = '/formattedData' + (i - 1) + '.txt';
-//     var pathToData = path.join(kpCompleteLocation,fileName);
-
-//     allParamComboArr.push({hiddenLayers: hlArray, trainingObj: trainingObj, pathToData: pathToData, totalRows: dataSummary.totalRows});
-//   }
-
-//   parallelNets(allParamComboArr);
-// };
 
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
