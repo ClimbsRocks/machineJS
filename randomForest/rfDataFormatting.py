@@ -29,9 +29,18 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     csvProcessedOutputFile = csv.writer(outputFile)
     inputFile = open(inputFileName, 'w+')
     csvProcessedInputFile = csv.writer(inputFile)
+
+
     for row in csvRows:
+        # write the output column to the output file
         csvProcessedOutputFile.writerow( [row.pop(0)] )
-        csvProcessedInputFile.writerow( row )
+        # remove all 'NA' from the input, then write it to a file
+        newRow = []
+        for value in row:
+            if value == 'NA':
+                value = 0
+            newRow.append(value)
+        csvProcessedInputFile.writerow( newRow )
     
 
 with open(inputFileName, 'rU') as csvInputToVectorize:
@@ -41,7 +50,18 @@ with open(inputFileName, 'rU') as csvInputToVectorize:
     inputRows = csv.DictReader(csvInputToVectorize)
     inputList = []
     for row in inputRows:
-        inputList.append(row)
+        newDict = {}
+        for key in row:
+            try:
+                print row[key]
+                float(row[key])
+                newDict[key] = float(row[key])
+            except:
+                newDict[key] = row[key]
+        inputList.append(newDict)
+    print 'we have correctly built up the input list'
     print inputList
     vectorizedInput = dictVectorizer1.fit_transform(inputList)
-    csvProcessedOutputFile2.writerows(vectorizedInput)
+    print 'we have vectorized the input'
+    print vectorizedInput.toarray().shape
+    csvProcessedOutputFile2.writerows(vectorizedInput.toarray())
