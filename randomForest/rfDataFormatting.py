@@ -8,12 +8,40 @@
 # possibly write this to file somewhere, rather than having to run this for each new python child_process we spin up? 
 import sys
 import csv
+import os
+import sklearn
+from sklearn.feature_extraction import DictVectorizer
+dictVectorizer1 = DictVectorizer()
 
+# API: this requires the full absolute path to the input data file
+fileName = os.path.split(sys.argv[1])[1]
+fullPathToDataFile = sys.argv[1]
 
-fileName = sys.argv[1]
-print fileName
-with open(fileName, 'rU') as csvInput:
-    csvRows = csv.DictReader(csvInput)
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'pythonOutputVect' to the filename the user gave us
+outputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect' + fileName)
+outputFileName2 = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect2' + fileName)
+inputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect' + fileName)
+
+with open(fullPathToDataFile, 'rU') as csvInput:
+    csvRows = csv.reader(csvInput)
+    # create new files for our output column and input columns
+    outputFile = open(outputFileName, 'w+')
+    csvProcessedOutputFile = csv.writer(outputFile)
+    inputFile = open(inputFileName, 'w+')
+    csvProcessedInputFile = csv.writer(inputFile)
     for row in csvRows:
-        print row
+        csvProcessedOutputFile.writerow( [row.pop(0)] )
+        csvProcessedInputFile.writerow( row )
+    
 
+with open(inputFileName, 'rU') as csvInputToVectorize:
+    outputFile2 = open(outputFileName2, 'w+')
+    csvProcessedOutputFile2 = csv.writer(outputFile2)
+
+    inputRows = csv.DictReader(csvInputToVectorize)
+    inputList = []
+    for row in inputRows:
+        inputList.append(row)
+    print inputList
+    vectorizedInput = dictVectorizer1.fit_transform(inputList)
+    csvProcessedOutputFile2.writerows(vectorizedInput)
