@@ -10,6 +10,7 @@ import sys
 import csv
 import os
 import math
+import json
 import sklearn
 from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
@@ -22,6 +23,14 @@ fullPathToDataFile = sys.argv[1]
 outputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect' + fileName)
 inputFileName2 = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect2' + fileName)
 inputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect' + fileName)
+
+def printParent(text):
+    messageObj = {
+        'text': text,
+        'type': 'console.log'
+    }
+    print json.dumps(messageObj)
+
 
 with open(fullPathToDataFile, 'rU') as csvInput:
     csvRows = csv.reader(csvInput)
@@ -69,8 +78,8 @@ with open(inputFileName, 'rU') as csvInputToVectorize:
                 except:
                     newDict[key] = row[key]
             inputList.append(newDict)
-        print 'we have correctly built up the input list'
+        printParent( 'we have correctly built up the input list' )
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
-        print 'we have vectorized the input'
-        print vectorizedInput.toarray().shape
+        printParent( 'we have vectorized the input' )
+        printParent( vectorizedInput.toarray().shape )
         csvProcessedOutputFile2.writerows(vectorizedInput.toarray())

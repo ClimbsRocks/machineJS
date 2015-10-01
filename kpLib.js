@@ -412,13 +412,20 @@ function makeTrainingObj (hlArray) {
 // **********************************************************************************
 var pythonOptions = {
   scriptPath: kpCompleteLocation,
-  args: [dataFile]
+  args: [dataFile],
+  mode: 'json'
 };
-PythonShell.run('randomForest/rfDataFormatting.py', pythonOptions, function (err, results) {
+var pyFormatterShell = PythonShell.run('randomForest/rfDataFormatting.py', pythonOptions, function (err, results) {
   if (err) throw err;
   // results is an array consisting of messages collected during execution
   console.log('results: %j', results);
   // TODO: inside this callback, now we can start spinning up child_processes to actually run a random forest. 
+});
+
+pyFormatterShell.on('message', function(message) {
+  if(message.type === 'console.log') {
+    console.log('snake says:',message.text);
+  }
 });
 
 
