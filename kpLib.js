@@ -400,14 +400,27 @@ function makeTrainingObj (hlArray) {
   return totalMessageObj;
 }
 
+// **********************************************************************************
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
   // and invoke parallelNets once formatting the data is done. 
-console.log('pathToData before invoking readAndFormatData:')
-readAndFormatData(kpCompleteLocation, dataFile, function(formattingSummary) {
-  dataSummary = formattingSummary;
-  parallelNets();
+// console.log('pathToData before invoking readAndFormatData:')
+// readAndFormatData(kpCompleteLocation, dataFile, function(formattingSummary) {
+//   dataSummary = formattingSummary;
+//   parallelNets();
+// });
+// **********************************************************************************
+var pythonOptions = {
+  scriptPath: kpCompleteLocation,
+  args: [dataFile]
+};
+PythonShell.run('randomForest/rfDataFormatting.py', pythonOptions, function (err, results) {
+  if (err) throw err;
+  // results is an array consisting of messages collected during execution
+  console.log('results: %j', results);
+  // TODO: inside this callback, now we can start spinning up child_processes to actually run a random forest. 
 });
+
 
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
 // this prevents you from having zombie child processes running indefinitely.
