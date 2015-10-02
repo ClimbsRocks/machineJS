@@ -1,14 +1,14 @@
 {
-  "name": "kpComplete",
+  "name": "ppComplete",
   "version": "0.0.1",
-  "description": "Katrina & Preston optimize your ml algos!",
-  "main": "kpLib.js",
+  "description": "automated machine learning! push button ensembling, grid search for javascript neural network",
+  "main": "ppLib.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/kuychaco/kpComplete.git"
+    "url": "http://github.com/ClimbsRocks/ppComplete.git"
   },
   "keywords": [
     "neuralNet",
@@ -31,12 +31,12 @@
     "date",
     "night"
   ],
-  "author": "Katrina Uychaco & Preston Parry",
+  "author": "Preston Parry",
   "license": "No license currently available",
   "bugs": {
-    "url": "https://github.com/kuychaco/kpComplete/issues"
+    "url": "https://github.com/ClimbsRocks/ppComplete/issues"
   },
-  "homepage": "https://github.com/kuychaco/kpComplete",
+  "homepage": "https://github.com/ClimbsRocks/ppComplete",
   "dependencies": {
     "brain": "^0.7.0",
     "longjohn": "^0.2.9",

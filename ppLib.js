@@ -8,6 +8,7 @@
 
 var controllerNN = require('./neuralNet/controllerNN.js');
 var path = require('path');
+var ppCompleteLocation = path.dirname(__filename);
 var numCPUs  = require('os').cpus().length;
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
@@ -42,7 +43,7 @@ console.log('controllerNN:',controllerNN);
 controllerNN.startTraining(argv);
 // **********************************************************************************
 // var pythonOptions = {
-//   scriptPath: kpCompleteLocation,
+//   scriptPath: ppCompleteLocation,
 //   args: [dataFile],
 //   mode: 'json'
 // };
