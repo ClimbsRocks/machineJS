@@ -15,6 +15,8 @@ import sklearn
 from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
 
+print 'hi from inside the snake!'
+
 # API: this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
 fullPathToDataFile = sys.argv[1]
@@ -31,6 +33,8 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
+
+printParent('hi from parent Printer')
 
 with open(fullPathToDataFile, 'rU') as csvInput:
     csvRows = csv.reader(csvInput)

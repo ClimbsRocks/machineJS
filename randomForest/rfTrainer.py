@@ -2,10 +2,7 @@
 
 '''
 next steps:
-    2. refactor the node.js main controller to be more modular. move nearly all the logic in there to a subsection called neuralNet
-    1. hook this all up so it runs as part of the system from the node.js main controller
     3. determine which parameters we want to mess with
-    4. create lists of the parameter combinations we want to try
         https://www.kaggle.com/forums/f/15/kaggle-forum/t/4092/how-to-tune-rf-parameters-in-practice
         A. M-Try (number of features it tries at each decision point in a tree). Starts at square root of features available, but tweak it up and down by a few (probably no more than 3 in each direction; it seems even 1 or 2 is enough)
         B. Number of folds for cross-validation: 10 is what most people use, but more gives you better accuracy (likely at the cost of compute time). again, returns are pretty rapidly diminishing. 
@@ -24,6 +21,8 @@ next steps:
         L. random_state: adds reliability. Would be a good one to split on if ensembling different RFs together. 
         M. oob_score: something about intelligent cross-validation. 
         N. allusions to regularization, or what I think they mean- feature selection. 
+    4. create lists of the parameter combinations we want to try
+
     5. test those combos!
         At the end of the test, run the best combo with 1000 trees (or some large number of trees), since more trees almost always increases accuracy
     6. make sure we are properly sending messages from the child to the parent
@@ -38,11 +37,26 @@ next steps:
 '''
     
 from sys import argv
-from sklearn.ensemble import RandomForestClassifier
 import csv
+import json
+import math
+from sklearn.cross_validation import train_test_split
+from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.ensemble import RandomForestClassifier
 
-trainingData = []
-targetData = []
+def printParent(text):
+    messageObj = {
+        'text': text,
+        'type': 'console.log'
+    }
+    print json.dumps(messageObj)
+
+printParent('hello from inside rfTrainer.py');
+
+
+X = []
+y = []
 
 targetDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/pythonOutputVectkaggleGiveCredit.csv'
 inputDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/pythonInputVect2kaggleGiveCredit.csv'
@@ -53,7 +67,7 @@ with open(inputDataFileName, 'rU') as openInputFile:
         # for value in row:
         #     if value == 'nan'
 
-        trainingData.append(row)
+        X.append(row)
 
 
 with open(targetDataFileName, 'rU') as openOutputFile:
@@ -63,11 +77,22 @@ with open(targetDataFileName, 'rU') as openOutputFile:
             row[0] = float(row[0])
         except:
             row[0] = row[0]
-        targetData.append(row[0])
-print trainingData
+        y.append(row[0])
+# printParent( X )
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-rf = RandomForestClassifier(n_estimators=150, n_jobs=1)
+rf = RandomForestClassifier(n_estimators=30, n_jobs=-1)
 
-rf.fit(trainingData, targetData)
+# TODO TODO: define parameters_to_try
+print size(X_train)
+
+parameters_to_try = {
+    'criterion': ['gini','entropy'],
+    'max_features': ['sqrt','log2',None,math.sqrt()]
+}
+
+clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
+
+rf.fit(X_train, y_train)
 
