@@ -212,6 +212,7 @@ module.exports = {
     };
 
     tStream1._flush = function (done) {
+      console.log('heard a flush event in tStream1');
       if (this._partialLineData) {
         var columns = this._partialLineData.split(',');
         var transformedRow = this.transformOneRow(columns)
@@ -231,6 +232,7 @@ module.exports = {
     tStream2.dataSummary = dataSummary;
 
     tStream2.processRow = function(row) {
+      // console.log(row);
       row = JSON.parse(row);
       for (var k = 0; k < row.length; k++) {
         var itemAsNum = parseFloat(row[k]);

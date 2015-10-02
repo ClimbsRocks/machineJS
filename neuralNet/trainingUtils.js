@@ -25,7 +25,6 @@ module.exports = {
     }
     numOfNetsToTest = allParamsToTest.length;
     // if this is dev or devKaggle, we only want to test the largest and smallest nets (2 total)
-    console.log('argv.dev inside createParamsToTest:',argv.dev);
     if(argv.dev || argv.devKaggle) {
       var tempParamsToTest = [];
       tempParamsToTest.push(allParamsToTest.shift());

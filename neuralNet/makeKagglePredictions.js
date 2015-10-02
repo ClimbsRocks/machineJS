@@ -5,15 +5,15 @@ var formatDataStreams = require('./formatDataStreams.js');
 var path = require('path');
 
 
-module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bestNetObj) {
+module.exports = function(pathToKaggleData, dataSummary, nnLocation, bestNetObj) {
   console.log('inside module.exports function from makeKagglePredictions');
   dataSummary.isTesting = true;
   var net = new brain.NeuralNetwork();
-  console.log(' bestNetObj:', bestNetObj);
+  // console.log(' bestNetObj:', bestNetObj);
   var bestNet = net.fromJSON( JSON.parse(bestNetObj.trainingBestAsJSON));
   var trainingResults = {};
 
-  var readFileStream = fs.createReadStream(path.join( kpCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
+  var readFileStream = fs.createReadStream(path.join( nnLocation, pathToKaggleData), {encoding: 'utf8'});
   var firstTransformForTesting = formatDataStreams.firstTransformForTesting(dataSummary);
   var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
 
@@ -45,7 +45,7 @@ module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bes
       // console.log('row:',row);
       var rowResults = row.rowID + ',' + results.numericOutput + '\n';
       // resultsToPush += JSON.stringify(row) + '\n';
-      console.log('results from testing!',rowResults);
+      // console.log('results from testing!',rowResults);
       resultsToPush += rowResults;
     }
 
@@ -67,7 +67,7 @@ module.exports = function(pathToKaggleData, dataSummary, kpCompleteLocation, bes
     done();
   };
 
-  var writeStream = fs.createWriteStream(path.join(kpCompleteLocation,'/kagglePredictions' + Date.now() + '.txt'), {encoding: 'utf8'});
+  var writeStream = fs.createWriteStream(path.join(nnLocation,'/kagglePredictions' + Date.now() + '.txt'), {encoding: 'utf8'});
 
   // TODO: better variable naming
   readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream).pipe(writeStream);
