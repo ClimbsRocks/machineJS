@@ -4,10 +4,9 @@ var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var nnLocation = path.dirname(__filename);
 var readAndFormatData = require(path.join(nnLocation,'readAndFormatData.js'));
-var dataFile = process.argv[2];
+var dataFile;
 // var advancedOptions = process.argv[3] || {};
 var argv = require('minimist')(process.argv.slice(2));
-console.log(argv);
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 var PythonShell = require('python-shell');
@@ -20,12 +19,12 @@ module.exports = {
     }
   },
   startTraining: function(argv) {
-    console.log('dataFile:',dataFile);
+    console.log('dataFile:',argv.dataFile);
     // Here is where we invoke the method with the path to the data
     // we pass in a callback function that will make the dataSummary a global variable 
       // and invoke parallelNets once formatting the data is done. 
 
-    readAndFormatData(nnLocation, dataFile, function(formattingSummary) {
+    readAndFormatData(nnLocation, argv.dataFile, function(formattingSummary) {
       dataSummary = formattingSummary;
       parallelNets();
     });
@@ -34,15 +33,6 @@ module.exports = {
 }
 
 
-// setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
-if(argv.dev || argv.devKaggle) {
-  if (dataFile.slice(-4) !== '.csv') {
-    dataFile = 'kaggleGiveCredit.csv'
-  }
-  if (argv.devKaggle && !argv.kagglePredict) {
-    argv.kagglePredict = 'kaggleGiveCreditTest.csv';
-  }
-}
 
 // TODO: graph the error rates! 
   // on each iteration, push the error rate into an array for that net. 
@@ -56,7 +46,6 @@ if(argv.dev || argv.devKaggle) {
 // TODO: nest most console logs inside a check for --dev (or --verbose?)
 // TODO: build out --devKaggle
 
-console.log('numCPUs:',numCPUs);
 
 var bestNetObj = {
   trainingBestAsJSON: '',
