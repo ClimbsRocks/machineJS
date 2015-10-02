@@ -7,14 +7,16 @@
   // manage CPUs. 
 
 var controllerNN = require('./neuralNet/controllerNN.js');
+var controllerRF = require('./randomForest/controllerRF.js');
 var path = require('path');
 var ppCompleteLocation = path.dirname(__filename);
 var numCPUs  = require('os').cpus().length;
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
 var argv = require('minimist')(process.argv.slice(2));
-console.log(argv);
+var PythonShell = require('python-shell');
 
+console.log('thanks for inviting us along on your machine learning journey!');
 
 
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
@@ -28,8 +30,7 @@ if(argv.dev || argv.devKaggle) {
   }
 }
 
-
-console.log('numCPUs:',numCPUs);
+argv.dataFile = dataFile;
 
 var readyToMakePredictions = false;
 
@@ -39,27 +40,9 @@ var readyToMakePredictions = false;
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
   // and invoke parallelNets once formatting the data is done. 
-console.log('controllerNN:',controllerNN);
-controllerNN.startTraining(argv);
+// controllerNN.startTraining(argv);
 // **********************************************************************************
-// var pythonOptions = {
-//   scriptPath: ppCompleteLocation,
-//   args: [dataFile],
-//   mode: 'json'
-// };
-// var pyFormatterShell = PythonShell.run('randomForest/rfDataFormatting.py', pythonOptions, function (err, results) {
-//   if (err) throw err;
-//   // results is an array consisting of messages collected during execution
-//   console.log('results: %j', results);
-//   // TODO: inside this callback, now we can start spinning up child_processes to actually run a random forest. 
-// });
-
-// pyFormatterShell.on('message', function(message) {
-//   if(message.type === 'console.log') {
-//     console.log('snake says:',message.text);
-//   }
-// });
-
+controllerRF.startTraining(argv);
 
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
 // this prevents you from having zombie child processes running indefinitely.
@@ -73,7 +56,7 @@ process.once("uncaughtException", function (error) {
   // exception is going to do the sensible thing and call process.exit().
   if (process.listeners("uncaughtException").length === 0) {
     controllerNN.killAll();
-    // controllerRF.killAll();
+    controllerRF.killAll();
   }
 });
 
