@@ -20,8 +20,8 @@ module.exports = {
       args: [path.join(globals.dataFileLocation,globals.argv.dataFile)],
       mode: 'json'
     };
-    var pyFormatterShell = PythonShell.run('rfDataFormatting.py', pythonOptions, function (err, results) {
-      console.log('inside callback for our rfDataFormatting.py shell');
+    var pyFormatterShell = PythonShell.run('dataFormatting.py', pythonOptions, function (err, results) {
+      console.log('inside callback for our dataFormatting.py shell');
       if (err) console.error(err);
       console.log('got results back');
       // results is an array consisting of messages collected during execution
@@ -42,8 +42,8 @@ module.exports = {
       mode: 'json'
     };
 
-    var pyTrainerShell = PythonShell.run('rfTrainer.py', pythonOptions, function (err, results) {
-      console.log('inside callback for our rfTrainer.py shell');
+    var pyTrainerShell = PythonShell.run('training.py', pythonOptions, function (err, results) {
+      console.log('inside callback for our training.py shell');
 
       if (err) console.error(err);
       console.log('got results back');
@@ -66,8 +66,8 @@ module.exports = {
       mode: 'json'
     };
 
-    var pyTrainerShell = PythonShell.run('rfMakePredictions.py', pythonOptions, function (err, results) {
-      console.log('inside callback for our rfTrainer.py shell');
+    var pyTrainerShell = PythonShell.run('makePredictions.py', pythonOptions, function (err, results) {
+      console.log('inside callback for our makePredictions.py shell');
 
       if (err) console.error(err);
       console.log('got results back');

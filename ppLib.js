@@ -7,7 +7,7 @@
   // manage CPUs. 
 
 var controllerNN = require('./neuralNet/controllerNN.js');
-var controllerRF = require('./randomForest/controllerRF.js');
+var controllerRF = require('./randomForest/controller.js');
 var path = require('path');
 var ppCompleteLocation = path.dirname(__filename);
 var numCPUs  = require('os').cpus().length;

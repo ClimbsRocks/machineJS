@@ -1,6 +1,6 @@
 var path = require('path');
 var rfLocation = path.dirname(__filename);
-var utils = require('./rfUtils.js');
+var utils = require('./utils.js');
 
 var dataFileLocation = rfLocation.split('/');
 dataFileLocation.pop();

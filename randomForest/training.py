@@ -59,8 +59,10 @@ printParent('hello from inside rfTrainer.py');
 X = []
 y = []
 
-targetDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/pythonOutputVectkaggleGiveCredit.csv'
-inputDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/pythonInputVect2kaggleGiveCredit.csv'
+
+# TODO TODO: take these in as arguments
+targetDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/y_trainkaggleGiveCredit.csv'
+inputDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/x_train2kaggleGiveCredit.csv'
 
 with open(inputDataFileName, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)

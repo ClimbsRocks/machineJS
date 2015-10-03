@@ -16,18 +16,17 @@ import sklearn
 from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
 
-# this will not work and should break everything terribly ;;al;ksdjf;iweulkajp9284[-q98 aes8-]
 
 print 'hi from inside the snake!'
 
 # API: this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
-fullPathToDataFile = sys.argv[1]
+inputFilePath = sys.argv[1]
 
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'pythonOutputVect' to the filename the user gave us
-outputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonOutputVect' + fileName)
-inputFileName2 = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect2' + fileName)
-inputFileName = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'pythonInputVect' + fileName)
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y_train' to the filename the user gave us
+y_train_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
+X_train_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
+X_train_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train' + fileName)
 
 def printParent(text):
     messageObj = {
@@ -39,21 +38,21 @@ def printParent(text):
 
 printParent('hi from parent Printer')
 
-with open(fullPathToDataFile, 'rU') as csvInput:
+with open(inputFilePath, 'rU') as csvInput:
     csvRows = csv.reader(csvInput)
     # create new files for our output column and input columns
-    outputFile = open(outputFileName, 'w+')
-    csvProcessedOutputFile = csv.writer(outputFile)
+    y_train_file = open(y_train_file_name, 'w+')
+    y_train_file_csv = csv.writer(y_train_file)
     firstRow = False
-    with open(inputFileName, 'w+') as inputFile:
-        csvProcessedInputFile = csv.writer(inputFile)
+    with open(X_train_temp_file_name, 'w+') as X_train_temp_file:
+        X_train_temp_file_csv = csv.writer(X_train_temp_file)
 
 
         for row in csvRows:
             # write the output column to the output file
             newRow = []
             if firstRow:
-                csvProcessedOutputFile.writerow( [row.pop(0)] )
+                y_train_file_csv.writerow( [row.pop(0)] )
 
                 for value in row:
                     if value == 'NA':
@@ -65,15 +64,15 @@ with open(fullPathToDataFile, 'rU') as csvInput:
                 row.pop(0)
                 newRow = row
             # remove all 'NA' from the input, then write it to a file
-            csvProcessedInputFile.writerow( newRow )
-    outputFile.close()
+            X_train_temp_file_csv.writerow( newRow )
+    y_train_file.close()
     
 
-with open(inputFileName, 'rU') as csvInputToVectorize:
-    with open(inputFileName2, 'w+') as outputFile2:
-        csvProcessedOutputFile2 = csv.writer(outputFile2)
+with open(X_train_temp_file_name, 'rU') as X_train_temp_file:
+    with open(X_train_file_name, 'w+') as X_train_file:
+        X_train_file_csv = csv.writer(X_train_file)
 
-        inputRows = csv.DictReader(csvInputToVectorize)
+        inputRows = csv.DictReader(X_train_temp_file)
         inputList = []
         for row in inputRows:
             newDict = {}
@@ -90,4 +89,5 @@ with open(inputFileName, 'rU') as csvInputToVectorize:
         pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
         printParent('we have pickled the dictVectorizer')
         printParent( vectorizedInput.toarray().shape )
-        csvProcessedOutputFile2.writerows(vectorizedInput.toarray())
+        X_train_file_csv.writerows(vectorizedInput.toarray())
+        os.remove(X_train_temp_file_name)
