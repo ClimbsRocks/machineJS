@@ -40,6 +40,7 @@ from sys import argv
 import csv
 import json
 import math
+import cPickle as pickle
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
@@ -88,7 +89,7 @@ sqrtNum = int(math.sqrt(len(X_train[0])))
 printParent('sqrtNum')
 printParent(sqrtNum)
 
-max_features_to_try = [sqrtNum + x for x in range(-2,2)]
+max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
 max_features_to_try.append('log2')
 max_features_to_try.append(None)
 printParent('max_features_to_try')
@@ -96,7 +97,7 @@ printParent(max_features_to_try)
 
 
 parameters_to_try = {
-    'criterion': ['gini','entropy'],
+    # 'criterion': ['gini','entropy'],
     'max_features': max_features_to_try,
 
 }
@@ -112,5 +113,7 @@ clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
 clf.fit(X_train, y_train)
 
 printParent('trained using grid search!')
-printParent(clf.best_estimator_)
+# printParent(clf.best_estimator_)
 
+pickle.dump(clf.best_estimator_, open('bestRF.p', 'w+'))
+printParent('wrote the best estimator to a file')
