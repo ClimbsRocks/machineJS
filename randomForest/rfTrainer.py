@@ -13,7 +13,7 @@ next steps:
         G. Possibly ensemble different random forests together. this is where the creative ensembling comes into play!
         H. Splitting criteria
         I. AdaBoost
-        J. Can bump up nodesize as much as possible to decrease training time
+        J. Can bump up nodesize as much as possible to decrease training time (split)
             consider doing this first, finding what node size we finally start decreasing accuracy on, then use that node size for the rest of the testing we do, then possibly bumping it down a bit again at the end. 
                 https://www.kaggle.com/c/the-analytics-edge-mit-15-071x/forums/t/7890/node-size-in-random-forest
         K. min_sample_leaf- smaller leaf makes you more prone to capturing noise from the training data. Try for at least 50??
@@ -84,15 +84,33 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_
 
 rf = RandomForestClassifier(n_estimators=30, n_jobs=-1)
 
-# TODO TODO: define parameters_to_try
-print size(X_train)
+sqrtNum = int(math.sqrt(len(X_train[0])))
+printParent('sqrtNum')
+printParent(sqrtNum)
+
+max_features_to_try = [sqrtNum + x for x in range(-2,2)]
+max_features_to_try.append('log2')
+max_features_to_try.append(None)
+printParent('max_features_to_try')
+printParent(max_features_to_try)
+
 
 parameters_to_try = {
     'criterion': ['gini','entropy'],
-    'max_features': ['sqrt','log2',None,math.sqrt()]
+    'max_features': max_features_to_try,
+
 }
 
+printParent('parameters_to_try')
+printParent(parameters_to_try)
+
+printParent('right before we create the grid search classifier')
 clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
 
-rf.fit(X_train, y_train)
+# rf.fit(X_train, y_train)
+
+clf.fit(X_train, y_train)
+
+printParent('trained using grid search!')
+printParent(clf.best_estimator_)
 

@@ -48,7 +48,8 @@ var kickOffForestTraining = function(argv, callback) {
 
   var pyTrainerShell = PythonShell.run('rfTrainer.py', pythonOptions, function (err, results) {
     console.log('inside callback for our rfTrainer.py shell');
-    if (err) throw err;
+
+    if (err) console.error(err);
     console.log('got results back');
     // results is an array consisting of messages collected during execution
     console.log('results: %j', results);
@@ -60,6 +61,10 @@ var kickOffForestTraining = function(argv, callback) {
     if(message.type === 'console.log') {
       console.log('snake says:',message.text);
     }
+    else {
+      console.log('heard a message:',message);
+    }
+
   });
   referencesToChildren.push(pyTrainerShell);
 
@@ -74,14 +79,14 @@ module.exports = {
     console.log('heard start training for random forests');
 
     if(argv.dev || argv.devKaggle) {
-      kickOffForestTraining();
+      kickOffForestTraining(argv);
 
     } else {
 
       formatInitialData(argv, function() {
         kickOffForestTraining(argv);
       });
-      
+
     }
   }
 
