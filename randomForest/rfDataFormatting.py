@@ -11,9 +11,12 @@ import csv
 import os
 import math
 import json
+import cPickle as pickle
 import sklearn
 from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
+
+# this will not work and should break everything terribly ;;al;ksdjf;iweulkajp9284[-q98 aes8-]
 
 print 'hi from inside the snake!'
 
@@ -66,7 +69,6 @@ with open(fullPathToDataFile, 'rU') as csvInput:
     outputFile.close()
     
 
-# TODO TODO: we are getting a number of 'nan' values- sort this out!
 with open(inputFileName, 'rU') as csvInputToVectorize:
     with open(inputFileName2, 'w+') as outputFile2:
         csvProcessedOutputFile2 = csv.writer(outputFile2)
@@ -82,8 +84,10 @@ with open(inputFileName, 'rU') as csvInputToVectorize:
                 except:
                     newDict[key] = row[key]
             inputList.append(newDict)
-        printParent( 'we have correctly built up the input list' )
+        printParent('we have correctly built up the input list')
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
         printParent( 'we have vectorized the input' )
+        pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
+        printParent('we have pickled the dictVectorizer')
         printParent( vectorizedInput.toarray().shape )
         csvProcessedOutputFile2.writerows(vectorizedInput.toarray())

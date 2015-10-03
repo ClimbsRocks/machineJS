@@ -86,34 +86,26 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_
 rf = RandomForestClassifier(n_estimators=30, n_jobs=-1)
 
 sqrtNum = int(math.sqrt(len(X_train[0])))
-printParent('sqrtNum')
-printParent(sqrtNum)
 
 max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
 max_features_to_try.append('log2')
 max_features_to_try.append(None)
-printParent('max_features_to_try')
-printParent(max_features_to_try)
 
 
 parameters_to_try = {
-    # 'criterion': ['gini','entropy'],
-    'max_features': max_features_to_try,
+    'criterion': ['gini','entropy'],
+    # 'max_features': max_features_to_try,
 
 }
 
-printParent('parameters_to_try')
+printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-printParent('right before we create the grid search classifier')
 clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
-
-# rf.fit(X_train, y_train)
 
 clf.fit(X_train, y_train)
 
 printParent('trained using grid search!')
-# printParent(clf.best_estimator_)
 
-pickle.dump(clf.best_estimator_, open('bestRF.p', 'w+'))
+pickle.dump(clf.best_estimator_, open('randomForest/bestRF.p', 'w+'))
 printParent('wrote the best estimator to a file')

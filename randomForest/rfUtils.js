@@ -22,10 +22,10 @@ module.exports = {
     };
     var pyFormatterShell = PythonShell.run('rfDataFormatting.py', pythonOptions, function (err, results) {
       console.log('inside callback for our rfDataFormatting.py shell');
-      if (err) throw err;
+      if (err) console.error(err);
       console.log('got results back');
       // results is an array consisting of messages collected during execution
-      // console.log('results: %j', results);
+      console.log('results: %j', results);
       callback();
 
     });
@@ -54,6 +54,29 @@ module.exports = {
     });
     module.exports.attachLogListener(pyTrainerShell);
     globals.referencesToChildren.push(pyTrainerShell);
+
+  },
+
+  makePredictions: function(globals, rfPickle) {
+    console.log('globals:',globals);
+    // TODO TODO: pass in the name of the file we are making predictions on
+    var pythonOptions = {
+      scriptPath: globals.rfLocation,
+      args: [path.join(globals.dataFileLocation,globals.argv.kagglePredict)],
+      mode: 'json'
+    };
+
+    var pyTrainerShell = PythonShell.run('rfMakePredictions.py', pythonOptions, function (err, results) {
+      console.log('inside callback for our rfTrainer.py shell');
+
+      if (err) console.error(err);
+      console.log('got results back');
+      // results is an array consisting of messages collected during execution
+      // console.log('results: %j', results);
+      callback();
+
+    });
+    module.exports.attachLogListener(pyTrainerShell);
 
   }
 

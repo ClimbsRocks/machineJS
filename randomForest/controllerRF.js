@@ -1,3 +1,4 @@
+var path = require('path');
 var rfLocation = path.dirname(__filename);
 var utils = require('./rfUtils.js');
 
@@ -24,19 +25,26 @@ module.exports = {
     console.log('heard start training for random forests');
 
     if(argv.dev || argv.devKaggle) {
-      utils.kickOffForestTraining(globals);
+      // utils.kickOffForestTraining(globals,function() {
+      //   // TODO: add in next step in chain here
+      //   module.exports.makePredictions();
+      // });
+      module.exports.makePredictions();
 
     } else {
 
       utils.formatInitialData(globals, function() {
         utils.kickOffForestTraining(globals,function() {
           // TODO: add in next step in chain here
-
+          module.exports.makePredictions();
         });
       });
 
     }
   },
-  makePredictions: function()
+  makePredictions: function(rfPickle) {
+    rfPickle = rfPickle || globals.rfLocation + '/' + 'bestRF.p';
+    utils.makePredictions(globals, rfPickle);
+  }
 
 };
