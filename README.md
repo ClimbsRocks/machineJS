@@ -29,13 +29,6 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 3. Expect some noise from your fan- you're finally putting your computer to use!
 4. Don't expect to be able to do anything intense while this is running. Internet browsing or code editing is fine, but watching a movie may get challenging
 
-## Format of Data File:
-1. .csv file
-2. First row holds the column names
-3. The first column holds the output data (what you want the net to make a prediction about)
-4. Make sure there are no empty rows!
-5. Make sure each row has the same number of columns (even if those columns are blank, they must exist)
-
 ## The Current State Of Advanced Options: 
 1. `--maxTrainingTime`: the maximum amount of time (in seconds) to let any child process train one individual neural net. 
 1 Default: 600 (5 minutes)
