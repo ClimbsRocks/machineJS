@@ -6,3 +6,4 @@ formattedData*.txt
 bestNet*.txt
 kagglePredictions*.txt
 *.csv
+*.p
