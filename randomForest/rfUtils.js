@@ -2,6 +2,17 @@ var PythonShell = require('python-shell');
 var path = require('path');
 
 module.exports = {
+  attachLogListener: function(referenceToShell) {
+    referenceToShell.on('message', function(message) {
+      if(message.type === 'console.log') {
+        console.log('snake says:',message.text);
+      }
+      else {
+        console.log('heard a message:',message);
+      }
+    });
+  },
+
   formatInitialData: function(globals, callback) {
     console.log('inside formatInitialData');
     var pythonOptions = {
@@ -14,19 +25,13 @@ module.exports = {
       if (err) throw err;
       console.log('got results back');
       // results is an array consisting of messages collected during execution
-      console.log('results: %j', results);
-      // TODO: inside this callback, now we can start spinning up child_processes to actually run a random forest. 
+      // console.log('results: %j', results);
       callback();
 
     });
 
     // TODO: for some reason we can't get console.logs from this python process
-    pyFormatterShell.on('message', function(message) {
-      console.log('heard a message from the snake:',message);
-      if(message.type === 'console.log') {
-        console.log('snake says:',message.text);
-      }
-    });
+    module.exports.attachLogListener(pyFormatterShell);
     globals.referencesToChildren.push(pyFormatterShell);
   },
 
@@ -43,20 +48,11 @@ module.exports = {
       if (err) console.error(err);
       console.log('got results back');
       // results is an array consisting of messages collected during execution
-      console.log('results: %j', results);
-      // TODO: inside this callback, now we can start spinning up child_processes to actually run a random forest. 
+      // console.log('results: %j', results);
       callback();
 
     });
-    pyTrainerShell.on('message', function(message) {
-      if(message.type === 'console.log') {
-        console.log('snake says:',message.text);
-      }
-      else {
-        console.log('heard a message:',message);
-      }
-
-    });
+    module.exports.attachLogListener(pyTrainerShell);
     globals.referencesToChildren.push(pyTrainerShell);
 
   }
