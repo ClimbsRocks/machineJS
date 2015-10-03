@@ -1,5 +1,3 @@
-var PythonShell = require('python-shell');
-var path = require('path');
 var rfLocation = path.dirname(__filename);
 var utils = require('./rfUtils.js');
 
@@ -17,6 +15,9 @@ var globals = {
 module.exports = {
   killAll: function() {
     // TODO: kill all child processes
+    for (var i = 0; i < globals.referencesToChildren.length; i++) {
+      globals.referencesToChildren[i].childProcess.kill();
+    }
   },
   startTraining: function(argv) {
     globals.argv = argv;
@@ -30,10 +31,12 @@ module.exports = {
       utils.formatInitialData(globals, function() {
         utils.kickOffForestTraining(globals,function() {
           // TODO: add in next step in chain here
+
         });
       });
 
     }
-  }
+  },
+  makePredictions: function()
 
 };
