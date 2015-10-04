@@ -62,19 +62,6 @@ var globalTrainingData = [];
 var dataSummary; 
 var readyToMakePredictions = false;
 
-var createEnsemble = function() {
-  // before anything else: make sure that our output has the exact same name for everything. 
-  // 1. average all predicted results together
-  // 2. take highest value
-  // 3. take lowest value
-  // 4. take highest or lowest based on which is closer to 100 or 0 (given 63 and 12, we would take 12 because it's relative absolute value (totally made up term) is greatest).
-  // 5. only take highest or lowest if they are above/below a certain threshold AND if they are 20 percentage points different than the other prediction. 
-  // 6. weight the predictions based on some metrics
-    // if two agree, take that value more heavily
-    // if one is super high or super low, weight that one more
-    // 
-}
-
 var totalRunningNets = 0;
 var neuralNetResults = {};
 
@@ -147,7 +134,7 @@ function attachListeners(child) {
       // TODO: have some way of timeboxing each experiment??
 
       if(allParamsToTest.length > 0) {
-        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'to go');
+        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'left to start');
         var newChild = createChild();
         attachListeners(newChild);
         referencesToChildren.push(newChild);
@@ -293,9 +280,7 @@ var namesOfWrittenNets = [];
 var bestNetChecker = function(trainingResults) {
   // console.log('checking if this is the best net:',trainingResults);
   // bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
-  console.log('trainingResults.errorRate:',trainingResults.errorRate,'bestNetObj.trainingErrorRate:',bestNetObj.trainingErrorRate[bestNetObj.trainingErrorRate.length -1]);
   if(trainingResults.errorRate < bestNetObj.trainingErrorRate[bestNetObj.trainingErrorRate.length -1]) {
-    console.log('this is the best net!');
     // console.log('trainingResults:',trainingResults);
     // console.log('trainingResults.net:',trainingResults.net);
     // make this the best net
@@ -304,7 +289,7 @@ var bestNetChecker = function(trainingResults) {
     // Admittedly, this is potentially still creating a new net every three seconds, which is a lot.
     // The risk we're running right now is simply that we lose three seconds worth of work. The worst case scenario is that we write the most recent net to file, and then 2.9 seconds later, we simultaneously get a new best net, don't write it to file, and then close out the server for some reason, forever losing that last net. This seems a small risk. 
     if(completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
-      var bestNetFileName = 'bestNet' + Date.now() + '.txt';
+      var bestNetFileName = 'neuralNet/bestNet/bestNet' + Date.now() + '.txt';
       namesOfWrittenNets.push(bestNetFileName);
       fs.writeFile(bestNetFileName, bestNetObj.trainingBestAsJSON, function() {
         // delete the previously written bestNet file(s), now that we have a new one written to disk successfully. 
@@ -325,8 +310,8 @@ function makeTrainingObj (hlArray) {
   var trainingObj = {
     errorThresh: 0.05,  // error threshold to reach
     iterations: 1000,   // maximum training iterations
-    log: true,           // console.log() progress periodically
-    logPeriod: 1,       // number of iterations between logging
+    // log: true,           // console.log() progress periodically
+    // logPeriod: 1,       // number of iterations between logging
     learningRate: 0.6    // learning rate
   };
 

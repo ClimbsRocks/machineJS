@@ -89,7 +89,6 @@ globalArgs = json.loads(sys.argv[2])
 
 # if we're developing, train on only 10% of the dataset.
 for key in globalArgs:
-    printParent(key)
     if key in( 'devKaggle', 'dev'): 
         printParent('heard devKaggle!')
         X, X_test, y, y_test = train_test_split(X, y, test_size=0.9, random_state=0)
@@ -104,8 +103,8 @@ max_features_to_try.append(None)
 
 
 parameters_to_try = {
-    # 'max_features': max_features_to_try,
-    # 'min_samples_leaf':[1,2,5,25,50,150],
+    'max_features': max_features_to_try,
+    'min_samples_leaf':[1,2,5,25,50,150],
     'criterion': ['gini','entropy']
 }
 
