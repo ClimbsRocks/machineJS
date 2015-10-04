@@ -14,6 +14,7 @@ import json
 import cPickle as pickle
 import sklearn
 from sklearn.feature_extraction import DictVectorizer
+
 dictVectorizer1 = DictVectorizer()
 
 
@@ -24,6 +25,10 @@ fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
 # we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
 trainOrPredict = sys.argv[2]
+if trainOrPredict == 'predict':
+    # TODO TODO: try to load up dictVectorizer.p
+    with open('randomForest/dictVectorizer.p', 'rU') as file:
+        dictVectorizer1 = pickle.load(file)
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
 y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
@@ -88,8 +93,9 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
         printParent('we have correctly built up the input list')
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
         printParent( 'we have vectorized the input' )
-        pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
-        printParent('we have pickled the dictVectorizer')
+        if trainOrPredict == 'train':
+            pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
+            printParent('we have pickled the dictVectorizer')
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())
         os.remove(X_temp_file_name)
