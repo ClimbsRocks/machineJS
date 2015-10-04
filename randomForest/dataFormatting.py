@@ -18,7 +18,7 @@ from sklearn.feature_extraction import DictVectorizer
 dictVectorizer1 = DictVectorizer()
 
 
-print 'hi from inside the snake!'
+# print 'hi from inside the snake!'
 
 # API: this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
@@ -42,8 +42,6 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
-
-printParent('hi from parent Printer')
 
 with open(inputFilePath, 'rU') as csvInput:
     csvRows = csv.reader(csvInput)
@@ -90,12 +88,11 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
                 except:
                     newDict[key] = row[key]
             inputList.append(newDict)
-        printParent('we have correctly built up the input list')
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
-        printParent( 'we have vectorized the input' )
         if trainOrPredict == 'train':
             pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
             printParent('we have pickled the dictVectorizer')
+        printParent( 'we have vectorized the input. it has shape:' )
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())
         os.remove(X_temp_file_name)
