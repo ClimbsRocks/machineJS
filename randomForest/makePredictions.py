@@ -61,7 +61,7 @@ printParent(idIndex)
 
 time.sleep(2)
 
-with open('predictions/randomForest.csv', 'w+') as predictionsFile:
+with open('predictions/randomForestRaw.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
     # get predictions for each item in the prediction data set
     predictedResults = rf.predict_proba(X)
@@ -71,6 +71,20 @@ with open('predictions/randomForest.csv', 'w+') as predictionsFile:
         try:
             len(prediction)
             csvwriter.writerow(prediction)
+        except:
+            csvwriter.writerow([prediction])
+
+with open('predictions/randomForestClean.csv', 'w+') as predictionsFile:
+    csvwriter = csv.writer(predictionsFile)
+    csvwriter.writerow(['ID','Probability'])
+    # get predictions for each item in the prediction data set
+    predictedResults = rf.predict_proba(X)
+    printParent('predicted results for every item in the predictions dataset!')
+    printParent(predictedResults.shape)
+    for prediction in predictedResults:
+        try:
+            len(prediction)
+            csvwriter.writerow(prediction[0])
         except:
             csvwriter.writerow([prediction])
 
