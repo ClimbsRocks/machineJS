@@ -22,11 +22,13 @@ print 'hi from inside the snake!'
 # API: this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
+# we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
+trainOrPredict = sys.argv[2]
 
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y_train' to the filename the user gave us
-y_train_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
-X_train_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
-X_train_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train' + fileName)
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
+y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
+X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '2' + fileName)
+X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
 
 def printParent(text):
     messageObj = {
@@ -41,18 +43,18 @@ printParent('hi from parent Printer')
 with open(inputFilePath, 'rU') as csvInput:
     csvRows = csv.reader(csvInput)
     # create new files for our output column and input columns
-    y_train_file = open(y_train_file_name, 'w+')
-    y_train_file_csv = csv.writer(y_train_file)
+    y_file = open(y_file_name, 'w+')
+    y_file_csv = csv.writer(y_file)
     firstRow = False
-    with open(X_train_temp_file_name, 'w+') as X_train_temp_file:
-        X_train_temp_file_csv = csv.writer(X_train_temp_file)
+    with open(X_temp_file_name, 'w+') as X_temp_file:
+        X_temp_file_csv = csv.writer(X_temp_file)
 
 
         for row in csvRows:
             # write the output column to the output file
             newRow = []
             if firstRow:
-                y_train_file_csv.writerow( [row.pop(0)] )
+                y_file_csv.writerow( [row.pop(0)] )
 
                 for value in row:
                     if value == 'NA':
@@ -64,15 +66,15 @@ with open(inputFilePath, 'rU') as csvInput:
                 row.pop(0)
                 newRow = row
             # remove all 'NA' from the input, then write it to a file
-            X_train_temp_file_csv.writerow( newRow )
-    y_train_file.close()
+            X_temp_file_csv.writerow( newRow )
+    y_file.close()
     
 
-with open(X_train_temp_file_name, 'rU') as X_train_temp_file:
-    with open(X_train_file_name, 'w+') as X_train_file:
-        X_train_file_csv = csv.writer(X_train_file)
+with open(X_temp_file_name, 'rU') as X_temp_file:
+    with open(X_file_name, 'w+') as X_file:
+        X_file_csv = csv.writer(X_file)
 
-        inputRows = csv.DictReader(X_train_temp_file)
+        inputRows = csv.DictReader(X_temp_file)
         inputList = []
         for row in inputRows:
             newDict = {}
@@ -89,5 +91,5 @@ with open(X_train_temp_file_name, 'rU') as X_train_temp_file:
         pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
         printParent('we have pickled the dictVectorizer')
         printParent( vectorizedInput.toarray().shape )
-        X_train_file_csv.writerows(vectorizedInput.toarray())
-        os.remove(X_train_temp_file_name)
+        X_file_csv.writerows(vectorizedInput.toarray())
+        os.remove(X_temp_file_name)

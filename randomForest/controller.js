@@ -1,6 +1,6 @@
 var path = require('path');
 var rfLocation = path.dirname(__filename);
-var utils = require('./utils.js');
+var utils = require('./processes.js');
 
 var dataFileLocation = rfLocation.split('/');
 dataFileLocation.pop();
@@ -24,14 +24,14 @@ module.exports = {
     globals.argv = argv;
     console.log('heard start training for random forests');
 
-    if(argv.dev || argv.devKaggle) {
-      // utils.kickOffForestTraining(globals,function() {
-      //   // TODO: add in next step in chain here
-      //   module.exports.makePredictions();
-      // });
-      module.exports.makePredictions();
+    // if(argv.dev || argv.devKaggle) {
+    //   utils.kickOffForestTraining(globals,function() {
+    //     // TODO: add in next step in chain here
+    //     module.exports.makePredictions();
+    //   });
+    //   // module.exports.makePredictions();
 
-    } else {
+    // } else {
 
       utils.formatInitialData(globals, function() {
         utils.kickOffForestTraining(globals,function() {
@@ -40,7 +40,7 @@ module.exports = {
         });
       });
 
-    }
+    // }
   },
   makePredictions: function(rfPickle) {
     rfPickle = rfPickle || globals.rfLocation + '/' + 'bestRF.p';
