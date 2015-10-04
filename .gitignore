@@ -7,3 +7,4 @@ bestNet*.txt
 kagglePredictions*.txt
 *.csv
 *.p
+*.pkl

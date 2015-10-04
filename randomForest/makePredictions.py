@@ -3,7 +3,7 @@ import os
 import sys
 import csv
 import time
-import cPickle as pickle
+import joblib
 
 
 def printParent(text):
@@ -44,9 +44,10 @@ with open(y_file_name, 'rU') as y_file:
             row[0] = row[0]
         y.append(row[0])
 
+time.sleep(2)
 # load up the previously trained (and tuned!) random forest classifier
-with open('randomForest/bestRF.p', 'rU') as clf_file:
-    rf = pickle.load(clf_file)
+# with open('randomForest/bestRF.pkl', 'rU') as clf_file:
+rf = joblib.load('randomForest/bestRF/bestRF.pkl')
 
 dictVectMapping = sys.argv[2].split(',')
 
@@ -59,7 +60,8 @@ except:
 printParent('idIndex')
 printParent(idIndex)
 
-time.sleep(2)
+
+
 
 with open('predictions/randomForestRaw.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
@@ -85,8 +87,10 @@ with open('predictions/randomForestClean.csv', 'w+') as predictionsFile:
         try:
             len(prediction)
             csvwriter.writerow(prediction[0])
+            printParent('we are in the try block')
         except:
             csvwriter.writerow([prediction])
+            printParent('we are in the exception block')
 
 
 # write those predictions to a single, standalone, centralized file that ONLY holds the ID for that row, and then the predictions for each model. 

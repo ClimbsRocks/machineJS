@@ -42,7 +42,7 @@ import json
 import math
 import os
 import time
-import cPickle as pickle
+import joblib
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
@@ -85,6 +85,12 @@ with open(y_file_name, 'rU') as openOutputFile:
         y.append(row[0])
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+if sys.argv[2].devKaggle:
+    printParent('heard devKaggle!')
+    X, X_test, y, y_test = train_test_split(X, y, test_size=0.9, random_state=0)
+else:
+    printParent('did not hear devKaggle')
+    printParent(sys.argv[2])
 
 rf = RandomForestClassifier(n_estimators=15, n_jobs=-1)
 
@@ -96,9 +102,9 @@ max_features_to_try.append(None)
 
 
 parameters_to_try = {
-    'criterion': ['gini','entropy'],
-    'max_features': max_features_to_try,
-    'min_samples_leaf':[1,2,5]
+    # 'max_features': max_features_to_try,
+    # 'min_samples_leaf':[1,2,5,25,50,150],
+    'criterion': ['gini','entropy']
 }
 
 printParent('we are about to run a grid search over the following space:')
@@ -106,7 +112,6 @@ printParent(parameters_to_try)
 
 clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
 
-printParent('right before clf.fit')
 
 # clf.fit(X_train, y_train)
 clf.fit(X, y)
@@ -143,7 +148,7 @@ bigRFscore = bigRF.score(X, y)
 printParent('the bigger randomForest has a score of')
 printParent(bigRFscore)
 
-pickle.dump(bigRF, open('randomForest/bestRF.p', 'w+'))
+joblib.dump(bigRF, 'randomForest/bestRF/bestRF.pkl')
 
-# pickle.dump(clf.best_estimator_, open('randomForest/bestRF.p', 'w+'))
+# joblib.dump(clf.best_estimator_, 'randomForest/bestRF.p')
 printParent('wrote the best estimator to a file')
