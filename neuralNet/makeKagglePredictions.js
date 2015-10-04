@@ -75,6 +75,9 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation, bes
 
   writeStream.on('finish', function() {
     console.log("you just made our neural network incredibly happy by letting it make predictions on the whole dataset for you! Now it's just wishing that you'll come back and give it more things to learn about...");
+
+    console.log('in case you were curious, your best neural net looked like this:');
+    console.log(bestNet);
   })
 
 // Deprecated:

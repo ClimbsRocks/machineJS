@@ -135,7 +135,7 @@ function attachListeners(child) {
       // TODO: have some way of timeboxing each experiment??
 
       if(allParamsToTest.length > 0) {
-        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, 'left to start');
+        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
         var newChild = createChild();
         attachListeners(newChild);
         referencesToChildren.push(newChild);
