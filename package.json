@@ -39,7 +39,9 @@
   "homepage": "https://github.com/ClimbsRocks/ppComplete",
   "dependencies": {
     "brain": "^0.7.0",
+    "convert-newline": "0.0.5",
     "csv": "^0.4.6",
+    "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
     "python-shell": "^0.1.0"
