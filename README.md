@@ -44,4 +44,5 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
   b) set the number of nets trained to 2
   c) if no data is passed in, automatically use the kaggleGiveCredit.csv dataset
 7. `--devKaggle`: Does all the same things as `--dev`, but also runs `--kagglePredict` on the default dataset kaggleGiveCreditTest.csv
+8. `--devEnsemble`: Assumes that we already have predictions made for us by the rest of the module and present in predictions/*.csv. Allows you to focus on assembling your ensemble without having to retrain the models each time :)
 
