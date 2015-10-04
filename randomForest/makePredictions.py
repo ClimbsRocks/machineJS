@@ -60,37 +60,23 @@ except:
 printParent('idIndex')
 printParent(idIndex)
 
-
-
-
-with open('predictions/randomForestRaw.csv', 'w+') as predictionsFile:
-    csvwriter = csv.writer(predictionsFile)
-    # get predictions for each item in the prediction data set
-    predictedResults = rf.predict_proba(X)
-    printParent('predicted results for every item in the predictions dataset!')
-    printParent(predictedResults.shape)
-    for prediction in predictedResults:
-        try:
-            len(prediction)
-            csvwriter.writerow(prediction)
-        except:
-            csvwriter.writerow([prediction])
-
-with open('predictions/randomForestClean.csv', 'w+') as predictionsFile:
+with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
     csvwriter.writerow(['ID','Probability'])
     # get predictions for each item in the prediction data set
     predictedResults = rf.predict_proba(X)
     printParent('predicted results for every item in the predictions dataset!')
     printParent(predictedResults.shape)
-    for prediction in predictedResults:
+    for idx, prediction in enumerate(predictedResults):
+        inputRow = X[idx]
+        rowID = inputRow[idIndex]
         try:
             len(prediction)
-            csvwriter.writerow(prediction[0])
-            printParent('we are in the try block')
+            # printParent('we are in the try block')
+            csvwriter.writerow([rowID,prediction[1]])
         except:
-            csvwriter.writerow([prediction])
-            printParent('we are in the exception block')
+            csvwriter.writerow([rowID,prediction])
+            # printParent('we are in the exception block')
 
 
 # write those predictions to a single, standalone, centralized file that ONLY holds the ID for that row, and then the predictions for each model. 

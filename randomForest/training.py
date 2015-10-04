@@ -87,7 +87,7 @@ with open(y_file_name, 'rU') as openOutputFile:
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 globalArgs = json.loads(sys.argv[2])
 
-# if we're developing, train on only 10% of the dataset. 
+# if we're developing, train on only 10% of the dataset.
 for key in globalArgs:
     printParent(key)
     if key in( 'devKaggle', 'dev'): 
