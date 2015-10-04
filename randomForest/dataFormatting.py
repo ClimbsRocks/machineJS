@@ -90,9 +90,7 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
         if trainOrPredict == 'train':
             pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
             printParent('we have pickled the dictVectorizer')
-        else:
-            printParent('feature names:')
-            messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
+        messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
         printParent( 'we have vectorized the data. it has shape:' )
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())

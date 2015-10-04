@@ -23,6 +23,7 @@ module.exports = {
   },
 
   generatePythonOptions: function(fileNameFromRoot, otherArgs) {
+    // the first argument for all python shells is going to be a path to a file, relative to the root of ppLib
     var fullPathToFile = dataFileLocation + '/' + fileNameFromRoot;
     var args = [];
     args = args.concat(fullPathToFile, otherArgs);

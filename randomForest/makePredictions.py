@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import csv
 import cPickle as pickle
 
 
@@ -17,15 +18,15 @@ fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
-X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
+y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_predict' + fileName)
+X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_predict2' + fileName)
 
 X = []
 y = []
 
 
 # load up the prediction data set
-with open(x_file_name, 'rU') as x_file:
+with open(X_file_name, 'rU') as x_file:
     inputRows = csv.reader(x_file)
     for row in inputRows:
         # for value in row:
@@ -46,8 +47,21 @@ with open(y_file_name, 'rU') as y_file:
 with open('randomForest/bestRF.p', 'rU') as clf_file:
     rf = pickle.load(clf_file)
 
+dictVectMapping = sys.argv[2].split(',')
+
+columnLabels = [item.lower() for item in dictVectMapping]
+printParent('columnLabels:')
+printParent(columnLabels)
+try:
+    idIndex = columnLabels.index('id')
+except:
+    printParent('no idIndex found')
+    idIndex = 1
+printParent('idIndex')
+printParent(idIndex)
+
 with open('predictions/randomForest.csv', 'w+') as predictionsFile:
-    csvwriter = csv.writer(predictionsFile, delimeter=',')
+    csvwriter = csv.writer(predictionsFile)
     # get predictions for each item in the prediction data set
     for idx, val in enumerate(X):
         predictedVal = rf.predict(val)

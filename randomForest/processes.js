@@ -3,7 +3,7 @@ var utils = require('./utils.js');
 
 module.exports = {
   dictVectMapping: {
-
+    // this will be given to us by DictVectorizer when it's run by python
   },
 
   formatData: function(globals, callback, trainOrPredict) {
@@ -35,12 +35,14 @@ module.exports = {
 
   makePredictions: function(globals, callback, rfPickle) {
     console.log('making predictions on the test data set');
-    module.exports.formatData(globals, callback, 'predict')
 
-    // TODO TODO: pass in the name of the file we are making predictions on
-    var pythonOptions = utils.generatePythonOptions(globals.argv.kagglePredict);
+    var startPredictionsScript = function() {
+      var pythonOptions = utils.generatePythonOptions(globals.argv.kagglePredict, [module.exports.dictVectMapping]);
 
-    utils.startPythonShell('makePredictions.py', pythonOptions, callback, globals.referencesToChildren);
+      utils.startPythonShell('makePredictions.py', callback, pythonOptions, globals.referencesToChildren);
+    };
+
+    module.exports.formatData(globals, startPredictionsScript, 'predict')
 
   }
 
