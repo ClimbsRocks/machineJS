@@ -41,6 +41,7 @@ import csv
 import json
 import math
 import os
+import time
 import cPickle as pickle
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -85,7 +86,7 @@ with open(y_file_name, 'rU') as openOutputFile:
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-rf = RandomForestClassifier(n_estimators=30, n_jobs=-1)
+rf = RandomForestClassifier(n_estimators=15, n_jobs=-1)
 
 sqrtNum = int(math.sqrt(len(X_train[0])))
 
@@ -109,5 +110,28 @@ clf.fit(X_train, y_train)
 
 printParent('we have used grid search to explore the entire parameter space and find the best possible version of a random forest for your particular data set!')
 
-pickle.dump(clf.best_estimator_, open('randomForest/bestRF.p', 'w+'))
+printParent('*********************************************************************************************************')
+printParent("this estimator's best prediction is:")
+printParent(clf.best_score_)
+printParent('*********************************************************************************************************')
+printParent("this estimator's best parameters are:")
+printParent(clf.best_params_)
+printParent('now that we have figured this out, we are going to train a random forest with considerably more trees. more trees means a better fit, but they also take significantly longer to train, so we kept the number of trees relatively low while searching through the parameter space to make sure you were not stuck here until python6 comes out.')
+
+
+time.sleep(2)
+
+bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=-2)
+bigRF.set_params(criterion=clf.best_params_['criterion'])
+
+bigRF.fit(X_train, y_train)
+printParent('we have trained an even more powerful random forest!')
+
+bigRFscore = bigRF.score(X_train, y_train)
+printParent('the bigger randomForest has a score of')
+printParent(bigRFscore)
+
+pickle.dump(bigRF, open('randomForest/bestRF.p', 'w+'))
+
+# pickle.dump(clf.best_estimator_, open('randomForest/bestRF.p', 'w+'))
 printParent('wrote the best estimator to a file')
