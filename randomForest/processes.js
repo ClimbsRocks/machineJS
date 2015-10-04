@@ -34,7 +34,7 @@ module.exports = {
   },
 
   makePredictions: function(globals, callback, rfPickle) {
-    console.log('making predictions on the test data set');
+    console.log('kicking off the process of making predictions on the predicting data set!');
 
     var startPredictionsScript = function() {
       var pythonOptions = utils.generatePythonOptions(globals.argv.kagglePredict, [module.exports.dictVectMapping]);

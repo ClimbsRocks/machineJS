@@ -22,7 +22,7 @@ module.exports = {
   },
   startTraining: function(argv) {
     globals.argv = argv;
-    console.log('heard start training for random forests');
+    console.log('in one part of your machine, we will be training a randomForest');
 
     if(argv.dev || argv.devKaggle) {
       // utils.kickOffForestTraining(globals,function() {
