@@ -16,7 +16,7 @@ next steps:
         J. Can bump up nodesize as much as possible to decrease training time (split)
             consider doing this first, finding what node size we finally start decreasing accuracy on, then use that node size for the rest of the testing we do, then possibly bumping it down a bit again at the end. 
                 https://www.kaggle.com/c/the-analytics-edge-mit-15-071x/forums/t/7890/node-size-in-random-forest
-        K. min_sample_leaf- smaller leaf makes you more prone to capturing noise from the training data. Try for at least 50??
+        K. min_samples_leaf- smaller leaf makes you more prone to capturing noise from the training data. Try for at least 50??
             http://www.analyticsvidhya.com/blog/2015/06/tuning-random-forest-model/
         L. random_state: adds reliability. Would be a good one to split on if ensembling different RFs together. 
         M. oob_score: something about intelligent cross-validation. 
@@ -84,11 +84,11 @@ with open(y_file_name, 'rU') as openOutputFile:
             row[0] = row[0]
         y.append(row[0])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 rf = RandomForestClassifier(n_estimators=15, n_jobs=-1)
 
-sqrtNum = int(math.sqrt(len(X_train[0])))
+sqrtNum = int(math.sqrt(len(X[0])))
 
 max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
 max_features_to_try.append('log2')
@@ -98,7 +98,7 @@ max_features_to_try.append(None)
 parameters_to_try = {
     'criterion': ['gini','entropy'],
     # 'max_features': max_features_to_try,
-
+    # 'min_samples_leaf':[1,2,5]
 }
 
 printParent('we are about to run a grid search over the following space:')
@@ -106,7 +106,10 @@ printParent(parameters_to_try)
 
 clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
 
-clf.fit(X_train, y_train)
+printParent('right before clf.fit')
+
+# clf.fit(X_train, y_train)
+clf.fit(X, y)
 
 printParent('we have used grid search to explore the entire parameter space and find the best possible version of a random forest for your particular data set!')
 
@@ -123,11 +126,15 @@ time.sleep(2)
 
 bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=-2)
 bigRF.set_params(criterion=clf.best_params_['criterion'])
+try:
+    bigRF.set_params(max_features=clf.best_params_['max_features'])
+try:
+    bigRF.set_params(min_samples_leaf=clf.best_params_['min_samples_leaf'])
 
-bigRF.fit(X_train, y_train)
+bigRF.fit(X, y)
 printParent('we have trained an even more powerful random forest!')
 
-bigRFscore = bigRF.score(X_train, y_train)
+bigRFscore = bigRF.score(X, y)
 printParent('the bigger randomForest has a score of')
 printParent(bigRFscore)
 
