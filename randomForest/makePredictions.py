@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import csv
+import time
 import cPickle as pickle
 
 
@@ -50,8 +51,6 @@ with open('randomForest/bestRF.p', 'rU') as clf_file:
 dictVectMapping = sys.argv[2].split(',')
 
 columnLabels = [item.lower() for item in dictVectMapping]
-printParent('columnLabels:')
-printParent(columnLabels)
 try:
     idIndex = columnLabels.index('id')
 except:
@@ -60,15 +59,20 @@ except:
 printParent('idIndex')
 printParent(idIndex)
 
+time.sleep(2)
+
 with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
     # get predictions for each item in the prediction data set
-    for idx, val in enumerate(X):
-        predictedVal = rf.predict(val)
-
-        csvwriter.writerow([
-        #get id somewhow#, 
-        predictedVal])
+    predictedResults = rf.predict_proba(X)
+    printParent('predicted results for every item in the predictions dataset!')
+    printParent(predictedResults.shape)
+    for prediction in predictedResults:
+        try:
+            len(prediction)
+            csvwriter.writerow(prediction)
+        except:
+            csvwriter.writerow([prediction])
 
 
 # write those predictions to a single, standalone, centralized file that ONLY holds the ID for that row, and then the predictions for each model. 
