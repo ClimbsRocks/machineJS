@@ -36,10 +36,11 @@ next steps:
 
 '''
     
-from sys import argv
+import sys
 import csv
 import json
 import math
+import os
 import cPickle as pickle
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
@@ -53,18 +54,18 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
-printParent('hello from inside rfTrainer.py');
-
 
 X = []
 y = []
 
+fileName = os.path.split(sys.argv[1])[1]
+inputFilePath = sys.argv[1]
 
-# TODO TODO: take these in as arguments
-targetDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/y_trainkaggleGiveCredit.csv'
-inputDataFileName='/Users/preston/ghLocal/machineLearningWork/ppComplete/randomForest/x_train2kaggleGiveCredit.csv'
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
+y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
+X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
 
-with open(inputDataFileName, 'rU') as openInputFile:
+with open(X_file_name, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)
     for row in inputRows:
         # for value in row:
@@ -73,7 +74,7 @@ with open(inputDataFileName, 'rU') as openInputFile:
         X.append(row)
 
 
-with open(targetDataFileName, 'rU') as openOutputFile:
+with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
     for row in outputRows:
         try:
@@ -81,7 +82,6 @@ with open(targetDataFileName, 'rU') as openOutputFile:
         except:
             row[0] = row[0]
         y.append(row[0])
-# printParent( X )
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
@@ -107,7 +107,7 @@ clf = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
 
 clf.fit(X_train, y_train)
 
-printParent('trained using grid search!')
+printParent('we have used grid search to explore the entire parameter space and find the best possible version of a random forest for your particular data set!')
 
 pickle.dump(clf.best_estimator_, open('randomForest/bestRF.p', 'w+'))
 printParent('wrote the best estimator to a file')
