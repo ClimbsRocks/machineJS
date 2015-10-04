@@ -44,6 +44,10 @@ var readyToMakePredictions = false;
 // **********************************************************************************
 controllerRF.startTraining(argv);
 
+var ppLibShutdown = function() {
+  controllerNN.killAll();
+  controllerRF.killAll();
+};
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
 // this prevents you from having zombie child processes running indefinitely.
 // lifted directly from: https://www.exratione.com/2013/05/die-child-process-die/
@@ -55,8 +59,24 @@ process.once("uncaughtException", function (error) {
   // Our assumption here is that any other code listening for an uncaught
   // exception is going to do the sensible thing and call process.exit().
   if (process.listeners("uncaughtException").length === 0) {
-    controllerNN.killAll();
-    controllerRF.killAll();
+    ppLibShutdown();
   }
+});
+
+if (process.platform === "win32") {
+  var rl = require("readline").createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.on("SIGINT", function () {
+    process.emit("SIGINT");
+  });
+}
+
+process.on("SIGINT", function () {
+  //graceful shutdown
+  ppLibShutdown();
+  process.exit();
 });
 
