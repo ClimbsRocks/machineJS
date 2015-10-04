@@ -9,11 +9,11 @@
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
 var path = require('path');
-var ppCompleteLocation = path.dirname(__filename);
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
 var argv = require('minimist')(process.argv.slice(2));
 argv.computerTotalCPUs = require('os').cpus().length;
+argv.ppCompleteLocation = path.dirname(__filename);
 
 console.log('thanks for inviting us along on your machine learning journey!');
 
@@ -34,13 +34,14 @@ argv.dataFile = dataFile;
 var readyToMakePredictions = false;
 
 
-
 // **********************************************************************************
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
   // and invoke parallelNets once formatting the data is done. 
+// argv.numCPUs = argv.computerTotalCPUs/2;
 controllerNN.startTraining(argv);
 // **********************************************************************************
+// argv.numCPUs = argv.computerTotalCPUs/2;
 controllerRF.startTraining(argv);
 
 var ppLibShutdown = function() {
@@ -58,6 +59,7 @@ process.once("uncaughtException", function (error) {
   // Our assumption here is that any other code listening for an uncaught
   // exception is going to do the sensible thing and call process.exit().
   if (process.listeners("uncaughtException").length === 0) {
+    console.log('we heard an unexpected shutdown event that is causing everything to close');
     ppLibShutdown();
   }
 });

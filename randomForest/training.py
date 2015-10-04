@@ -35,19 +35,24 @@ next steps:
 
 
 '''
-    
 import sys
 import csv
-import json
 import math
 import os
 import time
+import json
 import joblib
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
 
+    
+
+
+
+X = []
+y = []
 def printParent(text):
     messageObj = {
         'text': text,
@@ -55,12 +60,9 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
-
-X = []
-y = []
-
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
+
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
 y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
@@ -73,7 +75,7 @@ with open(X_file_name, 'rU') as openInputFile:
         #     if value == 'nan'
 
         X.append(row)
-
+        
 
 with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
@@ -87,13 +89,13 @@ with open(y_file_name, 'rU') as openOutputFile:
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 globalArgs = json.loads(sys.argv[2])
 
+
 # if we're developing, train on only 10% of the dataset.
 for key in globalArgs:
     if key in( 'devKaggle', 'dev'): 
-        printParent('heard devKaggle!')
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.95, random_state=0)
 
-rf = RandomForestClassifier(n_estimators=15, n_jobs=-1)
+rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
 
 sqrtNum = int(math.sqrt(len(X[0])))
 
@@ -111,7 +113,7 @@ parameters_to_try = {
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-gridSearch = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=-1)
+gridSearch = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=globalArgs['numCPUs'])
 
 
 # gridSearch.fit(X_train, y_train)
@@ -130,7 +132,7 @@ printParent('now that we have figured this out, we are going to train a random f
 
 time.sleep(2)
 
-bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=-1)
+bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=globalArgs['numCPUs'])
 bigRF.set_params(criterion=gridSearch.best_params_['criterion'])
 try:
     bigRF.set_params(max_features=gridSearch.best_params_['max_features'])

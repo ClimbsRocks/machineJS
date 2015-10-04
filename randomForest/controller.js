@@ -22,6 +22,7 @@ module.exports = {
   },
   startTraining: function(argv) {
     globals.argv = argv;
+    argv.numCPUs = argv.numCPUs || -1;
     console.log('in one part of your machine, we will be training a randomForest');
 
     // if(argv.dev || argv.devKaggle) {
