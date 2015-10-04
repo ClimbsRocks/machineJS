@@ -8,10 +8,11 @@
 
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
+var controllerEnsemble = require('./ensembling/controller.js');
 var path = require('path');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(1));
 argv.computerTotalCPUs = require('os').cpus().length;
 argv.ppCompleteLocation = path.dirname(__filename);
 
@@ -19,12 +20,12 @@ console.log('thanks for inviting us along on your machine learning journey!');
 
 
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
-if(argv.dev || argv.devKaggle) {
+if(argv.dev || argv.devKaggle || argv.devEnsemble) {
   require('longjohn');
   if (dataFile.slice(-4) !== '.csv') {
     dataFile = 'kaggleGiveCredit.csv'
   }
-  if (argv.devKaggle && !argv.kagglePredict) {
+  if (argv.devKaggle && !argv.kagglePredict || argv.devEnsemble) {
     argv.kagglePredict = 'kaggleGiveCreditTest.csv';
   }
 }
@@ -33,16 +34,20 @@ argv.dataFile = dataFile;
 
 var readyToMakePredictions = false;
 
-
-// **********************************************************************************
-// Here is where we invoke the method with the path to the data
-// we pass in a callback function that will make the dataSummary a global variable 
-  // and invoke parallelNets once formatting the data is done. 
-// argv.numCPUs = argv.computerTotalCPUs/2;
-controllerNN.startTraining(argv);
-// **********************************************************************************
-// argv.numCPUs = argv.computerTotalCPUs/2;
-controllerRF.startTraining(argv);
+if (argv.devEnsemble) {
+  controllerEnsemble.createEnsemble(argv);
+} else {
+  // **********************************************************************************
+  // Here is where we invoke the method with the path to the data
+  // we pass in a callback function that will make the dataSummary a global variable 
+    // and invoke parallelNets once formatting the data is done. 
+  // argv.numCPUs = argv.computerTotalCPUs/2;
+  controllerNN.startTraining(argv);
+  // **********************************************************************************
+  // argv.numCPUs = argv.computerTotalCPUs/2;
+  controllerRF.startTraining(argv);
+  
+}
 
 var ppLibShutdown = function() {
   controllerNN.killAll();
@@ -61,6 +66,7 @@ process.once("uncaughtException", function (error) {
   if (process.listeners("uncaughtException").length === 0) {
     console.log('we heard an unexpected shutdown event that is causing everything to close');
     ppLibShutdown();
+    throw error;
   }
 });
 
