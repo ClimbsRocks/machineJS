@@ -10,11 +10,10 @@ var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
 var path = require('path');
 var ppCompleteLocation = path.dirname(__filename);
-var numCPUs  = require('os').cpus().length;
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
 var argv = require('minimist')(process.argv.slice(2));
-var PythonShell = require('python-shell');
+argv.computerTotalCPUs = require('os').cpus().length;
 
 console.log('thanks for inviting us along on your machine learning journey!');
 
@@ -40,7 +39,7 @@ var readyToMakePredictions = false;
 // Here is where we invoke the method with the path to the data
 // we pass in a callback function that will make the dataSummary a global variable 
   // and invoke parallelNets once formatting the data is done. 
-// controllerNN.startTraining(argv);
+controllerNN.startTraining(argv);
 // **********************************************************************************
 controllerRF.startTraining(argv);
 

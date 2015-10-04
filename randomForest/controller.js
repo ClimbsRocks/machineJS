@@ -24,14 +24,14 @@ module.exports = {
     globals.argv = argv;
     console.log('in one part of your machine, we will be training a randomForest');
 
-    if(argv.dev || argv.devKaggle) {
-      // utils.kickOffForestTraining(globals,function() {
-      //   // TODO: add in next step in chain here
-      //   module.exports.makePredictions();
-      // });
-      module.exports.makePredictions();
+    // if(argv.dev || argv.devKaggle) {
+    //   // utils.kickOffForestTraining(globals,function() {
+    //   //   // TODO: add in next step in chain here
+    //   //   module.exports.makePredictions();
+    //   // });
+    //   module.exports.makePredictions();
 
-    } else {
+    // } else {
 
       utils.formatInitialData(globals, function() {
         utils.kickOffForestTraining(globals,function() {
@@ -40,7 +40,7 @@ module.exports = {
         });
       });
 
-    }
+    // }
   },
   makePredictions: function(rfPickle) {
     rfPickle = rfPickle || globals.rfLocation + '/' + 'bestRF.p';
