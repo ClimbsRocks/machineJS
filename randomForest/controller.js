@@ -44,7 +44,9 @@ module.exports = {
   },
   makePredictions: function(rfPickle) {
     rfPickle = rfPickle || globals.rfLocation + '/' + 'bestRF.p';
-    utils.makePredictions(globals, rfPickle);
+    utils.makePredictions(globals, function() {
+      console.log('inside callback after makePredictions() ')
+    }, rfPickle);
   }
 
 };
