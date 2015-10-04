@@ -2,6 +2,9 @@ var path = require('path');
 var utils = require('./utils.js');
 
 module.exports = {
+  dictVectMapping: {
+
+  },
 
   formatData: function(globals, callback, trainOrPredict) {
     var dataFile = globals.argv.dataFile;
@@ -10,8 +13,13 @@ module.exports = {
     }
     var pythonOptions = utils.generatePythonOptions(dataFile, trainOrPredict);
 
-    utils.startPythonShell('dataFormatting.py', callback, pythonOptions, globals.referencesToChildren);
+    var pyShell = utils.startPythonShell('dataFormatting.py', callback, pythonOptions, globals.referencesToChildren);
 
+    pyShell.on('message', function(message) {
+      if(message.type === 'dictVectMapping') {
+        module.exports.dictVectMapping = message.text;
+      }
+    });
   },
 
   formatInitialData: function(globals, callback) {

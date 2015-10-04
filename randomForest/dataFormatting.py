@@ -16,8 +16,8 @@ inputFilePath = sys.argv[1]
 trainOrPredict = sys.argv[2]
 
 if trainOrPredict == 'predict':
-    with open('randomForest/dictVectorizer.p', 'rU') as file:
-        dictVectorizer1 = pickle.load(file)
+    with open('randomForest/dictVectorizer.p', 'rU') as pickle_file:
+        dictVectorizer1 = pickle.load(pickle_file)
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
 y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
@@ -30,6 +30,14 @@ def printParent(text):
         'type': 'console.log'
     }
     print json.dumps(messageObj)
+
+def messageParent(text, type):
+    messageObj = {
+        'text': text,
+        'type': type
+    }
+    print json.dumps(messageObj)
+
 
 
 with open(inputFilePath, 'rU') as csvInput:
@@ -82,6 +90,9 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
         if trainOrPredict == 'train':
             pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
             printParent('we have pickled the dictVectorizer')
+        else:
+            printParent('feature names:')
+            messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
         printParent( 'we have vectorized the data. it has shape:' )
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())
