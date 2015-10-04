@@ -15,21 +15,24 @@ inputFilePath = sys.argv[1]
 # we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
 trainOrPredict = sys.argv[2]
 
-if trainOrPredict == 'predict':
-    with open('randomForest/dictVectorizer.p', 'rU') as pickle_file:
-        dictVectorizer1 = pickle.load(pickle_file)
-
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
-X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '2' + fileName)
-X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
-
 def printParent(text):
     messageObj = {
         'text': text,
         'type': 'console.log'
     }
     print json.dumps(messageObj)
+
+if trainOrPredict == 'predict':
+    try:
+        with open('randomForest/dictVectorizer.p', 'rU') as pickle_file:
+            dictVectorizer1 = pickle.load(pickle_file)
+    except:
+        printParent('trainOrPredict is predict but dictVectorizer.p does not exist')
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
+y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
+X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '2' + fileName)
+X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
+
 
 def messageParent(text, type):
     messageObj = {

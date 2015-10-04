@@ -97,8 +97,8 @@ max_features_to_try.append(None)
 
 parameters_to_try = {
     'criterion': ['gini','entropy'],
-    # 'max_features': max_features_to_try,
-    # 'min_samples_leaf':[1,2,5]
+    'max_features': max_features_to_try,
+    'min_samples_leaf':[1,2,5]
 }
 
 printParent('we are about to run a grid search over the following space:')
@@ -128,8 +128,13 @@ bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=-2)
 bigRF.set_params(criterion=clf.best_params_['criterion'])
 try:
     bigRF.set_params(max_features=clf.best_params_['max_features'])
+except:
+    None
+    
 try:
     bigRF.set_params(min_samples_leaf=clf.best_params_['min_samples_leaf'])
+except:
+    None
 
 bigRF.fit(X, y)
 printParent('we have trained an even more powerful random forest!')
