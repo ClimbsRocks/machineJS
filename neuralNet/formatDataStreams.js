@@ -212,7 +212,6 @@ module.exports = {
     };
 
     tStream1._flush = function (done) {
-      console.log('heard a flush event in tStream1');
       if (this._partialLineData) {
         var columns = this._partialLineData.split(',');
         var transformedRow = this.transformOneRow(columns)

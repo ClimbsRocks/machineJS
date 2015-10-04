@@ -18,7 +18,8 @@ module.exports = {
       referencesToChildren[i].kill();
     }
   },
-  startTraining: function(argv) {
+  startTraining: function(argsFromppLib) {
+    argv = argsFromppLib;
     console.log('dataFile:',argv.dataFile);
     // Here is where we invoke the method with the path to the data
     // we pass in a callback function that will make the dataSummary a global variable 
@@ -143,7 +144,7 @@ function attachListeners(child) {
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
         if(argv.kagglePredict || argv.devKaggle) {
-          makeKagglePredictions( argv.kagglePredict, dataSummary, nnLocation, bestNetObj );
+          makeKagglePredictions( argv.kagglePredict, dataSummary, argv.ppCompleteLocation, bestNetObj );
         }
       } 
       

@@ -5,15 +5,15 @@ var formatDataStreams = require('./formatDataStreams.js');
 var path = require('path');
 
 
-module.exports = function(pathToKaggleData, dataSummary, nnLocation, bestNetObj) {
-  console.log('inside module.exports function from makeKagglePredictions');
+module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation, bestNetObj) {
   dataSummary.isTesting = true;
   var net = new brain.NeuralNetwork();
   // console.log(' bestNetObj:', bestNetObj);
   var bestNet = net.fromJSON( JSON.parse(bestNetObj.trainingBestAsJSON));
   var trainingResults = {};
 
-  var readFileStream = fs.createReadStream(path.join( nnLocation, pathToKaggleData), {encoding: 'utf8'});
+  var readFileStream = fs.createReadStream(path.join( ppCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
+
   var firstTransformForTesting = formatDataStreams.firstTransformForTesting(dataSummary);
   var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
 
@@ -67,10 +67,15 @@ module.exports = function(pathToKaggleData, dataSummary, nnLocation, bestNetObj)
     done();
   };
 
-  var writeStream = fs.createWriteStream(path.join(nnLocation,'/kagglePredictions' + Date.now() + '.txt'), {encoding: 'utf8'});
+
+  var writeStream = fs.createWriteStream(path.join(ppCompleteLocation,'predictions/neuralNetwork.csv'), {encoding: 'utf8'});
 
   // TODO: better variable naming
   readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream).pipe(writeStream);
+
+  writeStream.on('finish', function() {
+    console.log("you just made our neural network incredibly happy by letting it make predictions on the whole dataset for you! Now it's just wishing that you'll come back and give it more things to learn about...");
+  })
 
 // Deprecated:
 //   // TODO TODO: create a new write stream that will write to file 
