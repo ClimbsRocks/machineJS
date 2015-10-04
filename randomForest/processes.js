@@ -15,7 +15,7 @@ module.exports = {
   },
 
   formatInitialData: function(globals, callback) {
-    console.log('inside formatInitialData');
+    console.log('formatting the training data set');
     module.exports.formatData(globals, callback, 'train');
   },
 
@@ -26,6 +26,7 @@ module.exports = {
   },
 
   makePredictions: function(globals, callback, rfPickle) {
+    console.log('making predictions on the test data set');
     module.exports.formatData(globals, callback, 'predict')
 
     // TODO TODO: pass in the name of the file we are making predictions on

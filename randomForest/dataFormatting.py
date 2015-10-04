@@ -1,11 +1,3 @@
-# read the data in so that each line is a dict
-  # ideally python would do this for us directly, knowing the column headers. but if it doesn't, we could do it super easily ourselves (read in the row as a list, read in the column headers as the first row as a list, create an object as we go where we look up the feature_name by the current position within the first row)
-  # update: python does it for us:
-    # https://docs.python.org/3/library/csv.html#csv.DictReader
-# run DictVectorizer on it!
-  # http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.DictVectorizer.html
-  # this handles binarizing as well as keeping track of the order while turning it into a list and such. this should do all we need it to. 
-# possibly write this to file somewhere, rather than having to run this for each new python child_process we spin up? 
 import sys
 import csv
 import os
@@ -17,16 +9,13 @@ from sklearn.feature_extraction import DictVectorizer
 
 dictVectorizer1 = DictVectorizer()
 
-
-# print 'hi from inside the snake!'
-
 # API: this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
 # we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
 trainOrPredict = sys.argv[2]
+
 if trainOrPredict == 'predict':
-    # TODO TODO: try to load up dictVectorizer.p
     with open('randomForest/dictVectorizer.p', 'rU') as file:
         dictVectorizer1 = pickle.load(file)
 
@@ -59,6 +48,7 @@ with open(inputFilePath, 'rU') as csvInput:
             if firstRow:
                 y_file_csv.writerow( [row.pop(0)] )
 
+                # remove all 'NA' from the input
                 for value in row:
                     if value == 'NA':
                         value = 0
@@ -68,7 +58,7 @@ with open(inputFilePath, 'rU') as csvInput:
                 # we want to push the labels in directly, after taking out the output label
                 row.pop(0)
                 newRow = row
-            # remove all 'NA' from the input, then write it to a file
+            # write the new row to a file
             X_temp_file_csv.writerow( newRow )
     y_file.close()
     
@@ -92,7 +82,7 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
         if trainOrPredict == 'train':
             pickle.dump(dictVectorizer1, open('randomForest/dictVectorizer.p', 'w+'))
             printParent('we have pickled the dictVectorizer')
-        printParent( 'we have vectorized the input. it has shape:' )
+        printParent( 'we have vectorized the data. it has shape:' )
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())
         os.remove(X_temp_file_name)
