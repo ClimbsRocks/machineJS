@@ -57,8 +57,6 @@ try:
 except:
     printParent('no idIndex found')
     idIndex = 1
-printParent('idIndex')
-printParent(idIndex)
 
 with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
@@ -69,7 +67,8 @@ with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     printParent(predictedResults.shape)
     for idx, prediction in enumerate(predictedResults):
         inputRow = X[idx]
-        rowID = inputRow[idIndex]
+        # convert the id from a string to an int
+        rowID = int(float(inputRow[idIndex]))
         try:
             len(prediction)
             # printParent('we are in the try block')

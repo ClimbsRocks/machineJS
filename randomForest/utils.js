@@ -36,8 +36,12 @@ module.exports = {
 
   startPythonShell: function(scriptName, callback, pythonOptions, referencesToChildren) {
     var pyShell = PythonShell.run(scriptName, pythonOptions, function (err, results) {
-      console.log('finished running',scriptName + '!');
-      if (err) console.error(err);
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('successfully finished running',scriptName + '!');
+
+      }
       callback();
     });
 
