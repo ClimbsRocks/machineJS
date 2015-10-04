@@ -8,12 +8,15 @@ dataFileLocation.pop();
 dataFileLocation = dataFileLocation.join('/');
 
 module.exports = {
+  expectedMessages: {
+    dictVectMapping: true
+  },
   attachLogListener: function(referenceToShell) {
     referenceToShell.on('message', function(message) {
       if(message.type === 'console.log') {
         console.log('snake says:',message.text);
       }
-      else {
+      else if ( !module.exports.expectedMessages[ message.type ] ){
         console.log('heard a message:',message);
       }
     });
@@ -40,6 +43,7 @@ module.exports = {
     module.exports.attachLogListener(pyShell);
     referencesToChildren.push(pyShell);
 
+    return pyShell;
   }
 
 }
