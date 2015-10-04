@@ -85,12 +85,14 @@ with open(y_file_name, 'rU') as openOutputFile:
         y.append(row[0])
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
-if sys.argv[2].devKaggle:
-    printParent('heard devKaggle!')
-    X, X_test, y, y_test = train_test_split(X, y, test_size=0.9, random_state=0)
-else:
-    printParent('did not hear devKaggle')
-    printParent(sys.argv[2])
+globalArgs = json.loads(sys.argv[2])
+
+# if we're developing, train on only 10% of the dataset. 
+for key in globalArgs:
+    printParent(key)
+    if key in( 'devKaggle', 'dev'): 
+        printParent('heard devKaggle!')
+        X, X_test, y, y_test = train_test_split(X, y, test_size=0.9, random_state=0)
 
 rf = RandomForestClassifier(n_estimators=15, n_jobs=-1)
 

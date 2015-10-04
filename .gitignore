@@ -8,3 +8,4 @@ kagglePredictions*.txt
 *.csv
 *.p
 *.pkl
+randomForest/bestRF/*

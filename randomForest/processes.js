@@ -11,7 +11,7 @@ module.exports = {
     if(trainOrPredict === 'predict') {
       dataFile = globals.argv.kagglePredict;
     }
-    var pythonOptions = utils.generatePythonOptions(dataFile, [trainOrPredict, globals.argv]);
+    var pythonOptions = utils.generatePythonOptions(dataFile, [trainOrPredict, JSON.stringify(globals.argv)]);
 
     var pyShell = utils.startPythonShell('dataFormatting.py', callback, pythonOptions, globals.referencesToChildren);
 
@@ -28,7 +28,7 @@ module.exports = {
   },
 
   kickOffForestTraining: function(globals, callback) {
-    var pythonOptions = utils.generatePythonOptions(globals.argv.dataFile, globals.argv);
+    var pythonOptions = utils.generatePythonOptions(globals.argv.dataFile, JSON.stringify(globals.argv));
 
     utils.startPythonShell('training.py', callback, pythonOptions, globals.referencesToChildren);
   },
@@ -37,7 +37,7 @@ module.exports = {
     console.log('kicking off the process of making predictions on the predicting data set!');
 
     var startPredictionsScript = function() {
-      var pythonOptions = utils.generatePythonOptions(globals.argv.kagglePredict, [module.exports.dictVectMapping, globals.argv]);
+      var pythonOptions = utils.generatePythonOptions(globals.argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(globals.argv)]);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions, globals.referencesToChildren);
       console.log('we have started a python shell with makePredictions.py')
