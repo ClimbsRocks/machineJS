@@ -20,7 +20,7 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation, bes
   var testStream = new stream.Transform({objectMode: true});
 
   // the first column just contains the row names. 
-  var hasRemovedColumnHeaders = false;
+  var firstRow = true;
 
   testStream._transform = function(chunk, encoding, done) {
     var data = chunk.toString();
@@ -29,8 +29,10 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation, bes
     this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
     var resultsToPush = '';
 
-    if(!hasRemovedColumnHeaders) {
-      rows.shift();
+    if(firstRow) {
+      var headers = rows.shift();
+      firstRow = false;
+      resultsToPush+= 'ID,Probability\n';
     }
 
     for(var i = 0; i < rows.length; i++) {
