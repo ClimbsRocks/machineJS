@@ -1,3 +1,4 @@
+global.neuralNetwork = {};
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
 var controllerEnsemble = require('./ensembling/controller.js');
@@ -39,7 +40,7 @@ if (argv.devEnsemble) {
   controllerNN.startTraining(argv);
   // **********************************************************************************
   // argv.numCPUs = argv.computerTotalCPUs/2;
-  controllerRF.startTraining(argv);
+  // controllerRF.startTraining(argv);
   
   controllerEnsemble.startListeners(2, argv);
 }

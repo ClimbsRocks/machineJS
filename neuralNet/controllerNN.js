@@ -11,6 +11,9 @@ var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 var EventEmitter = require('events');
 
+global.neuralNetwork = {};
+var nn = global.neuralNetwork;
+
 
 module.exports = {
   killAll: function() {
@@ -31,7 +34,8 @@ module.exports = {
     });
 
   }
-}
+
+};
 
 
 
@@ -48,7 +52,7 @@ module.exports = {
 // TODO: build out --devKaggle
 
 
-var bestNetObj = {
+nn.bestNetObj = {
   trainingBestAsJSON: '',
   testingBestAsJSON: '',
   trainingErrorRate: [Infinity],
@@ -68,7 +72,6 @@ var neuralNetResults = {};
 
 
 var updateNetStatus = function(message) {
-  // console.log('message inside updateNetStatus',message);
   var id = message.brainID;
   neuralNetResults[id].iterations = message.iterations;
   neuralNetResults[id].trainingErrorRate.push(message.errorRate);
@@ -141,8 +144,9 @@ function attachListeners(child) {
       // testOutput(net.fromJSON(message.net));
       // TODO: have some way of timeboxing each experiment??
 
+      console.log('trained', completedNets,'so far,', numOfNetsToTest - completedNets, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
+
       if(allParamsToTest.length > 0) {
-        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
         var newChild = createChild();
         attachListeners(newChild);
         referencesToChildren.push(newChild);
@@ -154,25 +158,17 @@ function attachListeners(child) {
           // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
           // once we have reached that threshold, only then run makeKagglePredictions
         // var extendedTrainingNet = new brain.NeuralNetwork();
-        // extendedTrainingNet.fromJSON(bestNetObj.trainingBestAsJSON);
+        // extendedTrainingNet.fromJSON(nn.bestNetObj.trainingBestAsJSON);
 
 
         if(argv.kagglePredict || argv.devKaggle) {
-          makeKagglePredictions( argv.kagglePredict, dataSummary, argv.ppCompleteLocation, bestNetObj );
+          makeKagglePredictions( argv.kagglePredict, dataSummary, argv.ppCompleteLocation );
         }
       } 
       
-    } else if (message.type === 'getNewData') {
-      // trying to share data between parent and child efficiently here by sending it as messages. 
-      // this was slow, but as long as it's predictably slow, we can work around it (grab new data when only half drained, etc.)
-      child.send(globalTrainingData.slice(message.rowsSoFar, message.rowsSoFar + 10000));
     } else if (message.type === 'midTrainingCheckIn'){
       // TODO: build in logic to make this time based as well as iteration based. 
       updateNetStatus(message);
-      if(message.iterations === 100) {
-        // TODO: we're going to have to generalize this
-        netCheckup();
-      }
       bestNetChecker(message);
     } else {
       console.log('heard a message in parent and did not know what to do with it:',message);
@@ -182,8 +178,8 @@ function attachListeners(child) {
 
 var referencesToChildren = [];
 
+// we will set a global value for this when we call parallelNets for the first time
 var allParamsToTest; 
-// we will invoke this when we call parallelNets for the first time
 
 var parallelNets = function() {
   // Nets we want to test:
@@ -216,97 +212,30 @@ var parallelNets = function() {
 
 // CLEAN: I don't think we need any of the following code anymore, now that we're just sending in maxChildTrainingTime and maxChildTrainingIterations as parameters to the child process. 
 var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
-// console.log('advancedOptions:',advancedOptions);
+
 var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
 if(argv.dev || argv.devKaggle) {
-  maxChildTrainingIterations = 1;
+  maxChildTrainingIterations = 5;
 }
-// ADVANCED: let them specify a total training time, and then we'll guesstimate how long each child has to train from there
 
-// var trainingCuller = function() {
-//   // console.log('referencesToChildren:', referencesToChildren);
-//   for (var i = 0; i < referencesToChildren.length; i++) {
-//     var child = referencesToChildren[i];
-//     if(child.running) {
-//       var elapsedTrainingTime = (Date.now() - child.startTime) / 1000; // time is in milliseconds. elapsedTrainingTime is now in seconds.
-//       if(elapsedTrainingTime > maxChildTrainingTime *1.2) {
-//         // we are having the child auto-kill itself when it reaches a good stopping point (the next iteration)
-//         // however, in the case that the iteration is taking too long, we are back-stopping it here by killing the child if it's been running 20% longer than the max allowed time. 
-//         // there's a whole shutdown process to follow. 
-//         // TODO: modularize the child shutdown process and then include it here.
-//         child.running = false;
-//         console.log('sent a kill message');
-//         child.kill();
-
-//         // kill the child
-//         // follow the same steps as we would when the child finishes training naturally.
-//       }
-//     }
-//   }
-// };
-
-// ADVANCED: kill off some nets more quickly if we see that they're behind where other nets were after 200 iterations, and the delta between their iterations is smaller than other nets. 
-
-// TODO: run this once every minute, or on some less-frequent basis. 
-// var killNetChildInterval = setInterval(function() {
-//   trainingCuller();
-// }, 1000);
-
-var testOutput = function(net) {
-
-  var testSummary = {};
-  for (var i = 0; i <= 100; i++) {
-    testSummary[i] = {
-      countOfPredictionsAtThisProbability: 0,
-      observedValues: 0
-    };
-  }
-  // right now we're just reading in the entire training set. 
-  // TODO: test on only the held-back portion of the input data.
-  var readStream = fs.createReadStream(path.join(nnLocation,'/formattedData0.txt'), {encoding: 'utf8'});
-  readStream._partialLineData = '';
-
-  readStream.on('data', function(data) {
-    data = this._partialLineData + data;
-    var rows = data.toString().split('\n');
-    this._partialLineData = rows.splice( rows.length - 1, 1 )[0];
-
-    for (var j = 0; j < rows.length; j++) {
-      var row = JSON.parse(rows[j]);
-      if(row.testingDataSet) {
-        var nnPrediction = Math.round(net.run(row.input).numericOutput * 100);
-        testSummary[nnPrediction].countOfPredictionsAtThisProbability++;
-        // TODO: make this work for categorical output too. right now it only works for numeric output. 
-        testSummary[nnPrediction].observedValues += parseFloat(row.output.numericOutput, 10);
-      }
-    }
-  });
-
-  // TODO: turn this into a single error number, rather than the human-readable output below.
-  readStream.on('end', function() {
-    for(var key in testSummary) {
-      console.log(key, 'count:', testSummary[key].countOfPredictionsAtThisProbability, 'rate:', Math.round(testSummary[key].observedValues / testSummary[key].countOfPredictionsAtThisProbability * 100) + '%');
-    }
-  });
-};
 
 var mostRecentWrittenNet = Date.now();
 var namesOfWrittenNets = [];
 var bestNetChecker = function(trainingResults) {
   // console.log('checking if this is the best net:',trainingResults);
-  // bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
-  if(trainingResults.errorRate < bestNetObj.trainingErrorRate[bestNetObj.trainingErrorRate.length -1]) {
+  // nn.bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
+  if(trainingResults.errorRate < nn.bestNetObj.trainingErrorRate[nn.bestNetObj.trainingErrorRate.length -1]) {
     // console.log('trainingResults:',trainingResults);
     // console.log('trainingResults.net:',trainingResults.net);
     // make this the best net
-    bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
+    nn.bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
     // we will have many new bestNets on our first training round. This prevents us from having too many new files created
     // Admittedly, this is potentially still creating a new net every three seconds, which is a lot.
     // The risk we're running right now is simply that we lose three seconds worth of work. The worst case scenario is that we write the most recent net to file, and then 2.9 seconds later, we simultaneously get a new best net, don't write it to file, and then close out the server for some reason, forever losing that last net. This seems a small risk. 
     if(completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
       var bestNetFileName = 'neuralNet/bestNet/bestNet' + Date.now() + '.txt';
       namesOfWrittenNets.push(bestNetFileName);
-      fs.writeFile(bestNetFileName, bestNetObj.trainingBestAsJSON, function() {
+      fs.writeFile(bestNetFileName, nn.bestNetObj.trainingBestAsJSON, function() {
         // delete the previously written bestNet file(s), now that we have a new one written to disk successfully. 
         while(namesOfWrittenNets.length > 1) {
           fs.unlink(namesOfWrittenNets.shift());
@@ -315,8 +244,8 @@ var bestNetChecker = function(trainingResults) {
       mostRecentWrittenNet = Date.now();
     }
     // TODO: grab the entire array
-    bestNetObj.trainingErrorRate = neuralNetResults[trainingResults.brainID].trainingErrorRate;
-    bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
-    bestNetObj.iterations = trainingResults.iterations;
+    nn.bestNetObj.trainingErrorRate = neuralNetResults[trainingResults.brainID].trainingErrorRate;
+    nn.bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
+    nn.bestNetObj.iterations = trainingResults.iterations;
   }
 };
