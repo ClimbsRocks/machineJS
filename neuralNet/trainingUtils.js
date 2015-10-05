@@ -1,3 +1,7 @@
+var path = require('path');
+var nnLocation = path.dirname(__filename);
+
+
 module.exports = {
   createParamsToTest: function (numFeatures, argv) {
     var allParamsToTest = [];
@@ -33,5 +37,40 @@ module.exports = {
     }
     console.log('allParamsToTest:',allParamsToTest);
     return allParamsToTest;
+  },
+
+  makeTrainingObj: function (argv, dataSummary, trainingArgs) {
+    var trainingObj = {
+      errorThresh: 0.05,  // error threshold to reach
+      iterations: 1000,   // maximum training iterations
+      // log: true,           // console.log() progress periodically
+      // logPeriod: 1,       // number of iterations between logging
+      learningRate: 0.6    // learning rate
+    };
+
+    var brainID = ++trainingArgs.totalRunningNets;
+
+    // TODO TODO: Finish making argv.copyData functional
+    if(argv.copyData) {
+      var fileName = '/formattedData' + (brainID % numCPUs) + '.txt';
+    } else {
+      // TODO: rename this file to make it more user-friendly
+      var fileName = 'formattingData3.txt';
+    }
+    var pathToChildData = path.join(nnLocation,fileName);
+
+    var totalMessageObj = {
+      type: 'startBrain',
+      brainID: brainID,
+      hiddenLayers: trainingArgs.hlArray, 
+      trainingObj: trainingObj, 
+      pathToData: pathToChildData, 
+      totalRows: dataSummary.totalRows,
+      maxTrainingTime: trainingArgs.maxChildTrainingTime,
+      maxTrainingIterations: trainingArgs.maxChildTrainingIterations,
+      totalRunningNets: trainingArgs.totalRunningNets
+    };
+
+    return totalMessageObj;
   }
 }

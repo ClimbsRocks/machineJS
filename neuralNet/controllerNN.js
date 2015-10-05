@@ -86,8 +86,15 @@ var createChild = function() {
     var child = child_process.fork('./brainChildMemoryHog',{cwd: nnLocation});
   }
 
-  // if this is a dev run, we only want to train two nets (the smallest and largest configurations). otherwise, we want to test all configurations. 
-  var messageObj = makeTrainingObj( allParamsToTest.shift() );
+  trainingArgs = {
+    totalRunningNets: totalRunningNets,
+    maxChildTrainingIterations: maxChildTrainingIterations,
+    maxChildTrainingTime: maxChildTrainingTime, 
+    hlArray: allParamsToTest.shift()
+  };
+
+  var messageObj = trainingUtils.makeTrainingObj( argv, dataSummary, trainingArgs );
+  totalRunningNets = messageObj.totalRunningNets
 
   child.send(messageObj);
 
@@ -146,8 +153,8 @@ function attachListeners(child) {
         // TODO TODO: load up the bestNet
           // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
           // once we have reached that threshold, only then run makeKagglePredictions
-        var extendedTrainingNet = new brain.NeuralNetwork();
-        net.fromJSON(bestNetObj.trainingBestAsJSON);
+        // var extendedTrainingNet = new brain.NeuralNetwork();
+        // extendedTrainingNet.fromJSON(bestNetObj.trainingBestAsJSON);
 
 
         if(argv.kagglePredict || argv.devKaggle) {
@@ -313,37 +320,3 @@ var bestNetChecker = function(trainingResults) {
     bestNetObj.iterations = trainingResults.iterations;
   }
 };
-
-function makeTrainingObj (hlArray) {
-  var trainingObj = {
-    errorThresh: 0.05,  // error threshold to reach
-    iterations: 1000,   // maximum training iterations
-    // log: true,           // console.log() progress periodically
-    // logPeriod: 1,       // number of iterations between logging
-    learningRate: 0.6    // learning rate
-  };
-
-  var brainID = ++totalRunningNets;
-
-  // TODO TODO: Finish making argv.copyData functional
-  if(argv.copyData) {
-    var fileName = '/formattedData' + (brainID % numCPUs) + '.txt';
-  } else {
-    // TODO: rename this file to make it more user-friendly
-    var fileName = 'formattingData3.txt';
-  }
-  var pathToChildData = path.join(nnLocation,fileName);
-
-  var totalMessageObj = {
-    type: 'startBrain',
-    brainID: brainID,
-    hiddenLayers: hlArray, 
-    trainingObj: trainingObj, 
-    pathToData: pathToChildData, 
-    totalRows: dataSummary.totalRows,
-    maxTrainingTime: maxChildTrainingTime,
-    maxTrainingIterations: maxChildTrainingIterations
-  };
-
-  return totalMessageObj;
-}
