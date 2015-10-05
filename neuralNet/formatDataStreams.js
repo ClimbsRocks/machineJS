@@ -152,7 +152,7 @@ module.exports = {
     return tStream1;
   },
 
-  firstTransformForTesting: function (dataSummary) {
+  firstTransformForTesting: function () {
     var tStream1 = new stream.Transform({objectMode: true});
     tStream1._partialLineData = '';
     // var countOfRows = 0; 

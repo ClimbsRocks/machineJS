@@ -10,34 +10,6 @@ var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 var EventEmitter = require('events');
 
-nn.referencesToChildren = [];
-var dataSummary; 
-nn.readyToMakePredictions = false;
-
-nn.totalRunningNets = 0;
-nn.neuralNetResults = {};
-
-nn.bestNetObj = {
-  trainingBestAsJSON: '',
-  testingBestAsJSON: '',
-  trainingErrorRate: [Infinity],
-  testingError: 1,
-  trainingBestTrainingTime: Infinity,
-  testingBestTrainingTime: Infinity
-};
-
-nn.maxChildTrainingIterations = argv.maxTrainingIterations || 100;
-nn.maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
-
-// train super quickly if we're developing on ppComplete itself
-if(argv.dev || argv.devKaggle) {
-  nn.maxChildTrainingIterations = 5;
-}
-
-nn.completedNets = 0;
-nn.numOfNetsToTest;
-
-
 
 module.exports = {
   killAll: function() {
@@ -46,6 +18,7 @@ module.exports = {
     }
   },
   startTraining: function() {
+    trainingUtils.setGlobalVars();
     console.log('dataFile:',argv.dataFile);
 
     readAndFormatData(function() {
@@ -128,8 +101,8 @@ function attachListeners(child) {
       nn.completedNets++;
       // Or maybe we don't have to kill it, we can just send it new information to train on?!
       child.kill();
-      //TODO: send over a better message to bestNetChecker. 
-      bestNetChecker(message); 
+      //TODO: send over a better message to trainingUtils.bestNetChecker. 
+      trainingUtils.bestNetChecker(message); 
 
       // var net = new brain.NeuralNetwork();
       // testOutput(net.fromJSON(message.net));
@@ -160,7 +133,7 @@ function attachListeners(child) {
     } else if (message.type === 'midTrainingCheckIn'){
       // TODO: build in logic to make this time based as well as iteration based. 
       updateNetStatus(message);
-      bestNetChecker(message);
+      trainingUtils.bestNetChecker(message);
     } else {
       console.log('heard a message in parent and did not know what to do with it:',message);
     }
@@ -203,33 +176,3 @@ var parallelNets = function() {
 // CLEAN: I don't think we need any of the following code anymore, now that we're just sending in maxChildTrainingTime and maxChildTrainingIterations as parameters to the child process. 
 
 
-var mostRecentWrittenNet = Date.now();
-var namesOfWrittenNets = [];
-var bestNetChecker = function(trainingResults) {
-  // console.log('checking if this is the best net:',trainingResults);
-  // nn.bestNetObj.trainingErrorRate is an array of all the error rates it has had along the way. We want the most recent one. 
-  if(trainingResults.errorRate < nn.bestNetObj.trainingErrorRate[nn.bestNetObj.trainingErrorRate.length -1]) {
-    // console.log('trainingResults:',trainingResults);
-    // console.log('trainingResults.net:',trainingResults.net);
-    // make this the best net
-    nn.bestNetObj.trainingBestAsJSON = JSON.stringify(trainingResults.net);
-    // we will have many new bestNets on our first training round. This prevents us from having too many new files created
-    // Admittedly, this is potentially still creating a new net every three seconds, which is a lot.
-    // The risk we're running right now is simply that we lose three seconds worth of work. The worst case scenario is that we write the most recent net to file, and then 2.9 seconds later, we simultaneously get a new best net, don't write it to file, and then close out the server for some reason, forever losing that last net. This seems a small risk. 
-    if(nn.completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
-      var bestNetFileName = 'neuralNet/bestNet/bestNet' + Date.now() + '.txt';
-      namesOfWrittenNets.push(bestNetFileName);
-      fs.writeFile(bestNetFileName, nn.bestNetObj.trainingBestAsJSON, function() {
-        // delete the previously written bestNet file(s), now that we have a new one written to disk successfully. 
-        while(namesOfWrittenNets.length > 1) {
-          fs.unlink(namesOfWrittenNets.shift());
-        }
-      });
-      mostRecentWrittenNet = Date.now();
-    }
-    // TODO: grab the entire array
-    nn.bestNetObj.trainingErrorRate = nn.neuralNetResults[trainingResults.brainID].trainingErrorRate;
-    nn.bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
-    nn.bestNetObj.iterations = trainingResults.iterations;
-  }
-};
