@@ -34,6 +34,10 @@ if(argv.dev || argv.devKaggle) {
   nn.maxChildTrainingIterations = 5;
 }
 
+nn.completedNets = 0;
+nn.numOfNetsToTest;
+
+
 
 module.exports = {
   killAll: function() {
@@ -47,7 +51,7 @@ module.exports = {
     // we pass in a callback function that will make the dataSummary a global variable 
       // and invoke parallelNets once formatting the data is done. 
 
-    readAndFormatData(argv.dataFile, function(formattingSummary) {
+    readAndFormatData(function(formattingSummary) {
       dataSummary = formattingSummary;
       parallelNets();
     });
@@ -93,11 +97,7 @@ var createChild = function() {
     var child = child_process.fork('./brainChildMemoryHog',{cwd: nn.location});
   }
 
-  trainingArgs = {
-    hlArray: allParamsToTest.shift()
-  };
-
-  var messageObj = trainingUtils.makeTrainingObj( argv, dataSummary, trainingArgs );
+  var messageObj = trainingUtils.makeTrainingObj( dataSummary, allParamsToTest.shift() );
 
   child.send(messageObj);
 
@@ -121,8 +121,6 @@ var createChild = function() {
   return child;
 }
 
-var completedNets = 0;
-var numOfNetsToTest;
 
 function attachListeners(child) {
   child.running = true;
@@ -134,7 +132,7 @@ function attachListeners(child) {
       nn.neuralNetResults[id].running = false;
       child.running = false;
       child.endTime = Date.now();
-      completedNets++;
+      nn.completedNets++;
       // Or maybe we don't have to kill it, we can just send it new information to train on?!
       child.kill();
       //TODO: send over a better message to bestNetChecker. 
@@ -144,13 +142,13 @@ function attachListeners(child) {
       // testOutput(net.fromJSON(message.net));
       // TODO: have some way of timeboxing each experiment??
 
-      console.log('trained', completedNets,'so far,', numOfNetsToTest - completedNets, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
+      console.log('trained', nn.completedNets,'so far,', nn.numOfNetsToTest - nn.completedNets, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
 
       if(allParamsToTest.length > 0) {
         var newChild = createChild();
         attachListeners(newChild);
         nn.referencesToChildren.push(newChild);
-      } else if (completedNets === numOfNetsToTest) {
+      } else if (nn.completedNets === nn.numOfNetsToTest) {
         console.log('done training all the neural nets you could conjure up!');
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         nn.readyToMakePredictions = true;
@@ -185,8 +183,8 @@ var parallelNets = function() {
   // 1. hidden layers: 1 - 10
     // most likely, we'll settle on something like 1-3 hidden layers, but it's fun to try them all
   // 2. nodes per hidden layer: (0.5 - 100) * numFeatures
-  allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures, argv);
-  numOfNetsToTest = allParamsToTest.length;
+  allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures);
+  nn.numOfNetsToTest = allParamsToTest.length;
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
@@ -225,7 +223,7 @@ var bestNetChecker = function(trainingResults) {
     // we will have many new bestNets on our first training round. This prevents us from having too many new files created
     // Admittedly, this is potentially still creating a new net every three seconds, which is a lot.
     // The risk we're running right now is simply that we lose three seconds worth of work. The worst case scenario is that we write the most recent net to file, and then 2.9 seconds later, we simultaneously get a new best net, don't write it to file, and then close out the server for some reason, forever losing that last net. This seems a small risk. 
-    if(completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
+    if(nn.completedNets > 0 || Date.now() - mostRecentWrittenNet > 3000 || trainingResults.type === 'finishedTraining') {
       var bestNetFileName = 'neuralNet/bestNet/bestNet' + Date.now() + '.txt';
       namesOfWrittenNets.push(bestNetFileName);
       fs.writeFile(bestNetFileName, nn.bestNetObj.trainingBestAsJSON, function() {

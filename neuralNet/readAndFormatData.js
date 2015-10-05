@@ -3,7 +3,7 @@ var path = require('path');
 var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 var nn = global.neuralNetwork;
-var argv = require('minimist')(process.argv.slice(2));
+var argv = global.argv;
 var formatDataStreams = require('./formatDataStreams.js');
 var dataSummary = {
   createdSummary: false,
@@ -17,7 +17,7 @@ var dataSummary = {
 // FUTURE: build out the dataSummary object more quickly, rather than making a check on each individual row as we are now. 
 var createdSummary = false;
 
-module.exports = function( dataFileName, callback) {
+module.exports = function( callback) {
   // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
   // ADVANCED: allow the user to pass in an encrypted file
     // take in the encryption key for that file
@@ -29,7 +29,7 @@ module.exports = function( dataFileName, callback) {
   var dataFileLocation = nn.location.split('/');
   dataFileLocation.pop();
   dataFileLocation = dataFileLocation.join('/');
-  var readStream = fs.createReadStream(path.join(dataFileLocation, dataFileName), {encoding: 'utf8'});
+  var readStream = fs.createReadStream(path.join(dataFileLocation, argv.dataFile), {encoding: 'utf8'});
   console.log('we have created the write and read streams to format our data')
 
 

@@ -1,10 +1,11 @@
 var path = require('path');
 var nnLocation = path.dirname(__filename);
 var nn = global.neuralNetwork;
+var argv = global.argv;
 
 
 module.exports = {
-  createParamsToTest: function (numFeatures, argv) {
+  createParamsToTest: function (numFeatures) {
     var allParamsToTest = [];
     // TODO: double this and have it for a variety of trainingRates. 
   // ADVANCED: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
@@ -40,7 +41,7 @@ module.exports = {
     return allParamsToTest;
   },
 
-  makeTrainingObj: function (argv, dataSummary, trainingArgs) {
+  makeTrainingObj: function (dataSummary, hlArray) {
     var trainingObj = {
       errorThresh: 0.05,  // error threshold to reach
       iterations: 1000,   // maximum training iterations
@@ -63,7 +64,7 @@ module.exports = {
     var totalMessageObj = {
       type: 'startBrain',
       brainID: brainID,
-      hiddenLayers: trainingArgs.hlArray, 
+      hiddenLayers: hlArray, 
       trainingObj: trainingObj, 
       pathToData: pathToChildData, 
       totalRows: dataSummary.totalRows,
