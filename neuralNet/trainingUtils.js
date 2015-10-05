@@ -49,7 +49,7 @@ module.exports = {
       learningRate: 0.6    // learning rate
     };
 
-    var brainID = ++trainingArgs.totalRunningNets;
+    var brainID = ++nn.totalRunningNets;
 
     // TODO TODO: Finish making argv.copyData functional
     if(argv.copyData) {
@@ -69,7 +69,6 @@ module.exports = {
       totalRows: dataSummary.totalRows,
       maxTrainingTime: trainingArgs.maxChildTrainingTime,
       maxTrainingIterations: trainingArgs.maxChildTrainingIterations,
-      totalRunningNets: trainingArgs.totalRunningNets
     };
 
     return totalMessageObj;

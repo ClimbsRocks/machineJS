@@ -352,7 +352,6 @@ module.exports = {
       if(Math.random() > 0.8) {
         brainObj.testingDataSet = true;
       }
-      // globalTrainingData.push(brainObj);
 
       return brainObj;
     };

@@ -5,23 +5,26 @@ var numCPUs  = require('os').cpus().length;
 var nn = global.neuralNetwork;
 nn.location = path.dirname(__filename);
 var readAndFormatData = require(path.join(nn.location,'readAndFormatData.js'));
-var dataFile;
-// var advancedOptions = process.argv[3] || {};
-var argv = require('minimist')(process.argv.slice(2));
+var argv = global.argv;
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 var EventEmitter = require('events');
 
+nn.referencesToChildren = [];
+var dataSummary; 
+nn.readyToMakePredictions = false;
+
+nn.totalRunningNets = 0;
+nn.neuralNetResults = {};
 
 
 module.exports = {
   killAll: function() {
-    for(var i = 0; i < referencesToChildren.length; i++) {
-      referencesToChildren[i].kill();
+    for(var i = 0; i < nn.referencesToChildren.length; i++) {
+      nn.referencesToChildren[i].kill();
     }
   },
-  startTraining: function(argsFromppLib) {
-    argv = argsFromppLib;
+  startTraining: function() {
     console.log('dataFile:',argv.dataFile);
     // Here is where we invoke the method with the path to the data
     // we pass in a callback function that will make the dataSummary a global variable 
@@ -60,21 +63,14 @@ nn.bestNetObj = {
   testingBestTrainingTime: Infinity
 };
 
-var globalTrainingData = [];
-
 // we will get dataSummary from readAndFormatData()
-var dataSummary; 
-var readyToMakePredictions = false;
-
-var totalRunningNets = 0;
-var neuralNetResults = {};
 
 
 var updateNetStatus = function(message) {
   var id = message.brainID;
-  neuralNetResults[id].iterations = message.iterations;
-  neuralNetResults[id].trainingErrorRate.push(message.errorRate);
-  neuralNetResults[id].net = message.net;
+  nn.neuralNetResults[id].iterations = message.iterations;
+  nn.neuralNetResults[id].trainingErrorRate.push(message.errorRate);
+  nn.neuralNetResults[id].net = message.net;
 }
 
 var createChild = function() {
@@ -89,14 +85,12 @@ var createChild = function() {
   }
 
   trainingArgs = {
-    totalRunningNets: totalRunningNets,
     maxChildTrainingIterations: maxChildTrainingIterations,
     maxChildTrainingTime: maxChildTrainingTime, 
     hlArray: allParamsToTest.shift()
   };
 
   var messageObj = trainingUtils.makeTrainingObj( argv, dataSummary, trainingArgs );
-  totalRunningNets = messageObj.totalRunningNets
 
   child.send(messageObj);
 
@@ -110,8 +104,8 @@ var createChild = function() {
     running: true
   };
 
-  if(neuralNetResults[messageObj.brainID] === undefined) {
-    neuralNetResults[messageObj.brainID] = netTrackingObj;
+  if(nn.neuralNetResults[messageObj.brainID] === undefined) {
+    nn.neuralNetResults[messageObj.brainID] = netTrackingObj;
   } else {
     console.log('we already have a net at this property:',messageObj.brainID);
     console.log('other brain info:',messageObj);
@@ -130,7 +124,7 @@ function attachListeners(child) {
     var id = message.brainID;
     if(message.type === 'finishedTraining') {
       updateNetStatus(message);
-      neuralNetResults[id].running = false;
+      nn.neuralNetResults[id].running = false;
       child.running = false;
       child.endTime = Date.now();
       completedNets++;
@@ -148,11 +142,11 @@ function attachListeners(child) {
       if(allParamsToTest.length > 0) {
         var newChild = createChild();
         attachListeners(newChild);
-        referencesToChildren.push(newChild);
+        nn.referencesToChildren.push(newChild);
       } else if (completedNets === numOfNetsToTest) {
         console.log('done training all the neural nets you could conjure up!');
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
-        readyToMakePredictions = true;
+        nn.readyToMakePredictions = true;
         // TODO TODO: load up the bestNet
           // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
           // once we have reached that threshold, only then run makeKagglePredictions
@@ -175,7 +169,6 @@ function attachListeners(child) {
   });
 }
 
-var referencesToChildren = [];
 
 // we will set a global value for this when we call parallelNets for the first time
 var allParamsToTest; 
@@ -196,7 +189,7 @@ var parallelNets = function() {
       (function() {
         var child = createChild();
         attachListeners(child);
-        referencesToChildren.push(child);
+        nn.referencesToChildren.push(child);
       })();
       
     }
@@ -243,7 +236,7 @@ var bestNetChecker = function(trainingResults) {
       mostRecentWrittenNet = Date.now();
     }
     // TODO: grab the entire array
-    nn.bestNetObj.trainingErrorRate = neuralNetResults[trainingResults.brainID].trainingErrorRate;
+    nn.bestNetObj.trainingErrorRate = nn.neuralNetResults[trainingResults.brainID].trainingErrorRate;
     nn.bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
     nn.bestNetObj.iterations = trainingResults.iterations;
   }
