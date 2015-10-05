@@ -5,7 +5,7 @@ var argv = global.argv;
 
 
 module.exports = {
-  createParamsToTest: function (numFeatures) {
+  createParamsToTest: function () {
     var allParamsToTest = [];
     // TODO: double this and have it for a variety of trainingRates. 
   // ADVANCED: figure out some way of having fewer than 1 times the number of features as the node for each hidden layer. 
@@ -17,7 +17,7 @@ module.exports = {
     function createOneParamArray(numLayers,numNodes) {
       var outputArr = [];
       for (var i = 0; i < numLayers; i++) {
-        outputArr.push(numNodes * numFeatures); //multiply this by the number of features. 
+        outputArr.push(numNodes * nn.dataSummary.numFeatures); //multiply this by the number of features. 
       }
       return outputArr;
     }
@@ -41,7 +41,7 @@ module.exports = {
     return allParamsToTest;
   },
 
-  makeTrainingObj: function (dataSummary, hlArray) {
+  makeTrainingObj: function ( hlArray) {
     var trainingObj = {
       errorThresh: 0.05,  // error threshold to reach
       iterations: 1000,   // maximum training iterations
@@ -67,7 +67,7 @@ module.exports = {
       hiddenLayers: hlArray, 
       trainingObj: trainingObj, 
       pathToData: pathToChildData, 
-      totalRows: dataSummary.totalRows,
+      totalRows: nn.dataSummary.totalRows,
       maxTrainingTime: nn.maxChildTrainingTime,
       maxTrainingIterations: nn.maxChildTrainingIterations,
     };

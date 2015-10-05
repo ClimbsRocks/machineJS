@@ -47,12 +47,9 @@ module.exports = {
   },
   startTraining: function() {
     console.log('dataFile:',argv.dataFile);
-    // Here is where we invoke the method with the path to the data
-    // we pass in a callback function that will make the dataSummary a global variable 
-      // and invoke parallelNets once formatting the data is done. 
 
-    readAndFormatData(function(formattingSummary) {
-      dataSummary = formattingSummary;
+    readAndFormatData(function() {
+      // nn.dataSummary just got set by readAndFormatData, asynchronously;
       parallelNets();
     });
 
@@ -75,10 +72,6 @@ module.exports = {
 // TODO: build out --devKaggle
 
 
-
-// we will get dataSummary from readAndFormatData()
-
-
 var updateNetStatus = function(message) {
   var id = message.brainID;
   nn.neuralNetResults[id].iterations = message.iterations;
@@ -97,7 +90,7 @@ var createChild = function() {
     var child = child_process.fork('./brainChildMemoryHog',{cwd: nn.location});
   }
 
-  var messageObj = trainingUtils.makeTrainingObj( dataSummary, allParamsToTest.shift() );
+  var messageObj = trainingUtils.makeTrainingObj( allParamsToTest.shift() );
 
   child.send(messageObj);
 
@@ -160,7 +153,7 @@ function attachListeners(child) {
 
 
         if(argv.kagglePredict || argv.devKaggle) {
-          makeKagglePredictions( argv.kagglePredict, dataSummary, argv.ppCompleteLocation );
+          makeKagglePredictions( argv.kagglePredict, argv.ppCompleteLocation );
         }
       } 
       
@@ -183,7 +176,7 @@ var parallelNets = function() {
   // 1. hidden layers: 1 - 10
     // most likely, we'll settle on something like 1-3 hidden layers, but it's fun to try them all
   // 2. nodes per hidden layer: (0.5 - 100) * numFeatures
-  allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures);
+  allParamsToTest = trainingUtils.createParamsToTest();
   nn.numOfNetsToTest = allParamsToTest.length;
 
   // create a new child_process for all but one of the cpus on this machine. 

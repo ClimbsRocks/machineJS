@@ -5,7 +5,7 @@ var stream = require('stream');
 var nn = global.neuralNetwork;
 var argv = global.argv;
 var formatDataStreams = require('./formatDataStreams.js');
-var dataSummary = {
+nn.dataSummary = {
   createdSummary: false,
   totalRows: 0,
   chunkCount: 0,
@@ -13,9 +13,6 @@ var dataSummary = {
   countOfRows: 0,
   expectedRowLength: 0
 };
-
-// FUTURE: build out the dataSummary object more quickly, rather than making a check on each individual row as we are now. 
-var createdSummary = false;
 
 module.exports = function( callback) {
   // For now, this is only for unencrypted information, such as kaggle competitions. If you would like to help us make this secure, please submit pull requests!
@@ -33,7 +30,7 @@ module.exports = function( callback) {
   console.log('we have created the write and read streams to format our data')
 
 
-  var tStream1 = formatDataStreams.summarizeDataTransformStream(dataSummary);
+  var tStream1 = formatDataStreams.summarizeDataTransformStream();
   // we need to only invoke these once we have a dataSummary object ready, on the previous stream's .'end' event
   // TODO TODO: pick the process back up here again. I'm in the middle of refactoring how we pass around the dataSummary object. The fact that we're doing it asynch means we can't just take it in as an argument to the functions we export from module.exports and then return it from that function. Instead, we're attaching it to the stream object itself, which is passed around, and then grabbing it on end events. 
 
@@ -44,11 +41,11 @@ module.exports = function( callback) {
   writeStream1.on('finish', function() {
     console.log('heard a finish event to writeSream');
     // to deal with asynch issues, we are attaching the dataSummary object to tStream1 itself. 
-    dataSummary = tStream1.dataSummary;
+
     // set the average property on each dataSummary key
-    for (var column in dataSummary) {
-      if (dataSummary[column].count !== 0) {
-        dataSummary[column].mean = dataSummary[column].sum / dataSummary[column].count;
+    for (var column in nn.dataSummary) {
+      if (nn.dataSummary[column].count !== 0) {
+        nn.dataSummary[column].mean = nn.dataSummary[column].sum / nn.dataSummary[column].count;
       }
     }
 
@@ -56,17 +53,15 @@ module.exports = function( callback) {
     var t2Start = Date.now();
     console.log('first transformStream took:',trainingTime);
     var writeStream2 = fs.createWriteStream(path.join(nn.location,'/formattingData2.txt'), {encoding: 'utf8'});
-    var tStream2 = formatDataStreams.calculateStandardDeviationTStream(dataSummary);
+    var tStream2 = formatDataStreams.calculateStandardDeviationTStream();
     var readStream2 = fs.createReadStream(path.join(nn.location,'/formattingData.txt'), {encoding: 'utf8'});
     readStream2.pipe(tStream2).pipe(writeStream2);
     
     writeStream2.on('finish', function() {
-      // again, dealing with asynch issues by attaching dataSummary as a property of the transform streams themselves.
-      dataSummary = tStream2.dataSummary;
 
       console.log('finished the second transform!');
-      for(var column in dataSummary) {
-        var columnObj = dataSummary[column];
+      for(var column in nn.dataSummary) {
+        var columnObj = nn.dataSummary[column];
         
         if (columnObj.count !== 0) {
           columnObj.standardDeviation = columnObj.standardDeviationSum / (columnObj.count - columnObj.nullOrMissing - columnObj.countOfStrings);
@@ -79,7 +74,7 @@ module.exports = function( callback) {
       var t3Start = Date.now();
 
       var writeStream3 = fs.createWriteStream(path.join(nn.location,'/formattingData3.txt'), {encoding: 'utf8'});
-      var tStream3 = formatDataStreams.formatDataTransformStream(dataSummary);
+      var tStream3 = formatDataStreams.formatDataTransformStream();
       var readStream3 = fs.createReadStream(path.join(nn.location,'/formattingData2.txt'), {encoding: 'utf8'});
 
       // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once
@@ -94,7 +89,6 @@ module.exports = function( callback) {
       readStream3.pipe(tStream3).pipe(writeStream3);
       
       writeStream3.on('finish', function() {
-        dataSummary = tStream3.dataSummary;
         console.log('finished the third transform!');
         var trainingTime = (Date.now() - t2Start) / 1000;
         console.log('third transformStream took:',trainingTime);
@@ -123,14 +117,12 @@ module.exports = function( callback) {
 
           readCopyStream.on('end', function() {
             console.log('finished copying in:', (Date.now() - copyTime) / 1000, 'seconds');
-            // totalRows = dataSummary.totalRows;
-            // chunkCount = dataSummary.chunkCount;
-            callback(dataSummary);
+            callback();
             
           });
           
         } else {
-          callback(dataSummary);
+          callback();
 
         }
       });

@@ -6,9 +6,9 @@ var path = require('path');
 var nn = global.neuralNetwork;
 
 
-module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation) {
+module.exports = function(pathToKaggleData, ppCompleteLocation) {
   // nn = global.neuralNetwork;
-  dataSummary.isTesting = true;
+  nn.dataSummary.isTesting = true;
   var net = new brain.NeuralNetwork();
 
   var bestNet = net.fromJSON( JSON.parse(nn.bestNetObj.trainingBestAsJSON));
@@ -16,8 +16,8 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation) {
 
   var readFileStream = fs.createReadStream(path.join( ppCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
 
-  var firstTransformForTesting = formatDataStreams.firstTransformForTesting(dataSummary);
-  var tStream = formatDataStreams.formatDataTransformStream(dataSummary);
+  var firstTransformForTesting = formatDataStreams.firstTransformForTesting(nn.dataSummary);
+  var tStream = formatDataStreams.formatDataTransformStream(nn.dataSummary);
 
   var testStream = new stream.Transform({objectMode: true});
 
@@ -91,7 +91,7 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation) {
 //   //   that will have to translate what is currently an object into a comma-separated string
 //   //     the difficulty will be ensuring we keep the order. 
 //   //     the output will be the first column, then i think we have everything stored into keys that are just numeric indices, so we should be able to treat it like a pseudo-array
-//   //     we have the number of columns from dataSummary, so just iterate through it. 
+//   //     we have the number of columns from nn.dataSummary, so just iterate through it. 
 
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
@@ -99,7 +99,7 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation) {
   // Read in the data
   // format the data in the exact same way the training data is
     // this seems easy right now, but will become considerably more difficult once we have DilMil type data where we have categorical/binary data in a column, and then we need to cull it down to only the categories with enough coverage to be useful
-    // we will likely need access to the dataSummary object to know what the min and max were, as well as what categories were included. 
+    // we will likely need access to the nn.dataSummary object to know what the min and max were, as well as what categories were included. 
   // TODO: boot up a net from the best one that we've trained
   // run the formatted kaggle data through that net
   // TODO: write the output results to the file.
