@@ -75,6 +75,11 @@ module.exports = {
     return totalMessageObj;
   },
 
+  setGlobalVars: require('./utils/setGlobalVars.js'),
+
+  bestNetChecker: require('./utils/bestNetChecker.js'),
+
+
   // This function is broken at the moment, and is not a high priority to fix. 
   testOutput: function(net) {
 
