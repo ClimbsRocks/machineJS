@@ -1,7 +1,9 @@
 var nn = global.neuralNetwork;
 var argv = global.argv;
+var path = require('path');
 
 module.exports = function() {
+
   nn.referencesToChildren = [];
   nn.readyToMakePredictions = false;
 
