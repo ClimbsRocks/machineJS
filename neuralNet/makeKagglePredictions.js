@@ -3,11 +3,11 @@ var brain = require('brain');
 var stream = require('stream');
 var formatDataStreams = require('./formatDataStreams.js');
 var path = require('path');
-var nn;
+var nn = global.neuralNetwork;
 
 
 module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation) {
-  nn = global.neuralNetwork;
+  // nn = global.neuralNetwork;
   dataSummary.isTesting = true;
   var net = new brain.NeuralNetwork();
 

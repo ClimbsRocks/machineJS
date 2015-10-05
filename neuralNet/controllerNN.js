@@ -2,8 +2,9 @@ var fs = require('fs');
 var brain = require('brain');
 var path = require('path');
 var numCPUs  = require('os').cpus().length;
-var nnLocation = path.dirname(__filename);
-var readAndFormatData = require(path.join(nnLocation,'readAndFormatData.js'));
+var nn = global.neuralNetwork;
+nn.location = path.dirname(__filename);
+var readAndFormatData = require(path.join(nn.location,'readAndFormatData.js'));
 var dataFile;
 // var advancedOptions = process.argv[3] || {};
 var argv = require('minimist')(process.argv.slice(2));
@@ -11,8 +12,6 @@ var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
 var EventEmitter = require('events');
 
-global.neuralNetwork = {};
-var nn = global.neuralNetwork;
 
 
 module.exports = {
@@ -28,7 +27,7 @@ module.exports = {
     // we pass in a callback function that will make the dataSummary a global variable 
       // and invoke parallelNets once formatting the data is done. 
 
-    readAndFormatData(nnLocation, argv.dataFile, function(formattingSummary) {
+    readAndFormatData(argv.dataFile, function(formattingSummary) {
       dataSummary = formattingSummary;
       parallelNets();
     });
@@ -84,9 +83,9 @@ var createChild = function() {
   // FUTURE: see if we can increase the max memory size for each child process, as we would with node "--max-old-space-size= 4000" to signify a ~4GB RAM limit. 
     // NOTE: different computers handle that command as either bytes or megabytes. be careful. 
   if(argv.useStreams) {
-    var child = child_process.fork('./brainChildStream',{cwd: nnLocation});
+    var child = child_process.fork('./brainChildStream',{cwd: nn.location});
   } else {
-    var child = child_process.fork('./brainChildMemoryHog',{cwd: nnLocation});
+    var child = child_process.fork('./brainChildMemoryHog',{cwd: nn.location});
   }
 
   trainingArgs = {

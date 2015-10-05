@@ -1,6 +1,6 @@
 var path = require('path');
 var nnLocation = path.dirname(__filename);
-var globals = require('./controllerNN.js').globals;
+var nn = global.neuralNetwork;
 
 
 module.exports = {
