@@ -135,7 +135,7 @@ function attachListeners(child) {
       // TODO: have some way of timeboxing each experiment??
 
       if(allParamsToTest.length > 0) {
-        console.log('trained', totalRunningNets - numCPUs ,'so far,', allParamsToTest.length, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
+        console.log('trained', totalRunningNets - (numCPUs - 1) ,'so far,', numOfNetsToTest - completedNets, "still learning everything it can about your dataset in it's quest to be your best neural net ever!");
         var newChild = createChild();
         attachListeners(newChild);
         referencesToChildren.push(newChild);
@@ -147,7 +147,8 @@ function attachListeners(child) {
           // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
           // once we have reached that threshold, only then run makeKagglePredictions
         var extendedTrainingNet = new brain.NeuralNetwork();
-        net.fromJSON(bestNetObj.trainingBestAsJSON);
+        // extendedTrainingNet.fromJSON(bestNetObj.trainingBestAsJSON);
+        // extendedTrainingNet.train();
 
 
         if(argv.kagglePredict || argv.devKaggle) {
@@ -185,6 +186,7 @@ var parallelNets = function() {
   // 2. nodes per hidden layer: (0.5 - 100) * numFeatures
   allParamsToTest = trainingUtils.createParamsToTest(dataSummary.numFeatures, argv);
   numOfNetsToTest = allParamsToTest.length;
+  console.log('numOfNetsToTest:', numOfNetsToTest);
 
   // create a new child_process for all but one of the cpus on this machine. 
   for (var i = 0; i < numCPUs; i++) {
