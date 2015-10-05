@@ -67,8 +67,8 @@ module.exports = {
       trainingObj: trainingObj, 
       pathToData: pathToChildData, 
       totalRows: dataSummary.totalRows,
-      maxTrainingTime: trainingArgs.maxChildTrainingTime,
-      maxTrainingIterations: trainingArgs.maxChildTrainingIterations,
+      maxTrainingTime: nn.maxChildTrainingTime,
+      maxTrainingIterations: nn.maxChildTrainingIterations,
     };
 
     return totalMessageObj;

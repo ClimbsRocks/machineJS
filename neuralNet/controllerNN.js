@@ -17,6 +17,23 @@ nn.readyToMakePredictions = false;
 nn.totalRunningNets = 0;
 nn.neuralNetResults = {};
 
+nn.bestNetObj = {
+  trainingBestAsJSON: '',
+  testingBestAsJSON: '',
+  trainingErrorRate: [Infinity],
+  testingError: 1,
+  trainingBestTrainingTime: Infinity,
+  testingBestTrainingTime: Infinity
+};
+
+nn.maxChildTrainingIterations = argv.maxTrainingIterations || 100;
+nn.maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
+
+// train super quickly if we're developing on ppComplete itself
+if(argv.dev || argv.devKaggle) {
+  nn.maxChildTrainingIterations = 5;
+}
+
 
 module.exports = {
   killAll: function() {
@@ -54,14 +71,6 @@ module.exports = {
 // TODO: build out --devKaggle
 
 
-nn.bestNetObj = {
-  trainingBestAsJSON: '',
-  testingBestAsJSON: '',
-  trainingErrorRate: [Infinity],
-  testingError: 1,
-  trainingBestTrainingTime: Infinity,
-  testingBestTrainingTime: Infinity
-};
 
 // we will get dataSummary from readAndFormatData()
 
@@ -85,8 +94,6 @@ var createChild = function() {
   }
 
   trainingArgs = {
-    maxChildTrainingIterations: maxChildTrainingIterations,
-    maxChildTrainingTime: maxChildTrainingTime, 
     hlArray: allParamsToTest.shift()
   };
 
@@ -203,12 +210,6 @@ var parallelNets = function() {
   // The great part about this is that it's all relative. So we wouldn't hold a net with a training rate of .3 to the same absolute standard as a net with a trainingRate of .9. 
 
 // CLEAN: I don't think we need any of the following code anymore, now that we're just sending in maxChildTrainingTime and maxChildTrainingIterations as parameters to the child process. 
-var maxChildTrainingTime = argv.maxTrainingTime || 5 * 60; // limiting each child to only be trained for 5 minutes by default.
-
-var maxChildTrainingIterations = argv.maxTrainingIterations || 100;
-if(argv.dev || argv.devKaggle) {
-  maxChildTrainingIterations = 5;
-}
 
 
 var mostRecentWrittenNet = Date.now();
