@@ -1,14 +1,7 @@
-// This file should:
-  // get user input
-  // kick off the training process (likely it's own module)
-    // kick off the start of the process for training NNs and RFs and any other algos out there. 
-  // kick off the ensembling (again, likely it's own module)
-  // kick off the predicting (again, likely it's own module)
-  // manage CPUs. 
-
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
 var controllerEnsemble = require('./ensembling/controller.js');
+
 var path = require('path');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
@@ -35,6 +28,7 @@ argv.dataFile = dataFile;
 var readyToMakePredictions = false;
 
 if (argv.devEnsemble) {
+  controllerEnsemble.startListeners(2, globalArgs);
   controllerEnsemble.createEnsemble(argv);
 } else {
   // **********************************************************************************
@@ -47,6 +41,7 @@ if (argv.devEnsemble) {
   // argv.numCPUs = argv.computerTotalCPUs/2;
   controllerRF.startTraining(argv);
   
+  controllerEnsemble.startListeners(2, argv);
 }
 
 var ppLibShutdown = function() {

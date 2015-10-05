@@ -68,6 +68,7 @@ module.exports = {
   calculateAggregatedPredictions: function(algoNames, bestMethod) {
     var predictionCalculation = ensembleMethods[bestMethod];
     var results = [];
+    results.push(['ID','Probability']);
     for (var rowNum in summary) {
       // console.log('row:',row);
       // pick out only the predictions from the algos that were selected by createEnsemble:
@@ -84,10 +85,8 @@ module.exports = {
   },
 
   writeToFile: function(globalArgs, callback, results) {
-    console.log('inside writeToFile');
     csv.writeToPath(path.join(globalArgs.ppCompleteLocation, 'ppCompletePredictions.csv'), results)
     .on('finish',function() {
-      console.log('ended the csv stream');
       callback();
     });
   }

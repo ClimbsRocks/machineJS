@@ -9,7 +9,7 @@ var dataFile;
 var argv = require('minimist')(process.argv.slice(2));
 var trainingUtils = require('./trainingUtils.js');
 var makeKagglePredictions = require('./makeKagglePredictions.js');
-var PythonShell = require('python-shell');
+var EventEmitter = require('events');
 
 
 module.exports = {
@@ -143,6 +143,13 @@ function attachListeners(child) {
         console.log('done training all the neural nets you could conjure up!');
         // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
         readyToMakePredictions = true;
+        // TODO TODO: load up the bestNet
+          // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
+          // once we have reached that threshold, only then run makeKagglePredictions
+        var extendedTrainingNet = new brain.NeuralNetwork();
+        net.fromJSON(bestNetObj.trainingBestAsJSON);
+
+
         if(argv.kagglePredict || argv.devKaggle) {
           makeKagglePredictions( argv.kagglePredict, dataSummary, argv.ppCompleteLocation, bestNetObj );
         }

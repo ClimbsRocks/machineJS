@@ -80,6 +80,8 @@ module.exports = function(pathToKaggleData, dataSummary, ppCompleteLocation, bes
 
     console.log('in case you were curious, your best neural net looked like this:');
     console.log(bestNet);
+
+    process.emit('algoFinishedTraining');
   })
 
 // Deprecated:

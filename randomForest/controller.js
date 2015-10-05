@@ -26,10 +26,6 @@ module.exports = {
     console.log('in one part of your machine, we will be training a randomForest');
 
     // if(argv.dev || argv.devKaggle) {
-    //   // utils.kickOffForestTraining(globals,function() {
-    //   //   // TODO: add in next step in chain here
-    //   //   module.exports.makePredictions();
-    //   // });
     //   module.exports.makePredictions();
 
     // } else {
@@ -46,7 +42,10 @@ module.exports = {
   makePredictions: function(rfPickle) {
     rfPickle = rfPickle || globals.rfLocation + '/' + 'bestRF.p';
     utils.makePredictions(globals, function() {
-      console.log('inside callback after makePredictions() ')
+      process.emit('algoFinishedTraining');
+      console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');
+      console.log('we have finished training, tuning, and making predictions from a randomForest- typically one of the most predictive algorithms out there.');
+      console.log('Thanks for letting us help you find your way through this dataset!');
     }, rfPickle);
   }
 
