@@ -48,6 +48,11 @@ process.on('message', function(message) {
           rows[i] = JSON.parse(rows[i]);
         }
 
+        if(messageObj.extendedTraining === true) {
+          var net = new brain.NeuralNetwork();
+          net.fromJSON( JSON.parse(messageObj.trainingBestAsJSON));
+        }
+
         // this entire process of training the net happens synchronously. yeah, i know, it's weird dealing with synchronous code inside node.js :)
         var net = new brain.NeuralNetwork(message.trainingObj);
         var trainingResults = net.train(rows, message.trainingObj);

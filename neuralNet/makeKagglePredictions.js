@@ -84,7 +84,7 @@ module.exports = function(pathToKaggleData, ppCompleteLocation) {
     // console.log(bestNet);
 
     process.emit('algoFinishedTraining');
-  })
+  });
 
 // Deprecated:
 //   // TODO TODO: create a new write stream that will write to file 

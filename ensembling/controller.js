@@ -24,10 +24,12 @@ module.exports = {
     var finishedAlgos = 0;
     process.on('algoFinishedTraining', function() {
       finishedAlgos++;
-      if(finishedAlgos === numOfAlgosToWaitOn) {
-        module.exports.createEnsemble(globalArgs);
+      if(finishedAlgos === numOfAlgosToWaitOn - 1) {
         // tell the neural net it's time to turn off the light, stop reading, and go to bed. 
+        // the neural net is going to train itself until all the other processes have finished, that way it is as accurate as possible
         process.emit('stopTraining');
+      } else if( finishedAlgos === numOfAlgosToWaitOn ) {
+        module.exports.createEnsemble(globalArgs);
       }
     });
   }

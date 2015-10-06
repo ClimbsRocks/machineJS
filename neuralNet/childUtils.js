@@ -6,7 +6,7 @@ var makeKagglePredictions = require('./makeKagglePredictions.js');
 
 module.exports = {
   allParamsToTest: [],
-  createChild: function() {
+  createChild: function(extendedTrainingNet) {
     var child_process = require('child_process'); //this is node's built in module for creating new processes. 
     if(argv.useStreams) {
       var child = child_process.fork('./brainChildStream',{cwd: nn.location});
@@ -15,6 +15,11 @@ module.exports = {
     }
 
     var messageObj = utils.makeTrainingObj( module.exports.allParamsToTest.shift() );
+    
+    // one time only, once we have determined the best net, we are going to pass the serialized net in as an argument, to pass that onto the child process
+    if(extendedTrainingNet) {
+      messageObj.extendedTrainingNet = extendedTrainingNet;
+    }
 
     child.send(messageObj);
 
@@ -65,15 +70,15 @@ module.exports = {
           // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
           nn.readyToMakePredictions = true;
           // TODO TODO: load up the bestNet
+          var extendedTrainingChild = module.exports.createChild(nn.bestNetObj.trainingBestAsJSON);
+          module.exports.attachSpecialListeners(extendedTrainingChild);
             // train it for a longer period of time (10 minutes by default, but let the user specify this eventually)
             // once we have reached that threshold, only then run makeKagglePredictions
-          // var extendedTrainingNet = new brain.NeuralNetwork();
-          // extendedTrainingNet.fromJSON(nn.bestNetObj.trainingBestAsJSON);
 
 
-          if(argv.kagglePredict || argv.devKaggle) {
-            makeKagglePredictions( argv.kagglePredict, argv.ppCompleteLocation );
-          }
+          // if(argv.kagglePredict || argv.devKaggle) {
+          //   makeKagglePredictions( argv.kagglePredict, argv.ppCompleteLocation );
+          // }
         } 
         
       } else if (message.type === 'midTrainingCheckIn'){
@@ -83,6 +88,23 @@ module.exports = {
         console.log('heard a message in parent and did not know what to do with it:',message);
       }
     });
-  }
+  },
+
+  attachSpecialListeners: function(child) {
+    child.running = true;
+    child.startTime = Date.now();
+    process.on('stopTraining', function() {
+      child.kill();
+      makeKagglePredictions( argv.kagglePredict, argv.ppCompleteLocation );
+    });
+    child.on('message', function(message) {
+      // just make sure we are writing this to nn.bestNetObj.trainingBestAsJSON
+      // we probably accomplish that with utils.bestNetChecker(message);
+      var id = message.brainID;
+      utils.updateNetStatus(message);
+      utils.bestNetChecker(message);
+
+    });
+  },
 
 };
