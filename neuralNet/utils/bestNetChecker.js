@@ -29,6 +29,7 @@ module.exports = function(trainingResults) {
     // TODO: grab the entire array
     nn.bestNetObj.trainingErrorRate = nn.neuralNetResults[trainingResults.brainID].trainingErrorRate;
     nn.bestNetObj.trainingBestTrainingTime = trainingResults.trainingTime;
-    nn.bestNetObj.iterations = trainingResults.iterations;
+    nn.bestNetObj.brainID = trainingResults.brainID;
+    nn.bestNetObj.hiddenLayers = trainingResults.trainingParams.hiddenLayers;
   }
 };

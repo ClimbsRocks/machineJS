@@ -30,6 +30,7 @@ module.exports = function ( hlArray) {
     pathToData: pathToChildData, 
     totalRows: nn.dataSummary.totalRows,
     maxTrainingTime: nn.maxChildTrainingTime,
+    minTrainingTime: nn.minChildTrainingTime,
     maxTrainingIterations: nn.maxChildTrainingIterations,
   };
 
