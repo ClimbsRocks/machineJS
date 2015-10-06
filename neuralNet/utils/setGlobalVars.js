@@ -26,6 +26,7 @@ module.exports = function() {
   // train super quickly if we're developing on ppComplete itself
   if(argv.dev || argv.devKaggle) {
     nn.maxChildTrainingIterations = 5;
+    nn.minTrainingTime = 1; //1 millisecond
   }
 
   nn.completedNets = 0;
