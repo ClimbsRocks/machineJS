@@ -1,7 +1,7 @@
 var fs = require('fs');
 var brain = require('brain');
 var stream = require('stream');
-var formatDataStreams = require('./formatDataStreams.js');
+var formattingUtils = require('./formattingUtils.js');
 var path = require('path');
 var nn = global.neuralNetwork;
 
@@ -16,8 +16,8 @@ module.exports = function(pathToKaggleData, ppCompleteLocation) {
 
   var readFileStream = fs.createReadStream(path.join( ppCompleteLocation, pathToKaggleData), {encoding: 'utf8'});
 
-  var firstTransformForTesting = formatDataStreams.firstTransformForTesting(nn.dataSummary);
-  var tStream = formatDataStreams.formatDataTransformStream(nn.dataSummary);
+  var firstTransformForTesting = formattingUtils.firstTransformForTesting(nn.dataSummary);
+  var tStream = formattingUtils.formatDataTransformStream(nn.dataSummary);
 
   var testStream = new stream.Transform({objectMode: true});
 

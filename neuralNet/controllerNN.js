@@ -12,6 +12,7 @@ var makeKagglePredictions = require('./makeKagglePredictions.js');
 var readAndFormatData = require(path.join(nn.location,'readAndFormatData.js'));
 var utils = require('./utils.js');
 var childUtils = require('./childUtils.js');
+var formattingUtils = require('./formattingUtils.js');
 
 
 module.exports = {

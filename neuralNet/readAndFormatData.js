@@ -5,6 +5,7 @@ var stream = require('stream');
 var nn = global.neuralNetwork;
 var argv = global.argv;
 var formatDataStreams = require('./formatDataStreams.js');
+var formattingUtils = require('./formattingUtils.js');
 nn.dataSummary = {
   createdSummary: false,
   totalRows: 0,
@@ -30,7 +31,7 @@ module.exports = function( callback) {
   console.log('we have created the write and read streams to format our data')
 
 
-  var tStream1 = formatDataStreams.summarizeDataTransformStream();
+  var tStream1 = formattingUtils.summarizeDataTransformStream();
   // we need to only invoke these once we have a dataSummary object ready, on the previous stream's .'end' event
   // TODO TODO: pick the process back up here again. I'm in the middle of refactoring how we pass around the dataSummary object. The fact that we're doing it asynch means we can't just take it in as an argument to the functions we export from module.exports and then return it from that function. Instead, we're attaching it to the stream object itself, which is passed around, and then grabbing it on end events. 
 
