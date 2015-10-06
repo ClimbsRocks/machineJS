@@ -24,8 +24,7 @@ def printParent(text):
 
 if trainOrPredict == 'predict':
     try:
-        # with open('randomForest/dictVectorizer.pkl', 'rU') as joblib_file:
-        dictVectorizer1 = joblib.load('randomForest/dictVectorizer.pkl')
+        dictVectorizer1 = joblib.load('pySetup/dictVectorizer.pkl')
     except:
         printParent('trainOrPredict is predict but dictVectorizer.p does not exist')
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
@@ -91,7 +90,7 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
             inputList.append(newDict)
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
         if trainOrPredict == 'train':
-            joblib.dump(dictVectorizer1, 'randomForest/dictVectorizer.pkl')
+            joblib.dump(dictVectorizer1, 'pySetup/dictVectorizer.pkl')
             printParent('we have pickled the dictVectorizer')
         messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
         printParent( 'we have vectorized the data. it has shape:' )

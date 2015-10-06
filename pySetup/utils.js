@@ -1,3 +1,5 @@
+var py = global.pythonNamespace;
+
 var path = require('path');
 var PythonShell = require('python-shell');
 
@@ -34,7 +36,7 @@ module.exports = {
     };
   },
 
-  startPythonShell: function(scriptName, callback, pythonOptions, referencesToChildren) {
+  startPythonShell: function(scriptName, callback, pythonOptions) {
     var pyShell = PythonShell.run(scriptName, pythonOptions, function (err, results) {
       if (err) {
         console.error(err);
@@ -46,7 +48,7 @@ module.exports = {
     });
 
     module.exports.attachLogListener(pyShell);
-    referencesToChildren.push(pyShell);
+    py.referencesToChildren.push(pyShell);
 
     return pyShell;
   }

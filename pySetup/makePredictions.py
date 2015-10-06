@@ -46,8 +46,7 @@ with open(y_file_name, 'rU') as y_file:
 
 time.sleep(2)
 # load up the previously trained (and tuned!) random forest classifier
-# with open('randomForest/bestRF.pkl', 'rU') as clf_file:
-rf = joblib.load('randomForest/bestRF/bestRF.pkl')
+rf = joblib.load('pySetup/bestRF/bestRF.pkl')
 
 dictVectMapping = sys.argv[2].split(',')
 

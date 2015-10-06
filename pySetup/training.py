@@ -156,7 +156,7 @@ if extendedTraining:
     printParent('the bigger randomForest has a score of')
     printParent(bigRFscore)
 
-    joblib.dump(bigRF, 'randomForest/bestRF/bestRF.pkl')
+    joblib.dump(bigRF, 'pySetup/bestRF/bestRF.pkl')
 else:
-    joblib.dump(gridSearch.best_estimator_, 'randomForest/bestRF/bestRF.pkl')
+    joblib.dump(gridSearch.best_estimator_, 'pySetup/bestRF/bestRF.pkl')
 printParent('wrote the best estimator to a file')
