@@ -1,10 +1,11 @@
 global.neuralNetwork = {};
 global.argv = require('minimist')(process.argv.slice(1));
+var path = require('path');
+global.rootDir = path.dirname(__filename);
+
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerPython = require('./pySetup/controllerPython.js');
 var controllerEnsemble = require('./ensembling/controller.js');
-
-var path = require('path');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
 argv.computerTotalCPUs = require('os').cpus().length;
@@ -37,10 +38,10 @@ if (argv.devEnsemble) {
   // we pass in a callback function that will make the dataSummary a global variable 
     // and invoke parallelNets once formatting the data is done. 
   // argv.numCPUs = argv.computerTotalCPUs/2;
-  // controllerNN.startTraining();
+  controllerNN.startTraining();
   // **********************************************************************************
   // argv.numCPUs = argv.computerTotalCPUs/2;
-  controllerPython.startTraining(argv);
+  // controllerPython.startTraining(argv);
   
   controllerEnsemble.startListeners(2, argv);
 }

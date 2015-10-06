@@ -3,11 +3,7 @@ var py = global.pythonNamespace;
 var path = require('path');
 var PythonShell = require('python-shell');
 
-var rfLocation = path.dirname(__filename);
-
-var dataFileLocation = rfLocation.split('/');
-dataFileLocation.pop();
-dataFileLocation = dataFileLocation.join('/');
+var rfLocation = py.rfLocation;
 
 module.exports = {
   expectedMessages: {
@@ -26,7 +22,7 @@ module.exports = {
 
   generatePythonOptions: function(fileNameFromRoot, otherArgs) {
     // the first argument for all python shells is going to be a path to a file, relative to the root of ppLib
-    var fullPathToFile = dataFileLocation + '/' + fileNameFromRoot;
+    var fullPathToFile = global.rootDir + '/' + fileNameFromRoot;
     var args = [];
     args = args.concat(fullPathToFile, otherArgs);
     return {

@@ -2,18 +2,11 @@ var py = global.pythonNamespace = {};
 
 var path = require('path');
 var rfLocation = path.dirname(__filename);
+py.rfLocation= rfLocation;
+py.referencesToChildren= [];
 var processes = require('./processes.js');
 
-var dataFileLocation = rfLocation.split('/');
-dataFileLocation.pop();
-dataFileLocation = dataFileLocation.join('/');
-
 argv = global.argv;
-
-py.referencesToChildren= [];
-py.rfLocation= rfLocation;
-py.dataFileLocation= dataFileLocation;
-py.rfLocation = rfLocation;
 
 
 module.exports = {

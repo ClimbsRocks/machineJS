@@ -23,10 +23,7 @@ module.exports = function( callback) {
   var writeStream1 = fs.createWriteStream(path.join(nn.location,'/formattingData.txt'), {encoding: 'utf8'});
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
-  var dataFileLocation = nn.location.split('/');
-  dataFileLocation.pop();
-  dataFileLocation = dataFileLocation.join('/');
-  var readStream = fs.createReadStream(path.join(dataFileLocation, argv.dataFile), {encoding: 'utf8'});
+  var readStream = fs.createReadStream(path.join(global.rootDir, argv.dataFile), {encoding: 'utf8'});
   console.log('we have created the write and read streams to format our data')
 
 
