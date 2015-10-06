@@ -90,11 +90,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_
 globalArgs = json.loads(sys.argv[2])
 
 
-# if we're developing, train on only 10% of the dataset.
-for key in globalArgs:
-    if key in( 'devKaggle', 'dev'): 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.95, random_state=0)
-
+# if we're developing, train on only 1% of the dataset.
 rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
 
 sqrtNum = int(math.sqrt(len(X[0])))
@@ -106,9 +102,18 @@ max_features_to_try.append(None)
 
 parameters_to_try = {
     'max_features': max_features_to_try,
-    'min_samples_leaf':[1,2,5,25,50,150],
+    'min_samples_leaf':[1,2,5,25,50,100,150],
     'criterion': ['gini','entropy']
 }
+
+extendedTraining=True
+for key in globalArgs:
+    if key in( 'devKaggle', 'dev'): 
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+        parameters_to_try.pop('min_samples_leaf',None)
+        parameters_to_try.pop('max_features_to_try',None)
+        extendedTraining = False
+
 
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
@@ -130,29 +135,28 @@ printParent(gridSearch.best_params_)
 printParent('now that we have figured this out, we are going to train a random forest with considerably more trees. more trees means a better fit, but they also take significantly longer to train, so we kept the number of trees relatively low while searching through the parameter space to make sure you were not stuck here until python6 comes out.')
 
 
-time.sleep(2)
+if extendedTraining:
+    bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=globalArgs['numCPUs'])
+    bigRF.set_params(criterion=gridSearch.best_params_['criterion'])
+    try:
+        bigRF.set_params(max_features=gridSearch.best_params_['max_features'])
+    except:
+        None
+        
+    try:
+        bigRF.set_params(min_samples_leaf=gridSearch.best_params_['min_samples_leaf'])
+    except:
+        None
 
-bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=globalArgs['numCPUs'])
-bigRF.set_params(criterion=gridSearch.best_params_['criterion'])
-try:
-    bigRF.set_params(max_features=gridSearch.best_params_['max_features'])
-except:
-    None
-    
-try:
-    bigRF.set_params(min_samples_leaf=gridSearch.best_params_['min_samples_leaf'])
-except:
-    None
+    # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigRF on the entire dataset (X,y)
+    bigRF.fit(X, y)
+    printParent('we have trained an even more powerful random forest!')
 
-# note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigRF on the entire dataset (X,y)
-bigRF.fit(X, y)
-printParent('we have trained an even more powerful random forest!')
+    bigRFscore = bigRF.score(X, y)
+    printParent('the bigger randomForest has a score of')
+    printParent(bigRFscore)
 
-bigRFscore = bigRF.score(X, y)
-printParent('the bigger randomForest has a score of')
-printParent(bigRFscore)
-
-joblib.dump(bigRF, 'randomForest/bestRF/bestRF.pkl')
-
-# joblib.dump(gridSearch.best_estimator_, 'randomForest/bestRF.p')
+    joblib.dump(bigRF, 'randomForest/bestRF/bestRF.pkl')
+else:
+    joblib.dump(gridSearch.best_estimator_, 'randomForest/bestRF/bestRF.pkl')
 printParent('wrote the best estimator to a file')

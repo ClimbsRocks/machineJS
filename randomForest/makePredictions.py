@@ -63,8 +63,6 @@ with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     csvwriter.writerow(['ID','Probability'])
     # get predictions for each item in the prediction data set
     predictedResults = rf.predict_proba(X)
-    printParent('predicted results for every item in the predictions dataset!')
-    printParent(predictedResults.shape)
     for idx, prediction in enumerate(predictedResults):
         inputRow = X[idx]
         # convert the id from a string to an int

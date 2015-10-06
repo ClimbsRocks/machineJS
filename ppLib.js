@@ -1,3 +1,5 @@
+global.neuralNetwork = {};
+global.argv = require('minimist')(process.argv.slice(1));
 var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerRF = require('./randomForest/controller.js');
 var controllerEnsemble = require('./ensembling/controller.js');
@@ -5,7 +7,6 @@ var controllerEnsemble = require('./ensembling/controller.js');
 var path = require('path');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
-var argv = require('minimist')(process.argv.slice(1));
 argv.computerTotalCPUs = require('os').cpus().length;
 argv.ppCompleteLocation = path.dirname(__filename);
 

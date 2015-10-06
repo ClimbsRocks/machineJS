@@ -32,10 +32,13 @@ process.on('message', function(message) {
             // FUTURE: add in a check to see how much we're decreasing the error rate by on each iteration, and kill the net if it's no longer decreasing the error rate on a useful trajectory
 
             // console.log('trainingTime:',messageObj.trainingTime,'maxTime:',message.maxTrainingTime,'iterations:',messageObj.iterations,'maxIterations:',message.maxTrainingIterations);
-            // see if we've exceeded our alotted trainingTime
+            // see if we've exceeded our alotted trainingTime, while also meeting our minimum training threshold:
             if(messageObj.trainingTime/1000 >= message.maxTrainingTime || messageObj.iterations >= message.maxTrainingIterations) {
-              messageObj.type = 'finishedTraining';
+              if(messageObj.trainingTime / 1000 >= message.minTrainingTime) {
+                messageObj.type = 'finishedTraining';
+              }
             }
+            
             process.send(messageObj);
           // }
         }
@@ -46,6 +49,11 @@ process.on('message', function(message) {
         var rows = data.split('\n');
         for (var i = 0; i < rows.length; i++) {
           rows[i] = JSON.parse(rows[i]);
+        }
+
+        if(message.extendedTraining === true) {
+          var net = new brain.NeuralNetwork();
+          net.fromJSON( JSON.parse(message.trainingBestAsJSON));
         }
 
         // this entire process of training the net happens synchronously. yeah, i know, it's weird dealing with synchronous code inside node.js :)
