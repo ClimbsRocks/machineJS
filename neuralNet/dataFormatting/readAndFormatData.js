@@ -4,8 +4,7 @@ var numCPUs  = require('os').cpus().length;
 var stream = require('stream');
 var nn = global.neuralNetwork;
 var argv = global.argv;
-var formatDataStreams = require('./formatDataStreams.js');
-var formattingUtils = require('./formattingUtils.js');
+var formattingUtils = require(path.join(nn.location,'formattingUtils.js'));
 nn.dataSummary = {
   createdSummary: false,
   totalRows: 0,
@@ -54,7 +53,7 @@ module.exports = function( callback) {
     var t2Start = Date.now();
     console.log('first transformStream took:',trainingTime);
     var writeStream2 = fs.createWriteStream(path.join(nn.location,'/formattingData2.txt'), {encoding: 'utf8'});
-    var tStream2 = formatDataStreams.calculateStandardDeviationTStream();
+    var tStream2 = formattingUtils.calculateStandardDeviationTStream();
     var readStream2 = fs.createReadStream(path.join(nn.location,'/formattingData.txt'), {encoding: 'utf8'});
     readStream2.pipe(tStream2).pipe(writeStream2);
     
@@ -75,7 +74,7 @@ module.exports = function( callback) {
       var t3Start = Date.now();
 
       var writeStream3 = fs.createWriteStream(path.join(nn.location,'/formattingData3.txt'), {encoding: 'utf8'});
-      var tStream3 = formatDataStreams.formatDataTransformStream();
+      var tStream3 = formattingUtils.formatDataTransformStream();
       var readStream3 = fs.createReadStream(path.join(nn.location,'/formattingData2.txt'), {encoding: 'utf8'});
 
       // FUTURE: pipe this into a memcached or redis database. that way we'll be holding the entire dataset in memory, but just once

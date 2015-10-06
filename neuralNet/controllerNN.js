@@ -9,10 +9,10 @@ var numCPUs  = require('os').cpus().length;
 var argv = global.argv;
 
 var makeKagglePredictions = require('./makeKagglePredictions.js');
-var readAndFormatData = require(path.join(nn.location,'readAndFormatData.js'));
 var utils = require('./utils.js');
 var childUtils = require('./childUtils.js');
 var formattingUtils = require('./formattingUtils.js');
+var readAndFormatData = require('./dataFormatting/readAndFormatData.js');
 
 
 module.exports = {
