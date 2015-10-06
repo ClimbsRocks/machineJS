@@ -8,6 +8,8 @@ module.exports = {
 
   bestNetChecker: require('./utils/bestNetChecker.js'),
 
+  makeExtendedTrainingObj: require('./utils/makeExtendedTrainingObj.js'),
+
   updateNetStatus: require('./utils/updateNetStatus.js')
 
 };
