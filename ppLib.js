@@ -40,7 +40,7 @@ if (argv.devEnsemble) {
   controllerNN.startTraining(argv);
   // **********************************************************************************
   // argv.numCPUs = argv.computerTotalCPUs/2;
-  // controllerRF.startTraining(argv);
+  controllerRF.startTraining(argv);
   
   controllerEnsemble.startListeners(2, argv);
 }

@@ -14,11 +14,13 @@ module.exports = {
       var child = child_process.fork('./brainChildMemoryHog',{cwd: nn.location});
     }
 
-    var messageObj = utils.makeTrainingObj( module.exports.allParamsToTest.shift() );
-    
+    var messageObj;
     // one time only, once we have determined the best net, we are going to pass the serialized net in as an argument, to pass that onto the child process
     if(extendedTrainingNet) {
-      messageObj.extendedTrainingNet = extendedTrainingNet;
+      messageObj = utils.makeExtendedTrainingObj();
+      
+    } else {
+      messageObj = utils.makeTrainingObj( module.exports.allParamsToTest.shift() );
     }
 
     child.send(messageObj);
@@ -35,7 +37,7 @@ module.exports = {
 
     if(nn.neuralNetResults[messageObj.brainID] === undefined) {
       nn.neuralNetResults[messageObj.brainID] = netTrackingObj;
-    } else {
+    } else if(!extendedTrainingNet) {
       console.log('we already have a net at this property:',messageObj.brainID);
       console.log('other brain info:',messageObj);
     }

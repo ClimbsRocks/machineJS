@@ -25,7 +25,7 @@ module.exports = function () {
       allParamsToTest.push(createOneParamArray(layersArray[i],nodesArray[j]));
     }
   }
-  numOfNetsToTest = allParamsToTest.length;
+
   // if this is dev or devKaggle, we only want to test the largest and smallest nets (2 total)
   if(argv.dev || argv.devKaggle) {
     var tempParamsToTest = [];
