@@ -7,7 +7,8 @@ var rfLocation = py.rfLocation;
 
 module.exports = {
   expectedMessages: {
-    dictVectMapping: true
+    dictVectMapping: true,
+    fileNames: true
   },
   attachLogListener: function(referenceToShell) {
     referenceToShell.on('message', function(message) {

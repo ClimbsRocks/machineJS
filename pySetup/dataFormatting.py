@@ -22,17 +22,6 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
-if trainOrPredict == 'predict':
-    try:
-        dictVectorizer1 = joblib.load('pySetup/dictVectorizer.pkl')
-    except:
-        printParent('trainOrPredict is predict but dictVectorizer.p does not exist')
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
-X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '2' + fileName)
-X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
-
-
 def messageParent(text, type):
     messageObj = {
         'text': text,
@@ -40,6 +29,21 @@ def messageParent(text, type):
     }
     print json.dumps(messageObj)
 
+if trainOrPredict == 'predict':
+    try:
+        dictVectorizer1 = joblib.load('pySetup/dictVectorizer.pkl')
+    except:
+        printParent('trainOrPredict is predict but dictVectorizer.p does not exist')
+
+# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
+y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
+X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
+X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '_temp' + fileName)
+
+fileNames = {}
+fileNames['X_file_name'] = X_file_name
+fileNames['y_file_name'] = y_file_name
+messageParent(fileNames, 'fileNames')
 
 
 with open(inputFilePath, 'rU') as csvInput:

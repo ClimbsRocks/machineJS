@@ -5,7 +5,10 @@ var utils = require('./utils.js');
 
 module.exports = {
   dictVectMapping: {
-    // this will be given to us by DictVectorizer when it's run by python
+    // this will be given to us by DictVectorizer, a python module that takes dictionaries and turns them into arrays. Obviously since dictionaries are not ordered, we need to keep track of which fields end up in which indices. 
+  },
+  fileNames: {
+    // this will be given to us by dataFormatting.py once it has created the files with the formatted data.
   },
 
   formatData: function( callback, trainOrPredict) {
@@ -22,6 +25,13 @@ module.exports = {
         module.exports.dictVectMapping = message.text;
       }
     });
+
+    pyShell.on('message', function(message) {
+      if(message.type === 'fileNames') {
+        // console.log('fileNames message:',message);
+        module.exports.fileNames = message.text;
+      }
+    });
   },
 
   formatInitialData: function( callback) {
@@ -30,7 +40,9 @@ module.exports = {
   },
 
   kickOffForestTraining: function( callback) {
-    var pythonOptions = utils.generatePythonOptions(argv.dataFile, JSON.stringify(argv));
+    // console.log('fileNames:',module.exports.fileNames);
+    var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames)]);
+
 
     utils.startPythonShell('training.py', callback, pythonOptions);
   },
