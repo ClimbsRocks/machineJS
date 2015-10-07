@@ -63,29 +63,25 @@ for key in globalArgs:
 classifier = classifierCreater[classifierName]
 
 # create features that are custom to the size of the input data. 
-# this will definitely have to be done individually. 
-# i don't see any harm in making each of these into their own file, because aside from the dev check, everything here will be custom to each classifier. 
+# Each individual paramaterMaker file sits in the paramaterMakers folder. If you want to modify what the parameters are, or submit a PR with a better combination of parameters to try, that is the place to start. 
 allParams = paramMakers.makeAll(X,y,globalArgs)
 parameters_to_try = allParams[classifierName]
 
 
-# here is where we start to do very similar things all over again. everything from here forwards can be generalized. 
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
 gridSearch = GridSearchCV(classifier, parameters_to_try, cv=10, n_jobs=globalArgs['numCPUs'])
 
 gridSearch.fit(X_train, y_train)
-
-printParent('we have used grid search to explore the entire parameter space and find the best possible version of a random forest for your particular data set!')
-
+printParent('\n')
 printParent('*********************************************************************************************************')
 printParent("this estimator's best prediction is:")
 printParent(gridSearch.best_score_)
 printParent('*********************************************************************************************************')
 printParent("this estimator's best parameters are:")
 printParent(gridSearch.best_params_)
-printParent('now that we have figured this out, we are going to train a random forest with considerably more trees. more trees means a better fit, but they also take significantly longer to train, so we kept the number of trees relatively low while searching through the parameter space to make sure you were not stuck here until python6 comes out.')
+printParent('\n')
 
 if extendedTraining:
     # create a dict with mappings from algo name ('clRandomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
@@ -95,7 +91,6 @@ if extendedTraining:
 
     # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
     bigClassifier.fit(X, y)
-    printParent('we have trained an even more powerful random forest!')
 
     bigClassifierscore = bigClassifier.score(X, y)
     printParent('the bigger randomForest has a score of')
@@ -104,4 +99,4 @@ if extendedTraining:
     joblib.dump(bigClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 else:
     joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
-printParent('wrote the best estimator to a file')
+printParent('we have written the best estimator to a file')

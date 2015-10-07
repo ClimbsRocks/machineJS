@@ -42,12 +42,17 @@ module.exports = {
     module.exports.formatData( callback, 'train');
   },
 
-  kickOffForestTraining: function( callback) {
+  kickOffForestTraining: function( callback, classifierName) {
     // console.log('fileNames:',module.exports.fileNames);
-    var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), 'clRandomForest']);
+    var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
 
-    utils.startPythonShell('training.py', callback, pythonOptions);
+    var pyShell = utils.startPythonShell('training.py', callback, pythonOptions);
+    pyShell.on('message', function(message) {
+      if(message.type === 'trainingResults') {
+        global.trainedAlgos[classifierName] = message.text;
+      }
+    });
   },
 
   makePredictions: function( callback, rfPickle) {

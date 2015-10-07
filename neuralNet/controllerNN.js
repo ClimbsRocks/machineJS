@@ -23,7 +23,6 @@ module.exports = {
   },
   startTraining: function() {
     utils.setGlobalVars();
-    console.log('dataFile:',argv.dataFile);
 
     readAndFormatData(function() {
       // nn.dataSummary just got set by readAndFormatData, asynchronously;

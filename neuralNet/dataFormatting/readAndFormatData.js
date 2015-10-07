@@ -24,7 +24,6 @@ module.exports = function( callback) {
   // NOTE: your data must be formatted using UTF-8. If you're getting weird errors and you're not sure how to do that, check out this blog post:
     // TODO: add in info on how to make sure your data is formatted using UTF-8
   var readStream = fs.createReadStream(path.join(global.rootDir, argv.dataFile), {encoding: 'utf8'});
-  console.log('we have created the write and read streams to format our data')
 
 
   var tStream1 = formattingUtils.summarizeDataTransformStream();
@@ -36,7 +35,6 @@ module.exports = function( callback) {
   readStream.pipe(tStream1).pipe(writeStream1);
 
   writeStream1.on('finish', function() {
-    console.log('heard a finish event to writeSream');
     // to deal with asynch issues, we are attaching the dataSummary object to tStream1 itself. 
 
     // set the average property on each dataSummary key
@@ -56,7 +54,6 @@ module.exports = function( callback) {
     
     writeStream2.on('finish', function() {
 
-      console.log('finished the second transform!');
       for(var column in nn.dataSummary) {
         var columnObj = nn.dataSummary[column];
         
@@ -86,10 +83,10 @@ module.exports = function( callback) {
       readStream3.pipe(tStream3).pipe(writeStream3);
       
       writeStream3.on('finish', function() {
-        console.log('finished the third transform!');
         var trainingTime = (Date.now() - t2Start) / 1000;
         console.log('third transformStream took:',trainingTime);
 
+        // delete the intermediate files we have created
         fs.unlink(path.join(nn.location,'/formattingData.txt'));
         fs.unlink(path.join(nn.location,'/formattingData2.txt'));
         if(argv.copyData) {

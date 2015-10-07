@@ -4,7 +4,6 @@ var argv = global.argv;
 
 module.exports = function ( hlArray) {
 
-  console.log('nn.bestNetObj:',nn.bestNetObj);
   // NOTE: these are the max training time parameters we can set. we will use other processes to decide when to kill off the net. 
   var trainingObj = {
     errorThresh: 0.0,  // error threshold to reach

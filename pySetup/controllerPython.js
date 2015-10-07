@@ -29,7 +29,7 @@ module.exports = {
         processes.kickOffForestTraining( function() {
           // TODO: add in next step in chain here
           module.exports.makePredictions();
-        });
+        }, 'clRandomForest');
       });
 
     // }

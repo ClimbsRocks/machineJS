@@ -9,8 +9,8 @@ def makeParams(X, y, globalArgs):
 
 
     parameters_to_try = {
-        # 'max_features': max_features_to_try,
-        # 'min_samples_leaf':[1,2,5,25,50,100,150],
+        'max_features': max_features_to_try,
+        'min_samples_leaf':[1,2,5,25,50,100,150],
         'criterion': ['gini','entropy']
     }
 

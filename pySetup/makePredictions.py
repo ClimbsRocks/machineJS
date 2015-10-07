@@ -12,7 +12,6 @@ printParent('scurrying off to make predictions now!')
 
 fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
-obviousPrint('classifierName',classifierName)
 
 y_file_name = fileNames['y_predict']
 X_file_name = fileNames['X_predict']
@@ -71,14 +70,11 @@ with open('predictions/' + classifierName + '.csv', 'w+') as predictionsFile:
         rowID = int(float(inputRow[idIndex]))
         try:
             len(prediction)
-            # printParent('we are in the try block')
             csvwriter.writerow([rowID,prediction[1]])
         except:
             csvwriter.writerow([rowID,prediction])
-            # printParent('we are in the exception block')
 
 
-# write those predictions to a single, standalone, centralized file that ONLY holds the ID for that row, and then the predictions for each model. 
 # Nope. Each classifier writes it's own predictions to it's own file. 
     # we will keep an array in ppLib.js that has references to all the file names
     # the files will all be in a predictions folder, that will hold nothing but these files holding the predictions from a single classifier
