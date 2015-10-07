@@ -11,3 +11,4 @@ kagglePredictions*.txt
 randomForest/bestRF/*
 *.zip
 *.npy
+*.pyc

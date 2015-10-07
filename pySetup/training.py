@@ -19,26 +19,7 @@ from sendMessages import messageParent
 
 X = []
 y = []
-def printParent(text):
-    messageObj = {
-        'text': text,
-        'type': 'console.log'
-    }
-    print json.dumps(messageObj)
 
-# printParent('sys.argv[3] inside training.py')
-# printParent(sys.argv[3])
-
-# # TODO: remove the need to do any of this by passing in these values as arguments. 
-# fileName = os.path.split(sys.argv[1])[1]
-# # TODO: directly pass in the fileName
-# inputFilePath = sys.argv[1]
-
-
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-# TODO: modify this to just use pyLocatoin
-# y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
-# X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
 y_file_name = json.loads(sys.argv[3])['y_train']
 X_file_name = json.loads(sys.argv[3])['X_train']
 

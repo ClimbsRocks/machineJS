@@ -4,31 +4,16 @@ import sys
 import csv
 import time
 import joblib
-
-
-def printParent(text):
-    messageObj = {
-        'text': text,
-        'type': 'console.log'
-    }
-    print json.dumps(messageObj)
+from sendMessages import printParent
+from sendMessages import messageParent
 
 printParent('scurrying off to make predictions now!')
 
 fileNames = json.loads(sys.argv[4])
-printParent('fileNames:')
-printParent(fileNames)
-
-fileName = os.path.split(sys.argv[1])[1]
-inputFilePath = sys.argv[1]
-
-# find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
 
 y_file_name = fileNames['y_predict']
 X_file_name = fileNames['X_predict']
 
-# y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_predict' + fileName)
-# X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_predict2' + fileName)
 
 X = []
 y = []
@@ -52,7 +37,6 @@ with open(y_file_name, 'rU') as y_file:
             row[0] = row[0]
         y.append(row[0])
 
-time.sleep(2)
 # load up the previously trained (and tuned!) random forest classifier
 rf = joblib.load('pySetup/bestRF/bestRF.pkl')
 

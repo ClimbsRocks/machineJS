@@ -9,21 +9,6 @@ from sklearn.feature_extraction import DictVectorizer
 from sendMessages import printParent
 from sendMessages import messageParent
 
-# def printParent(text):
-#     messageObj = {
-#         'text': text,
-#         'type': 'console.log'
-#     }
-#     print json.dumps(messageObj)
-
-# def messageParent(text, type):
-#     messageObj = {
-#         'text': text,
-#         'type': type
-#     }
-#     print json.dumps(messageObj)
-
-
 dictVectorizer1 = DictVectorizer()
 ppCompleteLocation = json.loads(sys.argv[3])['ppCompleteLocation']
 # this requires the full absolute path to the input data file
