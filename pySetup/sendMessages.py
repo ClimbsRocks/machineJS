@@ -13,3 +13,9 @@ def messageParent(text, type):
         'type': type
     }
     print json.dumps(messageObj)
+
+def obviousPrint(label, obj):
+    printParent('#######################################################################################################################')
+    printParent('#######################################################################################################################')
+    printParent(label)
+    printParent(obj)

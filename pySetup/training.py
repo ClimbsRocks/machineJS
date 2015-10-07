@@ -5,16 +5,25 @@ import os
 import time
 import json
 import joblib
+
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
+
 from sendMessages import printParent
 from sendMessages import messageParent
+
+# these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
 from makeClassifiers import makeClassifiers
 globalArgs = json.loads(sys.argv[2])
 classifierCreater = makeClassifiers(globalArgs)
+
 classifierName = sys.argv[4]
+sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
+import paramMakers
+
+
 # based on the arguments passed in, load a new module
     # that module will just be the new classifier. 
 
@@ -45,6 +54,7 @@ with open(y_file_name, 'rU') as openOutputFile:
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
+
 # if we're developing, train on only 1% of the dataset.
 extendedTraining=True
 for key in globalArgs:
@@ -56,37 +66,17 @@ for key in globalArgs:
 # Everything above this line is shared across classifiers
 # Most things below this line are specific to each classifier
 
-# printParent('classifierCreater')
-# printParent(classifierCreater['clRandomForest'])
-
 
 
 # instantiate a new classifier. This part might have to be done individually. 
     # we can probably have a module that is just a dict of names ('randomForest') to their instantiated classifiers
-# rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
 classifier = classifierCreater[classifierName]
 
 # create features that are custom to the size of the input data. 
 # this will definitely have to be done individually. 
 # i don't see any harm in making each of these into their own file, because aside from the dev check, everything here will be custom to each classifier. 
-sqrtNum = int(math.sqrt(len(X[0])))
-
-max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
-max_features_to_try.append('log2')
-max_features_to_try.append(None)
-
-
-parameters_to_try = {
-    'max_features': max_features_to_try,
-    'min_samples_leaf':[1,2,5,25,50,100,150],
-    'criterion': ['gini','entropy']
-}
-
-for key in globalArgs:
-    if key in( 'devKaggle', 'dev'): 
-        parameters_to_try.pop('min_samples_leaf', None)
-        parameters_to_try.pop('max_features', None)
-
+allParams = paramMakers.makeAll(X,y,globalArgs)
+parameters_to_try = allParams[classifierName]
 
 # here is where we start to do very similar things all over again. everything from here forwards can be generalized. 
 printParent('we are about to run a grid search over the following space:')
