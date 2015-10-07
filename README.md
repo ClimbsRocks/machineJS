@@ -15,6 +15,7 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 4. Make sure there are no empty rows!
 5. Make sure each row has the same number of columns (even if those columns are blank, they must exist)
 6. Make sure any strings are formatted using UTF-8. 
+7. Make sure there is no empty line at the end of the file. This manifests itself as "unexpected end of input" when parsing that row inside of brainChildMemoryHog.js to add it to our testing set
 <!-- TODO: add in directions on how to make sure their data is formatted in UTF-8. -->
 <!-- TODO: add in error messages letting the user know their data isn't formatted in UTF-8. -->
 
