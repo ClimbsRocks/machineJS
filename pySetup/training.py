@@ -14,6 +14,7 @@ from sendMessages import messageParent
 from makeClassifiers import makeClassifiers
 globalArgs = json.loads(sys.argv[2])
 classifierCreater = makeClassifiers(globalArgs)
+classifierName = sys.argv[4]
 # based on the arguments passed in, load a new module
     # that module will just be the new classifier. 
 
@@ -63,7 +64,7 @@ for key in globalArgs:
 # instantiate a new classifier. This part might have to be done individually. 
     # we can probably have a module that is just a dict of names ('randomForest') to their instantiated classifiers
 # rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
-rf = classifierCreater['clRandomForest']
+classifier = classifierCreater[classifierName]
 
 # create features that are custom to the size of the input data. 
 # this will definitely have to be done individually. 
@@ -91,7 +92,7 @@ for key in globalArgs:
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-gridSearch = GridSearchCV(rf, parameters_to_try, cv=10, n_jobs=globalArgs['numCPUs'])
+gridSearch = GridSearchCV(classifier, parameters_to_try, cv=10, n_jobs=globalArgs['numCPUs'])
 
 gridSearch.fit(X_train, y_train)
 

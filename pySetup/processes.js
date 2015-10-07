@@ -44,7 +44,7 @@ module.exports = {
 
   kickOffForestTraining: function( callback) {
     // console.log('fileNames:',module.exports.fileNames);
-    var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames)]);
+    var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), 'clRandomForest']);
 
 
     utils.startPythonShell('training.py', callback, pythonOptions);
