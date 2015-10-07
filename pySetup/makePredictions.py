@@ -37,6 +37,9 @@ with open(y_file_name, 'rU') as y_file:
             row[0] = row[0]
         y.append(row[0])
 
+# GENERALIZE: 
+    # have this file take in the name of the algo it is making predictions for
+    # then load from that correct file
 # load up the previously trained (and tuned!) random forest classifier
 rf = joblib.load('pySetup/bestRF/bestRF.pkl')
 
@@ -49,11 +52,16 @@ except:
     printParent('no idIndex found')
     idIndex = 1
 
+# get predictions for each item in the prediction data set
+predictedResults = rf.predict_proba(X)
+
+# GENERALIZE: 
+    # there are hardcoded valeus here too
 with open('predictions/randomForest.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
+
+    # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow(['ID','Probability'])
-    # get predictions for each item in the prediction data set
-    predictedResults = rf.predict_proba(X)
     for idx, prediction in enumerate(predictedResults):
         inputRow = X[idx]
         # convert the id from a string to an int

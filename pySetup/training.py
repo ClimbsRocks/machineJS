@@ -78,8 +78,13 @@ determine which parameters we want to mess with
 
 '''
 
+# instantiate a new classifier. This part might have to be done individually. 
+    # we can probably have a module that is just a dict of names ('randomForest') to their instantiated classifiers
 rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
 
+# create features that are custom to the size of the input data. 
+# this will definitely have to be done individually. 
+# i don't see any harm in making each of these into their own file, because aside from the dev check, everything here will be custom to each classifier. 
 sqrtNum = int(math.sqrt(len(X[0])))
 
 max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
@@ -99,6 +104,7 @@ for key in globalArgs:
         parameters_to_try.pop('max_features', None)
 
 
+# here is where we start to do very similar things all over again. everything from here forwards can be generalized. 
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
@@ -116,7 +122,10 @@ printParent("this estimator's best parameters are:")
 printParent(gridSearch.best_params_)
 printParent('now that we have figured this out, we are going to train a random forest with considerably more trees. more trees means a better fit, but they also take significantly longer to train, so we kept the number of trees relatively low while searching through the parameter space to make sure you were not stuck here until python6 comes out.')
 
-
+# this part, unfortunately, will probably have to be custom for each one, despite having a fair bit of boilerplate code. 
+# actually, no, i think even this part can be mostly generalized. 
+    # create a dict with mappings from algo name ('randomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
+    # then we just use a for loop to loop through best_params_ and set each of those as properties on the estimator. 
 if extendedTraining:
     bigRF = RandomForestClassifier(n_estimators=1500, n_jobs=globalArgs['numCPUs'])
     bigRF.set_params(criterion=gridSearch.best_params_['criterion'])
@@ -138,6 +147,9 @@ if extendedTraining:
     printParent('the bigger randomForest has a score of')
     printParent(bigRFscore)
 
+    # we will, of course, need to work on our file structure a bit. 
+    # and each classifier will have to write to it's own folder there, so we are going to have to be super consistent in our variable naming. 
+        # and lets make the classifier names something super unique so it's easy to do a global search and replace for it. maybe 'cl' + algo name, like 'clRandomForest'?
     joblib.dump(bigRF, 'pySetup/bestRF/bestRF.pkl')
 else:
     joblib.dump(gridSearch.best_estimator_, 'pySetup/bestRF/bestRF.pkl')
