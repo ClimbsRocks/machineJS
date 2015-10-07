@@ -9,6 +9,8 @@ from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
+from sendMessages import printParent
+from sendMessages import messageParent
 # based on the arguments passed in, load a new module
     # that module will just be the new classifier. 
     
@@ -37,8 +39,8 @@ def printParent(text):
 # TODO: modify this to just use pyLocatoin
 # y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_train' + fileName)
 # X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_train2' + fileName)
-y_file_name = json.loads(sys.argv[3])['y_file_name']
-X_file_name = json.loads(sys.argv[3])['X_file_name']
+y_file_name = json.loads(sys.argv[3])['y_train']
+X_file_name = json.loads(sys.argv[3])['X_train']
 
 with open(X_file_name, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)
@@ -110,6 +112,10 @@ parameters_to_try = {
     'criterion': ['gini','entropy']
 }
 
+for key in globalArgs:
+    if key in( 'devKaggle', 'dev'): 
+        parameters_to_try.pop('min_samples_leaf', None)
+        parameters_to_try.pop('max_features', None)
 
 
 printParent('we are about to run a grid search over the following space:')

@@ -15,12 +15,20 @@ def printParent(text):
 
 printParent('scurrying off to make predictions now!')
 
+fileNames = json.loads(sys.argv[4])
+printParent('fileNames:')
+printParent(fileNames)
+
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_predict' + fileName)
-X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_predict2' + fileName)
+
+y_file_name = fileNames['y_predict']
+X_file_name = fileNames['X_predict']
+
+# y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_predict' + fileName)
+# X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_predict2' + fileName)
 
 X = []
 y = []

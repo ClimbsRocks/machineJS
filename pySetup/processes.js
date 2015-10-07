@@ -29,7 +29,10 @@ module.exports = {
     pyShell.on('message', function(message) {
       if(message.type === 'fileNames') {
         // console.log('fileNames message:',message);
-        module.exports.fileNames = message.text;
+        for(var key in message.text) {
+          module.exports.fileNames[key] = message.text[key];
+          
+        }
       }
     });
   },
@@ -51,7 +54,7 @@ module.exports = {
     console.log('kicking off the process of making predictions on the predicting data set!');
 
     var startPredictionsScript = function() {
-      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv)]);
+      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames)]);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
       console.log('we have started a python shell with makePredictions.py')

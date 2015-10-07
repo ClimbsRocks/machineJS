@@ -6,43 +6,47 @@ import json
 import joblib
 import sklearn
 from sklearn.feature_extraction import DictVectorizer
+from sendMessages import printParent
+from sendMessages import messageParent
+
+# def printParent(text):
+#     messageObj = {
+#         'text': text,
+#         'type': 'console.log'
+#     }
+#     print json.dumps(messageObj)
+
+# def messageParent(text, type):
+#     messageObj = {
+#         'text': text,
+#         'type': type
+#     }
+#     print json.dumps(messageObj)
+
 
 dictVectorizer1 = DictVectorizer()
-
-# API: this requires the full absolute path to the input data file
+ppCompleteLocation = json.loads(sys.argv[3])['ppCompleteLocation']
+# this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
 # we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
 trainOrPredict = sys.argv[2]
 
-def printParent(text):
-    messageObj = {
-        'text': text,
-        'type': 'console.log'
-    }
-    print json.dumps(messageObj)
-
-def messageParent(text, type):
-    messageObj = {
-        'text': text,
-        'type': type
-    }
-    print json.dumps(messageObj)
-
 if trainOrPredict == 'predict':
     try:
-        dictVectorizer1 = joblib.load('pySetup/dictVectorizer.pkl')
+        dictVectorizer1 = joblib.load('pySetup/dataFiles/dictVectorizer.pkl')
     except:
         printParent('trainOrPredict is predict but dictVectorizer.p does not exist')
 
 # find the path to this file we're currently writing code in, and create a file in that directory that appends 'y' to the filename the user gave us
-y_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'y_' + trainOrPredict + fileName)
-X_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + fileName)
-X_temp_file_name = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'X_' + trainOrPredict + '_temp' + fileName)
+y_file_name = os.path.join(ppCompleteLocation, 'pySetup', 'dataFiles', 'y_' + trainOrPredict + fileName)
+X_file_name = os.path.join(ppCompleteLocation, 'pySetup', 'dataFiles', 'X_' + trainOrPredict + fileName)
+X_temp_file_name = os.path.join(ppCompleteLocation, 'pySetup', 'dataFiles', 'X_' + trainOrPredict + '_temp' + fileName)
 
 fileNames = {}
-fileNames['X_file_name'] = X_file_name
-fileNames['y_file_name'] = y_file_name
+fileNames['X_' + trainOrPredict] = X_file_name
+fileNames['y_' + trainOrPredict] = y_file_name
+# fileNames['y_file_name'] = y_file_name
 messageParent(fileNames, 'fileNames')
 
 
@@ -94,7 +98,7 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
             inputList.append(newDict)
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
         if trainOrPredict == 'train':
-            joblib.dump(dictVectorizer1, 'pySetup/dictVectorizer.pkl')
+            joblib.dump(dictVectorizer1, 'pySetup/dataFiles/dictVectorizer.pkl')
             printParent('we have pickled the dictVectorizer')
         messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
         printParent( 'we have vectorized the data. it has shape:' )
