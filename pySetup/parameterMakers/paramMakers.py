@@ -9,7 +9,7 @@
 
 import rfParamMaker
 
-def makeAll(X,y,globalArgs):
+def makeAll(X,y,globalArgs, dev):
     return {
-        'clRandomForest':rfParamMaker.makeParams(X,y,globalArgs)
+        'clRandomForest':rfParamMaker.makeParams(X,y,globalArgs, dev)
     }

@@ -57,8 +57,6 @@ except:
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)
 
-# GENERALIZE: 
-    # there are hardcoded valeus here too
 with open('predictions/' + classifierName + '.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 

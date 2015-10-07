@@ -25,7 +25,12 @@ sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
 import paramMakers
 
 import makeBigClassifiers
+import extendedTrainingList
 
+dev = False
+for key in globalArgs:
+    if key in( 'devKaggle', 'dev'): 
+        dev = True
 
 X = []
 y = []
@@ -50,13 +55,10 @@ with open(y_file_name, 'rU') as openOutputFile:
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-
 # if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-extendedTraining=True
-for key in globalArgs:
-    if key in( 'devKaggle', 'dev'): 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
-        extendedTraining = False
+if dev:
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+        # extendedTraining = False
 
 
 # instantiate a new classifier, given the type passed in to us
@@ -64,7 +66,7 @@ classifier = classifierCreater[classifierName]
 
 # create features that are custom to the size of the input data. 
 # Each individual paramaterMaker file sits in the paramaterMakers folder. If you want to modify what the parameters are, or submit a PR with a better combination of parameters to try, that is the place to start. 
-allParams = paramMakers.makeAll(X,y,globalArgs)
+allParams = paramMakers.makeAll(X,y,globalArgs, dev)
 parameters_to_try = allParams[classifierName]
 
 
@@ -83,14 +85,21 @@ printParent("this estimator's best parameters are:")
 printParent(gridSearch.best_params_)
 printParent('\n')
 
+# TODO: Get info on whether this algo supports extended training from some global module. 
+extendedTraining = extendedTrainingList.getAll()[classifierName]
+
 if extendedTraining:
     # create a dict with mappings from algo name ('clRandomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
     allBigClassifiers = makeBigClassifiers.makeAll(globalArgs)
     bigClassifier = allBigClassifiers[classifierName]
     bigClassifier.set_params(**gridSearch.best_params_)
+    # obviousPrint('bigClassifier params:',bigClassifier.get_params())
 
-    # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
-    bigClassifier.fit(X, y)
+    if dev:
+        bigClassifier.fit(X_train, y_train)
+    else: 
+        # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
+        bigClassifier.fit(X, y)
 
     bigClassifierscore = bigClassifier.score(X, y)
     printParent('the bigger randomForest has a score of')
