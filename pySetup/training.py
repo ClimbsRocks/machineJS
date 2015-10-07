@@ -11,10 +11,11 @@ from sklearn.metrics import classification_report
 from sklearn.ensemble import RandomForestClassifier
 from sendMessages import printParent
 from sendMessages import messageParent
+from makeClassifiers import makeClassifiers
+globalArgs = json.loads(sys.argv[2])
+classifierCreater = makeClassifiers(globalArgs)
 # based on the arguments passed in, load a new module
     # that module will just be the new classifier. 
-    
-
 
 
 X = []
@@ -42,7 +43,6 @@ with open(y_file_name, 'rU') as openOutputFile:
         y.append(row[0])
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
-globalArgs = json.loads(sys.argv[2])
 
 # if we're developing, train on only 1% of the dataset.
 extendedTraining=True
@@ -55,32 +55,15 @@ for key in globalArgs:
 # Everything above this line is shared across classifiers
 # Most things below this line are specific to each classifier
 
-'''
-determine which parameters we want to mess with
-    https://www.kaggle.com/forums/f/15/kaggle-forum/t/4092/how-to-tune-rf-parameters-in-practice
-    A. M-Try (number of features it tries at each decision point in a tree). Starts at square root of features available, but tweak it up and down by a few (probably no more than 3 in each direction; it seems even 1 or 2 is enough)
-    B. Number of folds for cross-validation: 10 is what most people use, but more gives you better accuracy (likely at the cost of compute time). again, returns are pretty rapidly diminishing. 
-    C. platt scaling of the results to increase overall accuracy at the cost of outliers (which sounds perfect for an ensemble)
-    D. preprocessing the data might help- FUTURE
-    E. Principle Component Analysis to decrease dependence between features
-    F. Number of trees
-    G. Possibly ensemble different random forests together. this is where the creative ensembling comes into play!
-    H. Splitting criteria
-    I. AdaBoost
-    J. Can bump up nodesize as much as possible to decrease training time (split)
-        consider doing this first, finding what node size we finally start decreasing accuracy on, then use that node size for the rest of the testing we do, then possibly bumping it down a bit again at the end. 
-            https://www.kaggle.com/c/the-analytics-edge-mit-15-071x/forums/t/7890/node-size-in-random-forest
-    K. min_samples_leaf- smaller leaf makes you more prone to capturing noise from the training data. Try for at least 50??
-        http://www.analyticsvidhya.com/blog/2015/06/tuning-random-forest-model/
-    L. random_state: adds reliability. Would be a good one to split on if ensembling different RFs together. 
-    M. oob_score: something about intelligent cross-validation. 
-    N. allusions to regularization, or what I think they mean- feature selection. 
+# printParent('classifierCreater')
+# printParent(classifierCreater['clRandomForest'])
 
-'''
+
 
 # instantiate a new classifier. This part might have to be done individually. 
     # we can probably have a module that is just a dict of names ('randomForest') to their instantiated classifiers
-rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
+# rf = RandomForestClassifier(n_estimators=15, n_jobs=globalArgs['numCPUs'])
+rf = classifierCreater['clRandomForest']
 
 # create features that are custom to the size of the input data. 
 # this will definitely have to be done individually. 

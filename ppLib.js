@@ -47,7 +47,7 @@ if (argv.devEnsemble) {
 }
 
 var ppLibShutdown = function() {
-  controllerNN.killAll();
+  // controllerNN.killAll();
   controllerPython.killAll();
 };
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
