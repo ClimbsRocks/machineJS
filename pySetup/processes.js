@@ -54,7 +54,7 @@ module.exports = {
     console.log('kicking off the process of making predictions on the predicting data set!');
 
     var startPredictionsScript = function() {
-      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames)]);
+      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), 'clRandomForest']);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
       console.log('we have started a python shell with makePredictions.py')

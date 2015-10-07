@@ -6,10 +6,13 @@ import time
 import joblib
 from sendMessages import printParent
 from sendMessages import messageParent
+from sendMessages import obviousPrint
 
 printParent('scurrying off to make predictions now!')
 
 fileNames = json.loads(sys.argv[4])
+classifierName = sys.argv[5]
+obviousPrint('classifierName',classifierName)
 
 y_file_name = fileNames['y_predict']
 X_file_name = fileNames['X_predict']
@@ -41,7 +44,7 @@ with open(y_file_name, 'rU') as y_file:
     # have this file take in the name of the algo it is making predictions for
     # then load from that correct file
 # load up the previously trained (and tuned!) random forest classifier
-rf = joblib.load('pySetup/bestRF/bestRF.pkl')
+classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
 dictVectMapping = sys.argv[2].split(',')
 
@@ -53,11 +56,11 @@ except:
     idIndex = 1
 
 # get predictions for each item in the prediction data set
-predictedResults = rf.predict_proba(X)
+predictedResults = classifier.predict_proba(X)
 
 # GENERALIZE: 
     # there are hardcoded valeus here too
-with open('predictions/randomForest.csv', 'w+') as predictionsFile:
+with open('predictions/' + classifierName + '.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
