@@ -7,7 +7,7 @@ var csv = require('fast-csv');
 
 module.exports = {
 
-  consolidateFiles: function(globalArgs, callback) {
+  generateSummary: function(globalArgs, callback) {
 
     fs.readdir(path.join(globalArgs.ppCompleteLocation,'predictions'), function(err,files) {
       if (err) {
@@ -23,7 +23,7 @@ module.exports = {
             var filePath = path.join(globalArgs.ppCompleteLocation,'predictions',fileName);
             var firstRow = true;
 
-            var pipingStream = byline(fs.createReadStream(filePath, {encoding: 'utf8'})); //.pipe(parser);
+            var pipingStream = byline(fs.createReadStream(filePath, {encoding: 'utf8'}));
             
             pipingStream.on('data', function(str) {
               var row = str.split(',');
@@ -31,6 +31,7 @@ module.exports = {
                 firstRow = false;
                 // skip it! 
               } else {
+                // the id is stored in the first column
                 var id = row[0];
                 if(summary[id] === undefined) {
                   summary[id] = {};
@@ -39,6 +40,8 @@ module.exports = {
                 if(parseFloat(row[1]) !== NaN) {
                   row[1] = parseFloat(row[1]);
                 }
+
+                //the prediction is stored in the second column
                 summary[id][prettyFileName] = row[1];
                 
               }
@@ -50,12 +53,15 @@ module.exports = {
                 callback();
               }
             });
+
           } else {
+            // if the file is not a .csv file, we will ignore it, and remove it from our count of files to parse
             fileCount--;
           }
 
         });
       }
+      // handles off by one errors
       if(fileCount === 0) {
         callback();
       }
@@ -76,7 +82,7 @@ module.exports = {
       algoNames.forEach(function(name) {
         eligiblePredictions.push(summary[rowNum][name]);
       });
-      // ensemble methods holds all the ways we have of ensembling together the results from different predictions. 
+      // ensembleMethods holds all the ways we have of ensembling together the results from different predictions. 
       // each method takes in an array, and returns a single number
       var output = ensembleMethods[bestMethod](eligiblePredictions);
       results.push([rowNum, output]);

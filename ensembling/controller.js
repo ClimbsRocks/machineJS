@@ -6,8 +6,21 @@ var argv;
 
 module.exports = {
   createEnsemble: function(globalArgs) {
-    utils.consolidateFiles(globalArgs, function() {
-      var results = utils.calculateAggregatedPredictions(['neuralNetwork','randomForest'], 'average');
+    // generateSummary reads in the prediction files from each classifier, and loads them into an in-memory object that matches them all up by rowID. 
+    utils.generateSummary(globalArgs, function() {
+
+      // FUTURE: 
+        // 1. Test all combinations of number of classifiers among the ones we've trained
+          // 2. for each combination of classifiers, run every single one of our ensembling methods
+          // 3. pick the [combination of classifiers, ensembling method] pair that has the lowest error rate across the data set
+
+      // for now, we are just going to use all classifiers that we have trained. that means the python classifiers listed at ppComplete/pySetup/classifierList.js, as well as the neueralNetwork trained in a separate module within ppComplete.
+      var allClassifierList = require(path.join(globalArgs.ppCompleteLocation,'pySetup','classifierList.js'));
+      allClassifierList.neuralNetwork = 'neuralNetwork';
+
+      // calculateAggregatedPredictions uses the best combination of classifiers and ensembling method to create our final prediction. 
+      // until we are ready for our version 3.0 release, we will simply pass it all of our classifiers, with the ensemble method of bagging them together. 
+      var results = utils.calculateAggregatedPredictions(allClassifierList, 'average');
       
       utils.writeToFile(globalArgs, function() {
         console.log('We have just written the final predictions to a file called "ppCompletePredictions.csv" that is saved at:\n',globalArgs.ppCompleteLocation + '/ppCompletePredictions.csv');
