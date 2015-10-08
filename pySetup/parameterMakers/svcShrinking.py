@@ -6,7 +6,7 @@ def makeParams(X, y, globalArgs, dev):
     # an easy way to split this out would be to have one svm that is shrinking, and one that is not
     # shrinking is actually set for us in makeClassifiers.py, but we are keeping it here just to make it obvious
     parameters_to_try = {
-        # 'shrinking': True,
+        # 'shrinking': False,
         'C': [1, 10, 100, 1000], 
         'gamma': [0.001, 0.0001], 
         'kernel': ['rbf']

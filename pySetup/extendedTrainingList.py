@@ -5,5 +5,6 @@ def getAll():
     return {
         'clRfEntropy':True,
         'clRfGini':True,
-        'clSVCFirst':False
+        'clSVCFirst':False,
+        'clSVCShrinking':False
     }
