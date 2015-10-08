@@ -1,6 +1,6 @@
 {
   "name": "ppComplete",
-  "version": "0.0.1",
+  "version": "0.9",
   "description": "automated machine learning! push button ensembling, grid search for javascript neural network",
   "main": "ppLib.js",
   "scripts": {
@@ -39,8 +39,6 @@
   "homepage": "https://github.com/ClimbsRocks/ppComplete",
   "dependencies": {
     "brain": "^0.7.0",
-    "convert-newline": "0.0.5",
-    "csv": "^0.4.6",
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
