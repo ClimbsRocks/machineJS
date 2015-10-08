@@ -26,8 +26,10 @@ module.exports = {
     // } else {
 
       processes.formatInitialData( function() {
+        // TODO: load up the list of classifier names, and invoke kickOffTraining on each of them
+        // TODO: make sure we have purged all hardcoded references to 'clRandomForest' or anything else relating to RF
+
         processes.kickOffForestTraining( function() {
-          // TODO: add in next step in chain here
           module.exports.makePredictions();
         }, 'clRandomForest');
       });
@@ -35,6 +37,7 @@ module.exports = {
     // }
   },
   makePredictions: function(rfPickle) {
+    // TODO: we still have hardcoded values here
     rfPickle = rfPickle || py.rfLocation + '/' + 'bestRF.p';
     processes.makePredictions( function() {
       process.emit('algoFinishedTraining');

@@ -7,9 +7,11 @@
 # 5. that function will then return the dictionary
 # 6. then back in training.py we can look up the classifierName within that dictionary to get the parameters
 
-import rfParamMaker
+import rfGiniParamMaker
+import rfEntropyParamMaker
 
 def makeAll(X,y,globalArgs, dev):
     return {
-        'clRandomForest':rfParamMaker.makeParams(X,y,globalArgs, dev)
+        'clRfGini':rfGiniParamMaker.makeParams(X,y,globalArgs, dev),
+        'clRfEntropy':rfGiniParamMaker.makeParams(X,y,globalArgs, dev)
     }

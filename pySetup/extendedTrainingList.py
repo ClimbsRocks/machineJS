@@ -3,5 +3,6 @@
 
 def getAll():
     return {
-        'clRandomForest':True
+        'clRfEntropy':True,
+        'clRfGini':True
     }

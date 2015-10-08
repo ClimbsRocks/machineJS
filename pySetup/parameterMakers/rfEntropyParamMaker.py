@@ -10,14 +10,11 @@ def makeParams(X, y, globalArgs, dev):
 
     parameters_to_try = {
         'max_features': max_features_to_try,
-        'min_samples_leaf':[1,2,5,25,50,100,150],
-        'criterion': ['gini','entropy']
-        # 'extendedTraining': [True]
+        'min_samples_leaf':[1,2,5,25,50,100,150]
     }
 
     if dev:
         parameters_to_try.pop('min_samples_leaf', None)
         parameters_to_try.pop('max_features', None)
-        # parameters_to_try['extendedTraining'] = [False]
         
     return parameters_to_try
