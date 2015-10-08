@@ -3,7 +3,12 @@ global.argv = require('minimist')(process.argv.slice(1));
 var path = require('path');
 global.rootDir = path.dirname(__filename);
 
-var controllerNN = require('./neuralNet/controllerNN.js');
+if(argv.dev || argv.devKaggle) {
+  var dev = true;
+}
+if (!dev) {
+  var controllerNN = require('./neuralNet/controllerNN.js');
+}
 var controllerPython = require('./pySetup/controllerPython.js');
 var controllerEnsemble = require('./ensembling/controller.js');
 var dataFile = process.argv[2];
@@ -38,15 +43,25 @@ if (argv.devEnsemble) {
   // we pass in a callback function that will make the dataSummary a global variable 
     // and invoke parallelNets once formatting the data is done. 
   // **********************************************************************************
-  controllerNN.startTraining();
+  if(!dev) {
+    controllerNN.startTraining();
+  }
   controllerPython.startTraining(argv);
   
   // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
-  controllerEnsemble.startListeners(4, argv);
+  var numberOfClassifiers = require('./pySetup/classifierList');
+  numberOfClassifiers = Object.keys(numberOfClassifiers).length;
+  if(!dev) {
+    // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
+    numberOfClassifiers++;
+  }
+  controllerEnsemble.startListeners(numberOfClassifiers, argv);
 }
 
 var ppLibShutdown = function() {
-  controllerNN.killAll();
+  if(!dev) {
+    controllerNN.killAll();
+  }
   controllerPython.killAll();
 };
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
