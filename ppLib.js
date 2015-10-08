@@ -42,7 +42,7 @@ if (argv.devEnsemble) {
   controllerPython.startTraining(argv);
   
   // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
-  controllerEnsemble.startListeners(2, argv);
+  controllerEnsemble.startListeners(4, argv);
 }
 
 var ppLibShutdown = function() {
