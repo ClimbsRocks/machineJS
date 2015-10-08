@@ -9,9 +9,11 @@
 
 import rfGiniParamMaker
 import rfEntropyParamMaker
+from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev):
-    return {
+    returnDict = {
         'clRfGini':rfGiniParamMaker.makeParams(X,y,globalArgs, dev),
-        'clRfEntropy':rfGiniParamMaker.makeParams(X,y,globalArgs, dev)
+        'clRfEntropy':rfEntropyParamMaker.makeParams(X,y,globalArgs, dev)
     }
+    return returnDict

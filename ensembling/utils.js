@@ -71,7 +71,7 @@ module.exports = {
     
   },
 
-  calculateAggregatedPredictions: function(algoNames, bestMethod) {
+  calculateAggregatedPredictions: function(classifierNames, bestMethod) {
     var predictionCalculation = ensembleMethods[bestMethod];
     var results = [];
     results.push(['ID','Probability']);
@@ -79,9 +79,11 @@ module.exports = {
       // console.log('row:',row);
       // pick out only the predictions from the algos that were selected by createEnsemble:
       var eligiblePredictions = [];
-      algoNames.forEach(function(name) {
-        eligiblePredictions.push(summary[rowNum][name]);
-      });
+
+      // classifierNames is a key-mirror object where each key and value are both the classifierName
+      for (var classifierName in classifierNames) {
+        eligiblePredictions.push(summary[rowNum][classifierName]);
+      }
       // ensembleMethods holds all the ways we have of ensembling together the results from different predictions. 
       // each method takes in an array, and returns a single number
       var output = ensembleMethods[bestMethod](eligiblePredictions);

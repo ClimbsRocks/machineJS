@@ -26,6 +26,6 @@ determine which parameters we want to mess with
 
 def makeAll(globalArgs):
     return {
-        'clRfGini': RandomForestClassifier(n_estimators=1200, n_jobs=globalArgs['numCPUs'], criterion='gini')
+        'clRfGini': RandomForestClassifier(n_estimators=1200, n_jobs=globalArgs['numCPUs'], criterion='gini'),
         'clRfEntropy': RandomForestClassifier(n_estimators=1200, n_jobs=globalArgs['numCPUs'], criterion='entropy')
     }

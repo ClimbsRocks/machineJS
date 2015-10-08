@@ -1,9 +1,9 @@
-global.neuralNetwork = {};
+// global.neuralNetwork = {};
 global.argv = require('minimist')(process.argv.slice(1));
 var path = require('path');
 global.rootDir = path.dirname(__filename);
 
-var controllerNN = require('./neuralNet/controllerNN.js');
+// var controllerNN = require('./neuralNet/controllerNN.js');
 var controllerPython = require('./pySetup/controllerPython.js');
 var controllerEnsemble = require('./ensembling/controller.js');
 var dataFile = process.argv[2];
@@ -37,15 +37,16 @@ if (argv.devEnsemble) {
   // Here is where we invoke the method with the path to the data
   // we pass in a callback function that will make the dataSummary a global variable 
     // and invoke parallelNets once formatting the data is done. 
-  controllerNN.startTraining();
   // **********************************************************************************
+  // controllerNN.startTraining();
   controllerPython.startTraining(argv);
   
+  // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
   controllerEnsemble.startListeners(2, argv);
 }
 
 var ppLibShutdown = function() {
-  controllerNN.killAll();
+  // controllerNN.killAll();
   controllerPython.killAll();
 };
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 

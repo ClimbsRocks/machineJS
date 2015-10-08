@@ -42,7 +42,7 @@ module.exports = {
     module.exports.formatData( callback, 'train');
   },
 
-  kickOffForestTraining: function( callback, classifierName) {
+  kickOffTraining: function( callback, classifierName) {
     // console.log('fileNames:',module.exports.fileNames);
     var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
@@ -55,16 +55,19 @@ module.exports = {
     });
   },
 
-  makePredictions: function( callback, rfPickle) {
+  makePredictions: function( callback, classifierName) {
     console.log('kicking off the process of making predictions on the predicting data set!');
 
     var startPredictionsScript = function() {
-      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), 'clRandomForest']);
+      var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
       console.log('we have started a python shell with makePredictions.py')
     };
 
+    // reads our predict file, formats it, and then invokes startPredictionsScript as it's callback
+    // right now we are formatting the file multiple times, where we should only have to format that data once. 
+    // TODO: throw in a flag for whether we've already formatted the prediction data or not. obviously, if we have, use it, skip over invoking formatData again, and just invoke startPredictionsScript directly. 
     module.exports.formatData( startPredictionsScript, 'predict')
 
   }

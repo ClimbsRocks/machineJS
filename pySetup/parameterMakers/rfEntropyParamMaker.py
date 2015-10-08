@@ -13,8 +13,8 @@ def makeParams(X, y, globalArgs, dev):
         'min_samples_leaf':[1,2,5,25,50,100,150]
     }
 
-    if dev:
-        parameters_to_try.pop('min_samples_leaf', None)
-        parameters_to_try.pop('max_features', None)
+    # if dev:
+    #     parameters_to_try.pop('min_samples_leaf', None)
+    #     parameters_to_try.pop('max_features', None)
         
     return parameters_to_try

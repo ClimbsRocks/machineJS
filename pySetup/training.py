@@ -105,7 +105,13 @@ if extendedTraining:
     printParent('the bigger randomForest has a score of')
     printParent(bigClassifierscore)
 
+    
+    if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
+        os.makedirs('pySetup/bestClassifiers/best' + classifierName)
     joblib.dump(bigClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+
 else:
+    if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
+        os.makedirs('pySetup/bestClassifiers/best' + classifierName)
     joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 printParent('we have written the best estimator to a file')
