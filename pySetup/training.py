@@ -57,7 +57,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_
 
 # if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
         # extendedTraining = False
 
 

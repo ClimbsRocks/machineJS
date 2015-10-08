@@ -1,5 +1,6 @@
 
 module.exports = {
   clRfEntropy: 'clRfEntropy', /*randomForest using the entropy criterion */
-  clRfGini: 'clRfGini' /*randomForst using the Gini criterion*/
+  clRfGini: 'clRfGini', /*randomForest using the Gini criterion*/
+  clSVCFirst: 'clSVCFirst' /* first SVC */
 };

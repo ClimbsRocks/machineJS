@@ -9,11 +9,13 @@
 
 import rfGiniParamMaker
 import rfEntropyParamMaker
+import svcFirstParameterMaker
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev):
     returnDict = {
         'clRfGini':rfGiniParamMaker.makeParams(X,y,globalArgs, dev),
-        'clRfEntropy':rfEntropyParamMaker.makeParams(X,y,globalArgs, dev)
+        'clRfEntropy':rfEntropyParamMaker.makeParams(X,y,globalArgs, dev),
+        'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev)
     }
     return returnDict
