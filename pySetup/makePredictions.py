@@ -8,8 +8,6 @@ from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
 
-printParent('scurrying off to make predictions now!')
-
 fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 

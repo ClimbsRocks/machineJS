@@ -20,28 +20,25 @@ module.exports = {
     argv.numCPUs = argv.numCPUs || -1;
     console.log('in one part of your machine, we will be training a randomForest');
 
-    // if(argv.dev || argv.devKaggle) {
-    //   module.exports.makePredictions();
+    var startOneClassifier = function(classifierName) {
+      // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
+      processes.kickOffTraining( function() {
+        module.exports.makePredictions(classifierName);
+      }, classifierName);
+    };
 
-    // } else {
+    processes.formatInitialData( function() {
+      var classifierList = require('./classifierList.js');
+      for (var classifierName in classifierList) {
+        startOneClassifier(classifierName);
+        
+      }
+    });
 
-      processes.formatInitialData( function() {
-        var classifierList = require('./classifierList.js');
-        for (var classifierName in classifierList) {
-          processes.kickOffTraining( function() {
-            module.exports.makePredictions(classifierName);
-          }, classifierName);
-          
-        }
-        // TODO: load up the list of classifier names, and invoke kickOffTraining on each of them
-        // TODO: make sure we have purged all hardcoded references to 'clRandomForest' or anything else relating to RF
-
-      });
-
-    // }
   },
+
   makePredictions: function(classifierName) {
-    // TODO: we still have hardcoded values here
+
     processes.makePredictions( function() {
       process.emit('algoFinishedTraining');
       console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');

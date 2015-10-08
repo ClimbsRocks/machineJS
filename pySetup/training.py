@@ -90,7 +90,7 @@ extendedTraining = extendedTrainingList.getAll()[classifierName]
 
 if extendedTraining:
     # create a dict with mappings from algo name ('clRandomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
-    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs)
+    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev)
     bigClassifier = allBigClassifiers[classifierName]
     bigClassifier.set_params(**gridSearch.best_params_)
     # obviousPrint('bigClassifier params:',bigClassifier.get_params())
@@ -114,4 +114,3 @@ else:
     if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
     joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
-printParent('we have written the best estimator to a file')

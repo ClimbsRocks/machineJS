@@ -11,7 +11,7 @@ var dataFile = process.argv[2];
 argv.computerTotalCPUs = require('os').cpus().length;
 argv.ppCompleteLocation = path.dirname(__filename);
 
-console.log('thanks for inviting us along on your machine learning journey!');
+console.log('thanks for inviting us along on your machine learning journey!\n');
 
 
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)

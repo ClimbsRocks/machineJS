@@ -84,9 +84,8 @@ with open(X_temp_file_name, 'rU') as X_temp_file:
         vectorizedInput = dictVectorizer1.fit_transform(inputList)
         if trainOrPredict == 'train':
             joblib.dump(dictVectorizer1, 'pySetup/dataFiles/dictVectorizer.pkl')
-            printParent('we have pickled the dictVectorizer')
         messageParent(dictVectorizer1.get_feature_names(), 'dictVectMapping')
         printParent( 'we have vectorized the data. it has shape:' )
         printParent( vectorizedInput.toarray().shape )
         X_file_csv.writerows(vectorizedInput.toarray())
-        os.remove(X_temp_file_name)
+        # os.remove(X_temp_file_name)

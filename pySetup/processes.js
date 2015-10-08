@@ -62,7 +62,6 @@ module.exports = {
       var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
-      console.log('we have started a python shell with makePredictions.py')
     };
 
     // reads our predict file, formats it, and then invokes startPredictionsScript as it's callback
