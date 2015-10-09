@@ -29,6 +29,7 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
 2. Close all programs and restart right before invoking (this will clear out as much RAM as possible)
 3. Expect some noise from your fan- you're finally putting your computer to use!
 4. Don't expect to be able to do anything intense while this is running. Internet browsing or code editing is fine, but watching a movie may get challenging
+5. Please don't run any other Python scripts while this is running.
 
 ## The Current State Of Advanced Options: 
 1. `--maxTrainingTime`: the maximum amount of time (in seconds) to let any child process train one individual neural net. 
@@ -46,4 +47,5 @@ NOTE: This is still under active development. It is not yet user-friendly. If yo
   c) if no data is passed in, automatically use the kaggleGiveCredit.csv dataset
 7. `--devKaggle`: Does all the same things as `--dev`, but also runs `--kagglePredict` on the default dataset kaggleGiveCreditTest.csv
 8. `--devEnsemble`: Assumes that we already have predictions made for us by the rest of the module and present in predictions/*.csv. Allows you to focus on assembling your ensemble without having to retrain the models each time :)
+
 

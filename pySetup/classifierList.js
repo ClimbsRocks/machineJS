@@ -4,7 +4,7 @@ if(argv.dev || argv.devKaggle) {
   module.exports = {
     // clRfEntropy: 'clRfEntropy',
     // clRfGini: 'clRfGini', 
-    clSVCFirst: 'clSVCFirst',
+    // clSVCFirst: 'clSVCFirst',
     clSVCShrinking: 'clSVCShrinking'
   };
 

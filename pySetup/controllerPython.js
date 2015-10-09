@@ -1,4 +1,5 @@
 var py = global.pythonNamespace = {};
+var exec = require('child_process').exec;
 
 var path = require('path');
 var rfLocation = path.dirname(__filename);
@@ -19,6 +20,11 @@ module.exports = {
       console.log(Object.keys(py.referencesToChildren[i].childProcess));
       py.referencesToChildren[i].childProcess.kill();
     }
+
+    // this is frequently not killing all the child processes of that child process. so if our python shell is running 8 other python scripts to spread the training out around all the cores, those 8 other python scripts are continuing to run after the above. 
+    // the following command will be executed on the command line and will kill all Python processes. 
+    // the unfortunate side effect is that any unrelated Python processes running on this machine will also be killed. But since this library takes up all the cores on the machine anyways, the user would likely have a very hard time running other Python scripts simultaneously regardless. 
+    exec('pkill -9 Python');
   },
   startTraining: function() {
     argv.numCPUs = argv.numCPUs || -1;
