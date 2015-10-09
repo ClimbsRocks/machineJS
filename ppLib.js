@@ -6,10 +6,14 @@ global.rootDir = path.dirname(__filename);
 if(argv.dev || argv.devKaggle) {
   var dev = true;
 }
-if (!dev) {
+var noPython = argv.noPython;
+var noNN = argv.noNN;
+if (!noNN) {
   var controllerNN = require('./neuralNet/controllerNN.js');
 }
-var controllerPython = require('./pySetup/controllerPython.js');
+if (!noPython) {
+  var controllerPython = require('./pySetup/controllerPython.js');
+}
 var controllerEnsemble = require('./ensembling/controller.js');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
@@ -43,26 +47,30 @@ if (argv.devEnsemble) {
   // we pass in a callback function that will make the dataSummary a global variable 
     // and invoke parallelNets once formatting the data is done. 
   // **********************************************************************************
-  if(!dev) {
+  if(!noNN) {
     controllerNN.startTraining();
   }
-  controllerPython.startTraining(argv);
+  if(!noPython) {
+    controllerPython.startTraining(argv);
+  }
   
   // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
   var numberOfClassifiers = require('./pySetup/classifierList');
   numberOfClassifiers = Object.keys(numberOfClassifiers).length;
   if(!dev) {
     // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
-    numberOfClassifiers++;
+    // numberOfClassifiers++;
   }
   controllerEnsemble.startListeners(numberOfClassifiers, argv);
 }
 
 var ppLibShutdown = function() {
-  if(!dev) {
+  if(!noNN) {
     controllerNN.killAll();
   }
-  controllerPython.killAll();
+  if(!noPython) {
+    controllerPython.killAll();
+  }
 };
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
 // this prevents you from having zombie child processes running indefinitely.
@@ -96,5 +104,11 @@ process.on("SIGINT", function () {
   //graceful shutdown
   ppLibShutdown();
   process.exit();
+});
+
+process.on("killAll", function() {
+  ppLibShutdown();
+  process.exit();
+
 });
 
