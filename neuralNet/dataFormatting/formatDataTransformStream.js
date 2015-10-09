@@ -53,14 +53,14 @@ module.exports= function() {
           // ADVANCED: give them control of what is considered a missing or null value. particularly NA. but maybe for them -1 is considered a missing value. 
       } else if (typeof item === 'string') {
         // handles categorical data
-        // we include the column name in the feature name so that we don't have collisions (for example, a school might have different columns for different classes, and might fill each cell with "Passed","Withdrew",etc. If we just included "Passed", rather than "Grade12Passed", it would be meaningless).
+        // we include the column name in the feature name so that we don't have collisions (for example, a school might have different columns for different classes, and might fill each column with the same words, "Passed","Withdrew",etc. If we just included "Passed", rather than "artHistoryPassed", it would be meaningless).
         var featureName = item + k;
         brainObj.input[featureName] = 1;
         // TODO: figure out some way of making sure we only use the same features for testing that we did for training. 
         if(!nn.dataSummary.isTesting) {
           // if that feature does not exist in our nn.dataSummary obj yet:
           if(!nn.dataSummary[k].features[featureName]) {
-            nn.dataSummary[k].features = 1;
+            nn.dataSummary[k].features[featureName] = 1;
             nn.dataSummary.numFeatures++;
           } else {
             nn.dataSummary[k].features[featureName]++;

@@ -49,8 +49,7 @@ columnLabels = [item.lower() for item in dictVectMapping]
 try:
     idIndex = columnLabels.index('id')
 except:
-    printParent('no idIndex found')
-    idIndex = 1
+    printParent('no idIndex found. please make sure that you have a column that is explicitly called "id" in the input and testing files')
 
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)

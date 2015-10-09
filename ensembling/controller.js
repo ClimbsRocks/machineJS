@@ -25,6 +25,7 @@ module.exports = {
       utils.writeToFile(globalArgs, function() {
         console.log('We have just written the final predictions to a file called "ppCompletePredictions.csv" that is saved at:\n',globalArgs.ppCompleteLocation + '/ppCompletePredictions.csv');
         console.log('Thanks for letting us help you on your machine learning journey! Hopefully this freed up more of your time to do the fun parts of ML. Pull Requests to make this even better are always welcome!');
+        process.emit('killAll');
       }, results);
       // generate the set that is the combination of all the algos we've trained so far
       // iterate through each row
@@ -45,6 +46,7 @@ module.exports = {
         module.exports.createEnsemble(globalArgs);
       }
     });
+
   }
 
 

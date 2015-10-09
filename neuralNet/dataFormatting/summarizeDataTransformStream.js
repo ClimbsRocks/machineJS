@@ -19,6 +19,7 @@ module.exports = function () {
     if(columns.length !== nn.dataSummary.expectedRowLength) {
       console.log('this row appears to be a different length than expected:');
       console.log('we expected to see a row that had',nn.dataSummary.expectedRowLength,'columns in it, and instead this row has',columns.length,'columns in it.');
+      console.log(columns);
       console.log('try making sure your header row has labels for each column (no blank spaces), and that each row has data for each column, even if that data is just an empty string, or a string that says "null"');
       // console.log(columns);
     } else {

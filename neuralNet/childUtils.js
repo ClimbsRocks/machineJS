@@ -69,6 +69,11 @@ module.exports = {
           nn.referencesToChildren.push(newChild);
         } else if (nn.completedNets === nn.numOfNetsToTest) {
           console.log('done training all the neural nets you could conjure up!');
+          if(argv.noPython) {
+            // if we are not running the python scripts for some reason, just end the training here and make predictions. 
+            process.emit('stopTraining');
+            makeKagglePredictions( argv.kagglePredict, argv.ppCompleteLocation );
+          }
           // this is a flag to warn the user that we're still training some nets if they try to access the results before we're finished
           nn.readyToMakePredictions = true;
           // TODO TODO: load up the bestNet
