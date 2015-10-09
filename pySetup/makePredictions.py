@@ -58,7 +58,7 @@ with open('predictions/' + classifierName + '.csv', 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
-    csvwriter.writerow(['ID','Probability'])
+    csvwriter.writerow(['PassengerID','Survived'])
     for idx, prediction in enumerate(predictedResults):
         inputRow = X[idx]
         # convert the id from a string to an int

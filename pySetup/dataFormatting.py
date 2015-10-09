@@ -31,7 +31,6 @@ X_temp_file_name = os.path.join(ppCompleteLocation, 'pySetup', 'dataFiles', 'X_'
 fileNames = {}
 fileNames['X_' + trainOrPredict] = X_file_name
 fileNames['y_' + trainOrPredict] = y_file_name
-# fileNames['y_file_name'] = y_file_name
 messageParent(fileNames, 'fileNames')
 
 
@@ -49,6 +48,7 @@ with open(inputFilePath, 'rU') as csvInput:
             # write the output column to the output file
             newRow = []
             if firstRow:
+                # printParent(row)
                 y_file_csv.writerow( [row.pop(0)] )
 
                 # remove all 'NA' from the input

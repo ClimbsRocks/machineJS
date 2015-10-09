@@ -74,7 +74,7 @@ module.exports = {
   calculateAggregatedPredictions: function(classifierNames, bestMethod) {
     var predictionCalculation = ensembleMethods[bestMethod];
     var results = [];
-    results.push(['ID','Probability']);
+    results.push(['PassengerID','Survived']);
     for (var rowNum in summary) {
       // console.log('row:',row);
       // pick out only the predictions from the algos that were selected by createEnsemble:
