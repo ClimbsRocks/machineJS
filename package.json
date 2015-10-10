@@ -1,6 +1,6 @@
 {
   "name": "ppComplete",
-  "version": "0.9",
+  "version": "0.5.0",
   "description": "automated machine learning! push button ensembling, grid search for javascript neural network",
   "main": "ppLib.js",
   "scripts": {
@@ -32,13 +32,14 @@
     "night"
   ],
   "author": "Preston Parry",
-  "license": "No license currently available",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ClimbsRocks/ppComplete/issues"
   },
   "homepage": "https://github.com/ClimbsRocks/ppComplete",
   "dependencies": {
     "brain": "^0.7.0",
+    "ensembler": "^0.5.0",
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
