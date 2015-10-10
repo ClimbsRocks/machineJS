@@ -4,6 +4,7 @@ var stream = require('stream');
 var formattingUtils = require('./formattingUtils.js');
 var path = require('path');
 var nn = global.neuralNetwork;
+var argv = global.argv;
 
 
 module.exports = function(pathToKaggleData, ppCompleteLocation) {
@@ -72,16 +73,17 @@ module.exports = function(pathToKaggleData, ppCompleteLocation) {
   };
 
 
-  var writeStream = fs.createWriteStream(path.join(ppCompleteLocation,'predictions/neuralNetwork.csv'), {encoding: 'utf8'});
+  var writeStream = fs.createWriteStream(path.join(ppCompleteLocation,'predictions/clneuralNetwork' + argv.dataFilePretty +'.csv'), {encoding: 'utf8'});
 
   // TODO: better variable naming
   readFileStream.pipe(firstTransformForTesting).pipe(tStream).pipe(testStream).pipe(writeStream);
 
   writeStream.on('finish', function() {
-    console.log("you just made our neural network incredibly happy by letting it make predictions on the whole dataset for you! Now it's just wishing that you'll come back and give it more things to learn about...");
+    console.log("you just made our neural network incredibly happy by letting it make predictions on the whole dataset for you! Now it's just wishing that you'll come back and give it more things to learn about...\n");
 
     console.log('in case you were curious, your best neural net had hidden layers:');
     console.log(nn.bestNetObj.hiddenLayers);
+    console.log('\n');
 
     process.emit('algoFinishedTraining');
   });
