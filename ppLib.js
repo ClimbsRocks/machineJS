@@ -14,7 +14,8 @@ if (!noNN) {
 if (!noPython) {
   var controllerPython = require('./pySetup/controllerPython.js');
 }
-var controllerEnsemble = require('./ensembling/controller.js');
+
+var ensembler = require('ensembler');
 var dataFile = process.argv[2];
 // var advancedOptions = process.argv[3] || {};
 argv.computerTotalCPUs = require('os').cpus().length;
@@ -39,8 +40,8 @@ argv.dataFile = dataFile;
 var readyToMakePredictions = false;
 
 if (argv.devEnsemble) {
-  controllerEnsemble.startListeners(3, globalArgs);
-  controllerEnsemble.createEnsemble(argv);
+  ensembler.startListeners(3, dataFile, './predictions', argv.ppCompleteLocation );
+  ensembler.createEnsemble( dataFile, './predictions', argv.ppCompleteLocation );
 } else {
   // **********************************************************************************
   // Here is where we invoke the method with the path to the data
@@ -61,7 +62,7 @@ if (argv.devEnsemble) {
     // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
     // numberOfClassifiers++;
   }
-  controllerEnsemble.startListeners(numberOfClassifiers, argv);
+  ensembler.startListeners( 3, dataFile, './predictions', argv.ppCompleteLocation );
 }
 
 var ppLibShutdown = function() {
