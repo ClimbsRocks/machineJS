@@ -17,7 +17,6 @@ if (!noPython) {
 
 var ensembler = require('ensembler');
 var dataFile = process.argv[2];
-// var advancedOptions = process.argv[3] || {};
 argv.computerTotalCPUs = require('os').cpus().length;
 argv.ppCompleteLocation = path.dirname(__filename);
 
@@ -36,12 +35,19 @@ if(argv.dev || argv.devKaggle || argv.devEnsemble) {
 }
 
 argv.dataFile = dataFile;
+var dataFilePretty = dataFile.split('/').pop().slice(0,-4);
+argv.dataFilePretty = dataFilePretty;
 
 var readyToMakePredictions = false;
+var numberOfClassifiers = require('./pySetup/classifierList');
+numberOfClassifiers = Object.keys(numberOfClassifiers).length;
+if(!noNN) {
+  numberOfClassifiers++;
+}
 
 if (argv.devEnsemble) {
-  ensembler.startListeners(3, dataFile, './predictions', argv.ppCompleteLocation );
-  ensembler.createEnsemble( dataFile, './predictions', argv.ppCompleteLocation );
+  ensembler.startListeners(numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
+  ensembler.createEnsemble( argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 } else {
   // **********************************************************************************
   // Here is where we invoke the method with the path to the data
@@ -56,13 +62,11 @@ if (argv.devEnsemble) {
   }
   
   // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
-  var numberOfClassifiers = require('./pySetup/classifierList');
-  numberOfClassifiers = Object.keys(numberOfClassifiers).length;
   if(!dev) {
     // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
     // numberOfClassifiers++;
   }
-  ensembler.startListeners( 3, dataFile, './predictions', argv.ppCompleteLocation );
+  ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 }
 
 var ppLibShutdown = function() {
