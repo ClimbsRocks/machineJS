@@ -2,10 +2,10 @@ var argv = global.argv;
 
 if(argv.dev || argv.devKaggle) {
   module.exports = {
-    // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini', 
     // clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking'
+    // clSVCShrinking: 'clSVCShrinking',
+    // clRfEntropy: 'clRfEntropy',
+    clRfGini: 'clRfGini'
   };
 
 } else {

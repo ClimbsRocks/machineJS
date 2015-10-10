@@ -10,6 +10,7 @@ from sendMessages import obviousPrint
 
 fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
+argv = json.loads(sys.argv[3])
 
 y_file_name = fileNames['y_predict']
 X_file_name = fileNames['X_predict']
@@ -54,7 +55,7 @@ except:
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)
 
-with open('predictions/' + classifierName + '.csv', 'w+') as predictionsFile:
+with open('predictions/' + classifierName + argv['dataFile'] , 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 

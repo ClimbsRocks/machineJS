@@ -13,7 +13,6 @@ argv = global.argv;
 module.exports = {
   killAll: function() {
     // kill all child processes
-    console.log('heard a killAll event in python');
     for (var i = 0; i < py.referencesToChildren.length; i++) {
       py.referencesToChildren[i].childProcess.kill();
     }
