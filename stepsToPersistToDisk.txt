@@ -1,0 +1,9 @@
+List of known steps required to write everything to disk and load up a fully-trained ppc instance at some future point:
+
+data-formatter: min-max-scalers (one per column)
+data-formatter: imputing missing values
+  what counts as a missing value
+  what is it replaced by?
+  this is just some code I picked off the internet, so we'll have to save and load this module by hand
+    it shouldn't be hard though- just save one overall list of what is considered a missing value
+    save an array, with one value for each column, that is the replacement value for that column.
