@@ -2,13 +2,22 @@ var py = global.pythonNamespace;
 var argv = global.argv;
 var path = require('path');
 var utils = require('./utils.js');
+var df = require('data-formatter');
 
 module.exports = {
   dictVectMapping: {
     // this will be given to us by DictVectorizer, a python module that takes dictionaries and turns them into arrays. Obviously since dictionaries are not ordered, we need to keep track of which fields end up in which indices. 
   },
+
   fileNames: {
     // this will be given to us by dataFormatting.py once it has created the files with the formatted data.
+    // ID
+    // X_train
+    // y_train
+    // X_test
+    // y_test
+    // X_train_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
+    // X_test_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
   },
 
   formatData: function( callback, trainOrPredict) {
