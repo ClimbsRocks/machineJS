@@ -22,6 +22,7 @@ module.exports = {
     // the unfortunate side effect is that any unrelated Python processes running on this machine will also be killed. But since this library takes up all the cores on the machine anyways, the user would likely have a very hard time running other Python scripts simultaneously regardless. 
     exec('pkill -9 Python');
   },
+
   startTraining: function() {
     argv.numCPUs = argv.numCPUs || -1;
     console.log('in one part of your machine, we will be training a randomForest');
@@ -40,19 +41,24 @@ module.exports = {
       }
     };
 
-    processes.formatData( startAllClassifiers );
+    // if this is while we are developing, skip over the data formatting part, as that is already well tested and known. 
+    if( argv.test ) {
+      processes.fileNames = require('./testingFileNames');
+      startAllClassifiers();
+    } else {
+      processes.formatData( startAllClassifiers );
+    }
 
   },
 
   makePredictions: function(classifierName) {
 
-    var madeNoise = false;
+    // var madeNoise = false;
     processes.makePredictions( function() {
       process.emit('algoFinishedTraining');
-      if(!madeNoise) {
-        console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');
-        
-      }
+      // if(!madeNoise) {
+      //   console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');
+      // }
     }, classifierName);
   }
 
