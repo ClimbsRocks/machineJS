@@ -38,14 +38,23 @@ y = []
 y_file_name = json.loads(sys.argv[3])['y_train']
 X_file_name = json.loads(sys.argv[3])['X_train']
 
+# our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
+# we need to remove this row form our actual dataset
+# none of our other files from data-formatter have header rows
 with open(X_file_name, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)
+    headerRow=False
     for row in inputRows:
-        X.append(row)
+        if(headerRow):
+            X.append(row)
+        else:
+            headerRow=True
         
 
 with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
+    # this might be unnecessary now that we have run our data through data-formatter
+    # we might be able to load in the y_train data directly
     for row in outputRows:
         try:
             row[0] = float(row[0])
