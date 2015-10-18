@@ -20,8 +20,7 @@ module.exports = {
     // X_test_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
   },
 
-  // TODO: remove trainOrPredict
-  formatData: function( callback, trainOrPredict) {
+  formatData: function( callback ) {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
     df({
       trainingData: argv.dataFile,

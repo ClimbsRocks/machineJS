@@ -12,31 +12,16 @@ fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 
-y_file_name = fileNames['y_predict']
-X_file_name = fileNames['X_predict']
-
+X_file_name = fileNames['X_test']
 
 X = []
-y = []
-
 
 # load up the prediction data set
 with open(X_file_name, 'rU') as x_file:
     inputRows = csv.reader(x_file)
     for row in inputRows:
-        # for value in row:
-        #     if value == 'nan'
-
         X.append(row)
 
-with open(y_file_name, 'rU') as y_file:
-    outputRows = csv.reader(y_file)
-    for row in outputRows:
-        try:
-            row[0] = float(row[0])
-        except:
-            row[0] = row[0]
-        y.append(row[0])
 
 # GENERALIZE: 
     # have this file take in the name of the algo it is making predictions for
