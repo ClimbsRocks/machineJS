@@ -14,7 +14,7 @@ ppCompleteLocation = json.loads(sys.argv[3])['ppCompleteLocation']
 # this requires the full absolute path to the input data file
 fileName = os.path.split(sys.argv[1])[1]
 inputFilePath = sys.argv[1]
-# we are using this same file for both the training and the predicting data sets. this variable writes each to separate files
+# we are using this same script to format both the training and the predicting data sets. the following variable writes each to separate files
 trainOrPredict = sys.argv[2]
 
 if trainOrPredict == 'predict':

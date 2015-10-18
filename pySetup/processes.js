@@ -20,39 +20,19 @@ module.exports = {
     // X_test_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
   },
 
+  // TODO: remove trainOrPredict
   formatData: function( callback, trainOrPredict) {
-    var dataFile = argv.dataFile;
-    if(trainOrPredict === 'predict') {
-      dataFile = argv.kagglePredict;
-    }
-    var pythonOptions = utils.generatePythonOptions(dataFile, [trainOrPredict, JSON.stringify(argv)]);
+    // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
+    df({
+      trainingData: ,
+      testingData: 
+    }, callback );
 
-    var pyShell = utils.startPythonShell('dataFormatting.py', callback, pythonOptions);
-
-    pyShell.on('message', function(message) {
-      if(message.type === 'dictVectMapping') {
-        module.exports.dictVectMapping = message.text;
-      }
-    });
-
-    pyShell.on('message', function(message) {
-      if(message.type === 'fileNames') {
-        // console.log('fileNames message:',message);
-        for(var key in message.text) {
-          module.exports.fileNames[key] = message.text[key];
-          
-        }
-      }
-    });
-  },
-
-  formatInitialData: function( callback) {
-    console.log('formatting the training data set');
-    module.exports.formatData( callback, 'train');
   },
 
   kickOffTraining: function( callback, classifierName) {
     // console.log('fileNames:',module.exports.fileNames);
+    // TODO: investigage if we have to refactor how we pass in file names?
     var pythonOptions = utils.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
 
@@ -73,9 +53,12 @@ module.exports = {
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
     };
 
+
+    // TODO: we will already have the data formatted for us by data-formatter, so we can probably skip right to invoking startPredictionsScript. 
+
     // reads our predict file, formats it, and then invokes startPredictionsScript as it's callback
     // right now we are formatting the file multiple times, where we should only have to format that data once. 
-    // TODO: throw in a flag for whether we've already formatted the prediction data or not. obviously, if we have, use it, skip over invoking formatData again, and just invoke startPredictionsScript directly. 
+    // former todo: throw in a flag for whether we've already formatted the prediction data or not. obviously, if we have, use it, skip over invoking formatData again, and just invoke startPredictionsScript directly. 
     module.exports.formatData( startPredictionsScript, 'predict')
 
   }

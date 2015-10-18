@@ -27,20 +27,20 @@ module.exports = {
     console.log('in one part of your machine, we will be training a randomForest');
 
     var startOneClassifier = function(classifierName) {
-
       // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
       processes.kickOffTraining( function() {
         module.exports.makePredictions(classifierName);
       }, classifierName);
     };
 
-    processes.formatInitialData( function() {
+    var startAllClassifiers = function() {
       var classifierList = require('./classifierList.js');
       for (var classifierName in classifierList) {
         startOneClassifier(classifierName);
-        
       }
-    });
+    };
+
+    processes.formatData( startAllClassifiers );
 
   },
 
