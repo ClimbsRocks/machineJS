@@ -1,5 +1,6 @@
 import json
 import os
+import os.path as path
 import sys
 import csv
 import time
@@ -43,7 +44,10 @@ classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/bes
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)
 
-with open('predictions/' + classifierName + argv['dataFile'] , 'w+') as predictionsFile:
+if not os.path.exists('predictions'):
+    os.makedirs('predictions')
+
+with open( path.join( 'predictions', classifierName + argv['dataFile']) , 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
