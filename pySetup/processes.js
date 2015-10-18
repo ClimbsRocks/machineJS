@@ -26,6 +26,8 @@ module.exports = {
       trainingData: argv.dataFile,
       testingData: argv.kagglePredict
     }, function(fileNames) {
+      console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+      console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
       callback();
@@ -48,13 +50,16 @@ module.exports = {
   },
 
   makePredictions: function( callback, classifierName) {
-    console.log('kicking off the process of making predictions on the predicting data set!');
+    console.log('kicking off the process of making predictions on the predicting data set for:', classifierName);
 
+    // TODO: 
     var startPredictionsScript = function() {
       var pythonOptions = utils.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
 
       utils.startPythonShell('makePredictions.py', callback, pythonOptions);
     };
+
+    startPredictionsScript();
 
 
     // TODO: we will already have the data formatted for us by data-formatter, so we can probably skip right to invoking startPredictionsScript. 
@@ -62,7 +67,7 @@ module.exports = {
     // reads our predict file, formats it, and then invokes startPredictionsScript as it's callback
     // right now we are formatting the file multiple times, where we should only have to format that data once. 
     // former todo: throw in a flag for whether we've already formatted the prediction data or not. obviously, if we have, use it, skip over invoking formatData again, and just invoke startPredictionsScript directly. 
-    module.exports.formatData( startPredictionsScript, 'predict')
+    // module.exports.formatData( startPredictionsScript, 'predict')
 
   }
 
