@@ -13,29 +13,32 @@ classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 
 X_file_name = fileNames['X_test']
+id_file_name = fileNames['id_test']
 
 X = []
+idColumn = []
 
-# load up the prediction data set
+# load up the prediction data set, without the header row
 with open(X_file_name, 'rU') as x_file:
     inputRows = csv.reader(x_file)
+    headerRow = False
     for row in inputRows:
-        X.append(row)
+        if(headerRow):
+            X.append(row)
+        else:
+            headerRow = True
 
 
-# GENERALIZE: 
-    # have this file take in the name of the algo it is making predictions for
-    # then load from that correct file
-# load up the previously trained (and tuned!) random forest classifier
+with open(id_file_name, 'rU') as id_file:
+    inputRows = csv.reader(id_file)
+    for row in inputRows:
+        idColumn.append(row)
+
+# load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
-dictVectMapping = sys.argv[2].split(',')
 
-columnLabels = [item.lower() for item in dictVectMapping]
-try:
-    idIndex = columnLabels.index('id')
-except:
-    printParent('no idIndex found. please make sure that you have a column that is explicitly called "id" in the input and testing files')
+# TODO: get access to the ids of each of these rows
 
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)
@@ -44,11 +47,14 @@ with open('predictions/' + classifierName + argv['dataFile'] , 'w+') as predicti
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
-    csvwriter.writerow(['PassengerID','Survived'])
+    # TODO: get the actual id and output column names
+    csvwriter.writerow(['ID','Output'])
     for idx, prediction in enumerate(predictedResults):
-        inputRow = X[idx]
         # convert the id from a string to an int
-        rowID = int(float(inputRow[idIndex]))
+        rowID = idColumn[ idx ]
+
+        # I'm not sure why we're checking if prediction is already a list
+            # or why we're taking the second item in that list
         try:
             len(prediction)
             csvwriter.writerow([rowID,prediction[1]])
