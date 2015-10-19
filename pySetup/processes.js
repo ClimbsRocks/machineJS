@@ -26,8 +26,6 @@ module.exports = {
       trainingData: argv.dataFile,
       testingData: argv.kagglePredict
     }, function(fileNames) {
-      console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-      console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
       callback();

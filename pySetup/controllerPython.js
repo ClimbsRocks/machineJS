@@ -42,7 +42,7 @@ module.exports = {
     };
 
     // if this is while we are developing, skip over the data formatting part, as that is already well tested and known. 
-    if( argv.test ) {
+    if( argv.dev ) {
       processes.fileNames = require('./testingFileNames');
       startAllClassifiers();
     } else {
