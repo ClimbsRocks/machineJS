@@ -5,15 +5,25 @@ import sys
 import csv
 import time
 import joblib
+import numpy as np
+import logging
+
 from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
+
+logging.basicConfig()
 
 fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 
-X_file_name = fileNames['X_test']
+if( classifierName[0:4] == 'clnn' ):
+    nn = True
+    X_file_name = fileNames['X_test_nn']
+else:
+    X_file_name = fileNames['X_test']
+
 id_file_name = fileNames['id_test']
 
 X = []
@@ -40,8 +50,8 @@ with open(id_file_name, 'rU') as id_file:
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
-
-# TODO: get access to the ids of each of these rows
+if nn:
+    X = np.array(X)
 
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)

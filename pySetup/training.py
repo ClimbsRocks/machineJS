@@ -22,6 +22,7 @@ logging.basicConfig()
 # these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
 from makeClassifiers import makeClassifiers
 globalArgs = json.loads(sys.argv[2])
+fileNames = json.loads(sys.argv[3])
 
 classifierName = sys.argv[4]
 sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
@@ -42,12 +43,12 @@ y = []
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
 if( classifierName[0:4] == 'clnn' ):
-    X_file_name = json.loads(sys.argv[3])['X_train_nn']
+    X_file_name = fileNames['X_train_nn']
 else:    
-    X_file_name = json.loads(sys.argv[3])['X_train']
+    X_file_name = fileNames['X_train']
 
 # for neural networks, the y values to not need to be normalized
-y_file_name = json.loads(sys.argv[3])['y_train']
+y_file_name = fileNames['y_train']
 
 # our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
 # we need to remove this row form our actual dataset
