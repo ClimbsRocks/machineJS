@@ -1,20 +1,14 @@
-global.neuralNetwork = {};
 global.argv = require('minimist')(process.argv.slice(1));
 var path = require('path');
 global.rootDir = path.dirname(__filename);
 
 if(argv.dev || argv.devKaggle) {
   argv.dev = true;
+} else {
+  argv.dev = false;
 }
 
-var noPython = argv.noPython;
-var noNN = argv.noNN;
-if (!noNN) {
-  var controllerNN = require('./neuralNet/controllerNN.js');
-}
-if (!noPython) {
-  var controllerPython = require('./pySetup/controllerPython.js');
-}
+var controllerPython = require('./pySetup/controllerPython.js');
 
 var ensembler = require('ensembler');
 var dataFile = process.argv[2];
@@ -42,9 +36,7 @@ argv.dataFilePretty = dataFilePretty;
 var readyToMakePredictions = false;
 var numberOfClassifiers = require('./pySetup/classifierList');
 numberOfClassifiers = Object.keys(numberOfClassifiers).length;
-if(!noNN) {
-  numberOfClassifiers++;
-}
+
 
 if (argv.devEnsemble) {
   ensembler.startListeners(numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
@@ -55,29 +47,12 @@ if (argv.devEnsemble) {
   // we pass in a callback function that will make the dataSummary a global variable 
     // and invoke parallelNets once formatting the data is done. 
   // **********************************************************************************
-  if(!noNN) {
-    controllerNN.startTraining();
-  }
-  if(!noPython) {
-    controllerPython.startTraining(argv);
-  }
+  controllerPython.startTraining(argv);
   
-  // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
-  if(!argv.dev) {
-    // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
-    // numberOfClassifiers++;
-  }
   ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 }
 
-var ppLibShutdown = function() {
-  if(!noNN) {
-    controllerNN.killAll();
-  }
-  if(!noPython) {
-    controllerPython.killAll();
-  }
-};
+
 // kills off all the child processes if the parent process faces an uncaught exception and crashes. 
 // this prevents you from having zombie child processes running indefinitely.
 // lifted directly from: https://www.exratione.com/2013/05/die-child-process-die/
@@ -94,6 +69,10 @@ process.once("uncaughtException", function (error) {
     throw error;
   }
 });
+
+var ppLibShutdown = function() {
+  controllerPython.killAll();
+};
 
 if (process.platform === "win32") {
   var rl = require("readline").createInterface({
