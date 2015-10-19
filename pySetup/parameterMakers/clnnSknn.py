@@ -8,12 +8,12 @@ def makeParams(X, y, globalArgs, dev):
     # TODO: break out each type into it's own classifier
     parameters_to_try = {
         'learning_rate': [0.001, 0.01, 0.1, 0.3, 0.6, 0.9],
-        'hidden0_units': [4,8,12],
-        'hidden0_type': ["Rectifier","Sigmoid","Tanh"]
+        'hidden0__units': [4,8,12],
+        'hidden0__type': ["Rectifier","Sigmoid","Tanh"]
     }
 
     if dev:
         parameters_to_try.pop('learning_rate', None)
-        parameters_to_try.pop('hidden0_units', None)
+        parameters_to_try.pop('hidden0__units', None)
         
     return parameters_to_try
