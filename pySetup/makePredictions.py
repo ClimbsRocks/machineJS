@@ -33,7 +33,9 @@ with open(X_file_name, 'rU') as x_file:
 with open(id_file_name, 'rU') as id_file:
     inputRows = csv.reader(id_file)
     for row in inputRows:
-        idColumn.append(row)
+        # the csv reader will read each row in as a list, even if that list only has a single item in it
+        # append each row ID value to idColumn
+        idColumn.append(row[0])
 
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
@@ -54,9 +56,7 @@ with open( path.join( 'predictions', classifierName + argv['dataFile']) , 'w+') 
     # TODO: get the actual id and output column names
     csvwriter.writerow(['ID','Output'])
     for idx, prediction in enumerate(predictedResults):
-        # convert the id from a string to an int
-        rowID = idColumn[ idx ]
-
+        rowID = idColumn[idx]
         # I'm not sure why we're checking if prediction is already a list
             # or why we're taking the second item in that list
         try:
