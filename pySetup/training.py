@@ -5,7 +5,9 @@ import os
 import time
 import json
 import joblib
+import logging
 
+import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
@@ -15,10 +17,11 @@ from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
 
+logging.basicConfig()
+
 # these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
 from makeClassifiers import makeClassifiers
 globalArgs = json.loads(sys.argv[2])
-classifierCreater = makeClassifiers(globalArgs)
 
 classifierName = sys.argv[4]
 sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
@@ -28,15 +31,23 @@ import makeBigClassifiers
 import extendedTrainingList
 
 dev = False
-for key in globalArgs:
-    if key in( 'devKaggle', 'dev'): 
-        dev = True
+if( globalArgs['dev'] ):
+    dev = True
+
+classifierCreater = makeClassifiers(globalArgs, dev)
 
 X = []
 y = []
 
+# for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
+# data-formatter did that for us already, so we just have to load in the correct feature data
+if( classifierName[0:4] == 'clnn' ):
+    X_file_name = json.loads(sys.argv[3])['X_train_nn']
+else:    
+    X_file_name = json.loads(sys.argv[3])['X_train']
+
+# for neural networks, the y values to not need to be normalized
 y_file_name = json.loads(sys.argv[3])['y_train']
-X_file_name = json.loads(sys.argv[3])['X_train']
 
 # our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
 # we need to remove this row form our actual dataset
@@ -62,13 +73,15 @@ with open(y_file_name, 'rU') as openOutputFile:
             row[0] = row[0]
         y.append(row[0])
 
+X = np.array(X)
+y = np.array(y)
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 # if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
         # extendedTraining = False
-
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -82,7 +95,7 @@ parameters_to_try = allParams[classifierName]
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-gridSearch = GridSearchCV(classifier, parameters_to_try, cv=10, n_jobs=globalArgs['numCPUs'])
+gridSearch = GridSearchCV(classifier, parameters_to_try, cv=10, n_jobs=-1)
 
 gridSearch.fit(X_train, y_train)
 printParent('\n')
