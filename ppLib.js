@@ -4,8 +4,9 @@ var path = require('path');
 global.rootDir = path.dirname(__filename);
 
 if(argv.dev || argv.devKaggle) {
-  var dev = true;
+  argv.dev = true;
 }
+
 var noPython = argv.noPython;
 var noNN = argv.noNN;
 if (!noNN) {
@@ -24,12 +25,12 @@ console.log('thanks for inviting us along on your machine learning journey!\n');
 
 
 // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
-if(argv.dev || argv.devKaggle || argv.devEnsemble) {
+if( argv.dev ) {
   require('longjohn');
   if (dataFile.slice(-4) !== '.csv') {
     dataFile = 'kaggleGiveCredit.csv'
   }
-  if (argv.devKaggle && !argv.kagglePredict || argv.devEnsemble) {
+  if ( (argv.devKaggle && !argv.kagglePredict) || argv.devEnsemble) {
     argv.kagglePredict = 'kaggleGiveCreditTest.csv';
   }
 }
@@ -62,7 +63,7 @@ if (argv.devEnsemble) {
   }
   
   // tell our ensembleCreater how many algos to wait to finish making predictions before it takes over and creates an ensemble. 
-  if(!dev) {
+  if(!argv.dev) {
     // in the dev case, we are going to be ignoring the neural networks. in the non-dev case, we want to include them. 
     // numberOfClassifiers++;
   }
