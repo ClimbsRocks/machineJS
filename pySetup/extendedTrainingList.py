@@ -6,5 +6,6 @@ def getAll():
         'clRfEntropy':True,
         'clRfGini':True,
         'clSVCFirst':False,
-        'clSVCShrinking':False
+        'clSVCShrinking':False,
+        'clnnSknn':True
     }
