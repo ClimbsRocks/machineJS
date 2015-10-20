@@ -22,6 +22,7 @@ if( classifierName[0:4] == 'clnn' ):
     nn = True
     X_file_name = fileNames['X_test_nn']
 else:
+    nn = False
     X_file_name = fileNames['X_test']
 
 id_file_name = fileNames['id_test']
