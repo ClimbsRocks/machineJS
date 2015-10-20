@@ -31,7 +31,7 @@ def makeAll(globalArgs, dev):
     if dev:
         estimator_count=120
         
-    iterationCount=1000
+    iterationCount=100
     if dev:
         iterationCount=2
     return {

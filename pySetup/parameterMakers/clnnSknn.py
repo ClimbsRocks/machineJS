@@ -7,7 +7,7 @@ def makeParams(X, y, globalArgs, dev):
         # test number of hidden layers
     # TODO: break out each type into it's own classifier
     parameters_to_try = {
-        'learning_rate': [0.001, 0.01, 0.1, 0.3, 0.6, 0.9],
+        'learning_rate': [0.001, 0.1, 0.6],
         'hidden0__units': [4,8,12],
         'hidden0__type': ["Rectifier","Sigmoid","Tanh"]
     }

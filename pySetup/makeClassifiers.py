@@ -8,7 +8,7 @@ from sknn.mlp import Classifier, Layer
 # TODO: see what we can remove from clnnSknn. it complains if we don't pass in enough arguments, but i'm not sure which of these are required and which are not
 def makeClassifiers(globalArgs, dev):
 
-    n_iter=25
+    n_iter=15
     n_estimators=20
     if(dev):
         n_iter=2
