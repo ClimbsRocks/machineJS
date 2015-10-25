@@ -39,6 +39,7 @@ classifierCreater = makeClassifiers(globalArgs, dev)
 
 X = []
 y = []
+headerRow = []
 
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
@@ -55,12 +56,23 @@ y_file_name = fileNames['y_train']
 # none of our other files from data-formatter have header rows
 with open(X_file_name, 'rU') as openInputFile:
     inputRows = csv.reader(openInputFile)
-    headerRow=False
+    firstRow=False
     for row in inputRows:
-        if(headerRow):
+        if(firstRow):
+            rowAsFloats = []
+            # make sure that floats that were saved as scientific notation are actually read in as floats
+            # this should be non-controversial, as by this point we should have turned all categorical data into binary representation (0 or 1).
+            for idx, val in enumerate(row):
+                try:
+                    val = float(val)
+                except:
+                    printParent(headerRow[idx])
+                    printParent(val)
+                rowAsFloats.append( val )
             X.append(row)
         else:
-            headerRow=True
+            headerRow = row
+            firstRow=True
         
 
 with open(y_file_name, 'rU') as openOutputFile:
@@ -77,7 +89,7 @@ with open(y_file_name, 'rU') as openOutputFile:
 X = np.array(X)
 y = np.array(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
@@ -96,7 +108,7 @@ parameters_to_try = allParams[classifierName]
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-gridSearch = GridSearchCV(classifier, parameters_to_try, cv=10, n_jobs=-1)
+gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1)
 
 gridSearch.fit(X_train, y_train)
 printParent('\n')
