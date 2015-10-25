@@ -26,6 +26,7 @@ else:
     X_file_name = fileNames['X_test']
 
 id_file_name = fileNames['id_test']
+y_file_name = fileNames['y_train']
 
 X = []
 idColumn = []
@@ -43,10 +44,25 @@ with open(X_file_name, 'rU') as x_file:
 
 with open(id_file_name, 'rU') as id_file:
     inputRows = csv.reader(id_file)
+    idHeader = False
     for row in inputRows:
-        # the csv reader will read each row in as a list, even if that list only has a single item in it
-        # append each row ID value to idColumn
-        idColumn.append(row[0])
+        if idHeader == False:
+            idHeader = row[0]
+        else:
+            # the csv reader will read each row in as a list, even if that list only has a single item in it
+            # append each row ID value to idColumn
+            idColumn.append(row[0])
+
+# read in the y_file simply to get the pretty header name for the output column
+with open(y_file_name, 'rU') as y_file:
+    inputRows = csv.reader(y_file)
+    outputHeader = False
+    for row in inputRows:
+        if outputHeader == False:
+            outputHeader = row[0]
+        else:
+            pass
+
 
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
@@ -65,7 +81,7 @@ with open( path.join( 'predictions', classifierName + argv['dataFile']) , 'w+') 
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     # TODO: get the actual id and output column names
-    csvwriter.writerow(['ID','Output'])
+    csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(predictedResults):
         rowID = idColumn[idx]
         # I'm not sure why we're checking if prediction is already a list

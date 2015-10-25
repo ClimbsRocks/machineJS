@@ -79,15 +79,21 @@ with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
     # this might be unnecessary now that we have run our data through data-formatter
     # we might be able to load in the y_train data directly
+    firstRow = False
     for row in outputRows:
-        try:
-            row[0] = float(row[0])
-        except:
-            row[0] = row[0]
-        y.append(row[0])
+        if firstRow:
+            try:
+                row[0] = float(row[0])
+            except:
+                row[0] = row[0]
+            y.append(row[0])
+        else:
+            # ignore the first row as it holds our header
+            firstRow = True
 
 X = np.array(X)
 y = np.array(y)
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
