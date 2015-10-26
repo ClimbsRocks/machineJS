@@ -1,3 +1,4 @@
+var path = require('path');
 global.argv = require('minimist')(process.argv.slice(1));
 var path = require('path');
 global.rootDir = path.dirname(__filename);
@@ -30,8 +31,16 @@ if( argv.dev ) {
 }
 
 argv.dataFile = dataFile;
-var dataFilePretty = dataFile.split('/').pop().slice(0,-4);
-argv.dataFilePretty = dataFilePretty;
+argv.dataFileName = path.basename( argv. dataFile );
+argv.dataFilePretty = argv.dataFileName.slice(0,-4);
+argv.binaryOutput = argv.binaryOutput || false; //python doesn't like undefined, so explicitly set this to false if it does not exist
+argv.outputFileName = argv.dataFileName;
+if( argv.dataFileName === 'train.csv' ) {
+  dataFileFolder = path.parse(argv.dataFile).dir.split(path.sep).pop();
+  argv.outputFileName = dataFileFolder + argv.dataFileName;
+}
+console.log('argv.outputFileName');
+console.log(argv.outputFileName);
 
 var readyToMakePredictions = false;
 var numberOfClassifiers = require('./pySetup/classifierList');
