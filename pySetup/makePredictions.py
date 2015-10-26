@@ -76,11 +76,10 @@ predictedResults = classifier.predict_proba(X)
 if not os.path.exists('predictions'):
     os.makedirs('predictions')
 
-with open( path.join( 'predictions', classifierName + argv['dataFile']) , 'w+') as predictionsFile:
+with open( path.join( 'predictions', argv['outputFileName'] + classifierName ) , 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
-    # TODO: get the actual id and output column names
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(predictedResults):
         rowID = idColumn[idx]
@@ -92,12 +91,37 @@ with open( path.join( 'predictions', classifierName + argv['dataFile']) , 'w+') 
         except:
             csvwriter.writerow([rowID,prediction])
 
+# if the final output is binary, create a separate file at this stage that can be easily uploaded to kaggle by rounding the predicted value to the nearest int
+if argv[ 'binaryOutput'] == 'true':
+
+    # first check to make sure that we have a distinct file name. if not, append the name of the enclosing folder to the fileName
+                    
+    # add kaggle to the front of the name to make it obvious that this is for kaggle
+    # this also keeps the rest of our files consistent for ensembler
+    with open( path.join( 'predictions', 'kaggle' + argv['outputFileName'] + classifierName ) , 'w+') as predictionsFile:
+        csvwriter = csv.writer(predictionsFile)
+
+        csvwriter.writerow([idHeader,outputHeader])
+        for idx, prediction in enumerate(predictedResults):
+
+            rowID = idColumn[idx]
+            # I'm not sure why we're checking if prediction is already a list
+                # or why we're taking the second item in that list
+            try:
+                len(prediction)
+                prediction = int( round( prediction[1] ) )
+            except:
+                prediction = int( round( prediction ) )
+                pass
+            csvwriter.writerow( [rowID,prediction] )
+
+
 
 # Nope. Each classifier writes it's own predictions to it's own file. 
     # we will keep an array in ppLib.js that has references to all the file names
     # the files will all be in a predictions folder, that will hold nothing but these files holding the predictions from a single classifier
     # once we have all of them written (this way we don't need to worry about asynchronicity issues, or multiple classifiers trying to write to the same file), we can go through and either centralize all of them into a single file, or just iterate through all of the files. 
-    # if we can keep metadata on each file (or, in the array with the file names, hold objects that have information such as observed error rate, relative ranking within all the classifiers of that type, type of classifier, training time, etc.)
+    # if we can, keep metadata on each file (or, in the array with the file names, hold objects that have information such as observed error rate, relative ranking within all the classifiers of that type, type of classifier, training time, etc.)
 
 
 
