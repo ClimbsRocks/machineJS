@@ -23,10 +23,10 @@ console.log('thanks for inviting us along on your machine learning journey!\n');
 if( argv.dev ) {
   require('longjohn');
   if (dataFile.slice(-4) !== '.csv') {
-    dataFile = 'kaggleGiveCredit.csv'
+    dataFile = 'data/titanic/train.csv'
   }
   if ( (argv.devKaggle && !argv.kagglePredict) || argv.devEnsemble) {
-    argv.kagglePredict = 'kaggleGiveCreditTest.csv';
+    argv.kagglePredict = 'data/titanic/test.csv';
   }
 }
 
@@ -37,7 +37,7 @@ argv.binaryOutput = argv.binaryOutput || false; //python doesn't like undefined,
 argv.outputFileName = argv.dataFileName;
 if( argv.dataFileName === 'train.csv' ) {
   dataFileFolder = path.parse(argv.dataFile).dir.split(path.sep).pop();
-  argv.outputFileName = dataFileFolder + argv.dataFileName;
+  argv.outputFileName = dataFileFolder + argv.dataFilePretty;
 }
 console.log('argv.outputFileName');
 console.log(argv.outputFileName);
