@@ -1,23 +1,20 @@
 import sys
 import csv
-import math
 import os
-import time
 import json
 import joblib
 import logging
+import time
 
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
-from sklearn.metrics import classification_report
-from sklearn.ensemble import RandomForestClassifier
 
 from sendMessages import printParent
-from sendMessages import messageParent
-from sendMessages import obviousPrint
 
 logging.basicConfig()
+
+startTime = time.time()
 
 # these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
 from makeClassifiers import makeClassifiers
@@ -98,9 +95,9 @@ y = np.array(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-if dev:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
-        # extendedTraining = False
+# if dev:
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
+#         # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -116,6 +113,8 @@ printParent(parameters_to_try)
 
 gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1)
 
+printParent('made it past grid search definition')
+
 gridSearch.fit(X_train, y_train)
 printParent('\n')
 printParent('*********************************************************************************************************')
@@ -125,6 +124,10 @@ printParent('*******************************************************************
 printParent("this estimator's best parameters are:")
 printParent(gridSearch.best_params_)
 printParent('\n')
+
+printParent('total training time for this classifier:')
+# this will give time in minutes
+printParent( (time.time() - startTime)/60 )
 
 # TODO: Get info on whether this algo supports extended training from some global module. 
 extendedTraining = extendedTrainingList.getAll()[classifierName]
@@ -137,7 +140,7 @@ if extendedTraining:
     # obviousPrint('bigClassifier params:',bigClassifier.get_params())
 
     if dev:
-        bigClassifier.fit(X_train, y_train)
+        bigClassifier.fit(X, y)
     else: 
         # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
         bigClassifier.fit(X, y)
