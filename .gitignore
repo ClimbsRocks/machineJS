@@ -12,3 +12,7 @@ randomForest/bestRF/*
 *.zip
 *.npy
 *.pyc
+predictions/*
+*.xls
+*.xlsx
+data/*
