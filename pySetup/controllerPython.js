@@ -6,6 +6,7 @@ var rfLocation = path.dirname(__filename);
 py.rfLocation= rfLocation;
 py.referencesToChildren= [];
 var processes = require('./processes.js');
+var classifierOptions = require('./classifierList.js');
 
 argv = global.argv;
 
@@ -35,7 +36,14 @@ module.exports = {
     };
 
     var startAllClassifiers = function() {
-      var classifierList = require('./classifierList.js');
+      if( argv.dev ) {
+        var classifierList = classifierOptions.dev;
+      } else if( processes.fileNames.trainingDataLength < 10000 ) {
+        var classifierList = classifierOptions.shortDataSet;
+      } else {
+        var classifierList = classifierOptions.longDataSet;
+      }
+
       for (var classifierName in classifierList) {
         startOneClassifier(classifierName);
       }
