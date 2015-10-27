@@ -22,6 +22,7 @@ module.exports = {
   shortDataSet: {
     clnnSknn3Layer: 'clnnSknn3Layer',
     clnnSknn: 'clnnSknn',
+    clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini', 
     clSVCFirst: 'clSVCFirst',
@@ -30,6 +31,7 @@ module.exports = {
   longDataSet: {
     clnnSknn3Layer: 'clnnSknn3Layer',
     clnnSknn: 'clnnSknn',
+    clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini'
   }

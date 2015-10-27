@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from sknn.mlp import Classifier, Layer
 
 # other splits for SVC kernel:
@@ -19,9 +20,10 @@ def makeClassifiers(globalArgs, dev):
         'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=globalArgs['numCPUs'], criterion='entropy'),
         'clSVCFirst': SVC(probability=True, shrinking=False),
         'clSVCShrinking': SVC(probability=True, shrinking=True),
+        'clKnn': KNeighborsClassifier(),
         'clnnSknn': Classifier(
             layers=[
-                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100),
                 Layer("Softmax")
             ],
             learning_rate=0.001,
@@ -29,9 +31,9 @@ def makeClassifiers(globalArgs, dev):
         ),
         'clnnSknn3Layer': Classifier(
             layers=[
-                Layer("Maxout", units=100, pieces=2),
-                Layer("Maxout", units=100, pieces=2),
-                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100),
+                Layer("Maxout", units=100),
+                Layer("Maxout", units=100),
                 Layer("Softmax")
             ],
             learning_rate=0.001,

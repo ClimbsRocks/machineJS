@@ -7,6 +7,7 @@ def getAll():
         'clRfGini':True,
         'clSVCFirst':False,
         'clSVCShrinking':False,
+        'clKnn':False,
         'clnnSknn3Layer':True,
         'clnnSknn':True
     }
