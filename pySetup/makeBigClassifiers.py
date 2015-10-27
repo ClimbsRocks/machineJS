@@ -44,7 +44,7 @@ def makeAll(globalArgs, dev):
                 Layer("Softmax")
             ],
             learning_rate=0.001,
-            n_iter=2
+            n_iter=iterationCount
         ),
         'clnnSknn3Layer': Classifier(
             layers=[
@@ -54,7 +54,7 @@ def makeAll(globalArgs, dev):
                 Layer("Softmax")
             ],
             learning_rate=0.001,
-            n_iter=n_iter
+            n_iter=iterationCount
         )
 
     }

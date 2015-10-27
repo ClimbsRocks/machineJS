@@ -23,7 +23,7 @@ def makeClassifiers(globalArgs, dev):
         'clKnn': KNeighborsClassifier(),
         'clnnSknn': Classifier(
             layers=[
-                Layer("Maxout", units=100),
+                Layer("Maxout", units=100, pieces=2),
                 Layer("Softmax")
             ],
             learning_rate=0.001,
@@ -31,9 +31,9 @@ def makeClassifiers(globalArgs, dev):
         ),
         'clnnSknn3Layer': Classifier(
             layers=[
-                Layer("Maxout", units=100),
-                Layer("Maxout", units=100),
-                Layer("Maxout", units=100),
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100, pieces=2),
                 Layer("Softmax")
             ],
             learning_rate=0.001,
