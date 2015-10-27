@@ -1,7 +1,7 @@
 var py = global.pythonNamespace;
 
 var path = require('path');
-var PythonShell = require('python-shell');
+var PythonShell = require('ppc-python-shell');
 
 var rfLocation = py.rfLocation;
 
