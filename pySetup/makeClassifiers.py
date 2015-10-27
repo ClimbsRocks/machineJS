@@ -10,9 +10,9 @@ def makeClassifiers(globalArgs, dev):
 
     n_iter=15
     n_estimators=20
-    if(dev):
-        n_iter=2
-        n_estimators=5
+    # if(dev):
+    #     n_iter=2
+    #     n_estimators=5
 
     return {
         'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=globalArgs['numCPUs'], criterion='gini'),
@@ -21,6 +21,16 @@ def makeClassifiers(globalArgs, dev):
         'clSVCShrinking': SVC(probability=True, shrinking=True),
         'clnnSknn': Classifier(
             layers=[
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Softmax")
+            ],
+            learning_rate=0.001,
+            n_iter=n_iter
+        ),
+        'clnnSknn3Layer': Classifier(
+            layers=[
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100, pieces=2),
                 Layer("Maxout", units=100, pieces=2),
                 Layer("Softmax")
             ],

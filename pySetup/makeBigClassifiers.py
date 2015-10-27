@@ -34,6 +34,7 @@ def makeAll(globalArgs, dev):
     iterationCount=100
     if dev:
         iterationCount=2
+    
     return {
         'clRfGini': RandomForestClassifier(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs'], criterion='gini'),
         'clRfEntropy': RandomForestClassifier(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs'], criterion='entropy'),
@@ -44,5 +45,16 @@ def makeAll(globalArgs, dev):
             ],
             learning_rate=0.001,
             n_iter=2
+        ),
+        'clnnSknn3Layer': Classifier(
+            layers=[
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Maxout", units=100, pieces=2),
+                Layer("Softmax")
+            ],
+            learning_rate=0.001,
+            n_iter=n_iter
         )
+
     }
