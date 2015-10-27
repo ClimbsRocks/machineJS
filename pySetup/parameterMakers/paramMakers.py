@@ -13,6 +13,7 @@ import svcFirstParameterMaker
 import svcFirstParameterMaker
 import svcShrinking
 import clnnSknn
+import clnnSknn3Layer
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev):
@@ -22,6 +23,7 @@ def makeAll(X,y,globalArgs, dev):
         'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev),
         'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev),
         'clSVCShrinking':svcShrinking.makeParams(X,y,globalArgs, dev),
+        'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev),
         'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev)
     }
     return returnDict

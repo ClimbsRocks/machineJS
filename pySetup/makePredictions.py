@@ -76,7 +76,7 @@ predictedResults = classifier.predict_proba(X)
 if not os.path.exists('predictions'):
     os.makedirs('predictions')
 
-with open( path.join( 'predictions', argv['outputFileName'] + classifierName ) , 'w+') as predictionsFile:
+with open( path.join( 'predictions', argv['outputFileName'] + classifierName + '.csv') , 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
@@ -98,7 +98,7 @@ if argv[ 'binaryOutput'] == 'true':
                     
     # add kaggle to the front of the name to make it obvious that this is for kaggle
     # this also keeps the rest of our files consistent for ensembler
-    with open( path.join( 'predictions', 'kaggle' + argv['outputFileName'] + classifierName ) , 'w+') as predictionsFile:
+    with open( path.join( 'predictions', 'kaggle' + argv['outputFileName'] + classifierName + '.csv') , 'w+') as predictionsFile:
         csvwriter = csv.writer(predictionsFile)
 
         csvwriter.writerow([idHeader,outputHeader])
