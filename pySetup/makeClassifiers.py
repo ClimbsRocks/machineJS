@@ -1,12 +1,12 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
 from sknn.mlp import Classifier, Layer
 
 # other splits for SVC kernel:
 # linear, poly, rbf, sigmoid, precomputed
 
-# TODO: see what we can remove from clnnSknn. it complains if we don't pass in enough arguments, but i'm not sure which of these are required and which are not
 def makeClassifiers(globalArgs, dev):
 
     n_iter=15
@@ -21,6 +21,7 @@ def makeClassifiers(globalArgs, dev):
         'clSVCFirst': SVC(probability=True, shrinking=False),
         'clSVCShrinking': SVC(probability=True, shrinking=True),
         'clKnn': KNeighborsClassifier(),
+        'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000),
         'clnnSknn': Classifier(
             layers=[
                 Layer("Maxout", units=100, pieces=2),

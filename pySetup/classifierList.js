@@ -12,27 +12,29 @@ classifier summary descriptions
 
 module.exports = {
   dev: {
-    // clSVCFirst: 'clSVCFirst',
-    // clSVCShrinking: 'clSVCShrinking',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
+    clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
     // clRfGini: 'clRfGini',
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn'
+    clLogisticRegression: 'clLogisticRegression'
   },
   shortDataSet: {
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
-    clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini', 
-    clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking'
+    // clRfEntropy: 'clRfEntropy',
+    // clRfGini: 'clRfGini', 
+    // clSVCFirst: 'clSVCFirst',
+    // clSVCShrinking: 'clSVCShrinking',
+    clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
     clnnSknn3Layer: 'clnnSknn3Layer',
     clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini'
+    clRfGini: 'clRfGini',
+    clLogisticRegression: 'clLogisticRegression'
   }
 };

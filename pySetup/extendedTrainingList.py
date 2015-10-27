@@ -1,6 +1,4 @@
 
-# import rfParamMaker
-
 def getAll():
     return {
         'clRfEntropy':True,
@@ -8,6 +6,7 @@ def getAll():
         'clSVCFirst':False,
         'clSVCShrinking':False,
         'clKnn':False,
+        'clLogisticRegression':False,
         'clnnSknn3Layer':True,
         'clnnSknn':True
     }
