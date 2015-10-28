@@ -1,5 +1,11 @@
 def makeParams(X, y, globalArgs, dev):
 
+    # other parameters to investigate that might only exist in the sklearn implementation:
+        # learning_rate
+        # n_estimators (i have a feeling this is num_boost_round)
+        # subsample
+        # max_features
+
     parameters_to_try = {
         'num_boost_round': [100, 250, 500],
         'eta': [0.05, 0.1, 0.3],
