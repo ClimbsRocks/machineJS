@@ -9,5 +9,6 @@ def getAll():
         'clLogisticRegression':False,
         'clnnSknn3Layer':True,
         'clnnSknn':True,
-        'clAdaBoost':False
+        'clAdaBoost':False,
+        'clXGBoost':False
     }

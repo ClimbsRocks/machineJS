@@ -16,7 +16,9 @@ module.exports = {
   dev: {
     // clnnSknn3Layer: 'clnnSknn3Layer',
     // clnnSknn: 'clnnSknn',
-    clKnn: 'clKnn',
+    // clKnn: 'clKnn',
+    // clAdaBoost: 'clAdaBoost'
+    clXGBoost: 'clXGBoost'
     // clRfEntropy: 'clRfEntropy',
     // clRfGini: 'clRfGini',
   },
@@ -28,16 +30,18 @@ module.exports = {
     clRfGini: 'clRfGini', 
     clSVCFirst: 'clSVCFirst',
     clSVCShrinking: 'clSVCShrinking',
-    clAdaBoost: 'clAdaBoost'
+    clAdaBoost: 'clAdaBoost',
+    clXGBoost: 'clXGBoost'
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
-    clKnn: 'clKnn',
-    clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini',
-    clAdaBoost: 'clAdaBoost'
-    // clLogisticRegression: 'clLogisticRegression'
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
+    // clKnn: 'clKnn',
+    // clRfEntropy: 'clRfEntropy',
+    // clRfGini: 'clRfGini',
+    // clAdaBoost: 'clAdaBoost',
+    // // clLogisticRegression: 'clLogisticRegression'
+    clXGBoost: 'clXGBoost'
   }
 };

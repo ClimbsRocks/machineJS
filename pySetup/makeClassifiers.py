@@ -4,6 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sknn.mlp import Classifier, Layer
 from sklearn.ensemble import AdaBoostClassifier
+import xgboost
 
 # other splits for SVC kernel:
 # linear, poly, rbf, sigmoid, precomputed
@@ -24,6 +25,7 @@ def makeClassifiers(globalArgs, dev):
         'clKnn': KNeighborsClassifier(),
         'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000),
         'clAdaBoost': AdaBoostClassifier(),
+        'clXGBoost': xgboost.XGBClassifier(),
         'clnnSknn': Classifier(
             layers=[
                 Layer("Maxout", units=100, pieces=2),
