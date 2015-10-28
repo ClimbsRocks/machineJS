@@ -16,6 +16,7 @@ import clnnSknn
 import clnnSknn3Layer
 import clKnn
 import clLogisticRegression
+import clAdaBoost
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev):
@@ -28,6 +29,7 @@ def makeAll(X,y,globalArgs, dev):
         'clKnn':clKnn.makeParams(X,y,globalArgs, dev),
         'clLogisticRegression':clLogisticRegression.makeParams(X,y,globalArgs, dev),
         'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev),
-        'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev)
+        'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev),
+        'clAdaBoost':clAdaBoost.makeParams(X,y,globalArgs, dev)
     }
     return returnDict

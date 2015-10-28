@@ -9,6 +9,7 @@ classifier summary descriptions
 'clnnSknn' scikit-neuralnetwork's wrapper around pyLearn2's neueral network. this is designed to be compatible with scikit-learn. It had very active development through mid 2015, but does not appear to be supported since then. 
 'clKnn': k-nearest-neighbors. a relatively different way of approaching the problem
 'clLogisticRegression': standard logistic regression. right now though it is trying to cast from float(64) to S(32), and choking on that, so it is commented out for future development at some later point in time. 
+'clAdaBoost': trains multiple classifiers, where each additional classifier focuses on the difficult test cases for the previous one.
 */
 
 module.exports = {
@@ -26,7 +27,8 @@ module.exports = {
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini', 
     clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking'
+    clSVCShrinking: 'clSVCShrinking',
+    clAdaBoost: 'clAdaBoost'
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
@@ -35,6 +37,7 @@ module.exports = {
     clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini',
+    clAdaBoost: 'clAdaBoost'
     // clLogisticRegression: 'clLogisticRegression'
   }
 };
