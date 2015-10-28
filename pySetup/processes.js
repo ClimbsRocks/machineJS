@@ -25,7 +25,9 @@ module.exports = {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
     df({
       trainingData: argv.dataFile,
-      testingData: argv.kagglePredict
+      testingData: argv.kagglePredict,
+      trainingPrettyName: argv.outputFileName,
+      testingPrettyName: argv.testOutputFileName
     }, function(fileNames) {
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
