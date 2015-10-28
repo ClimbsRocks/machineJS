@@ -105,7 +105,6 @@ classifier = classifierCreater[classifierName]
 # XGBoost requires data to be in it's own particular format. 
 if classifierName == 'clXGBoost':
     try:
-        # we may need to do the same with y_train as well. 
         X_train = classifier.DMatrix( X_train )
     except:
         pass
@@ -120,7 +119,8 @@ parameters_to_try = allParams[classifierName]
 printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
-gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1)
+# error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
+gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1, error_score=0)
 
 
 gridSearch.fit(X_train, y_train)
@@ -135,7 +135,7 @@ printParent('\n')
 
 printParent('total training time for this classifier:')
 # this will give time in minutes
-printParent( (time.time() - startTime)/60 )
+printParent( round((time.time() - startTime)/60, 1) )
 
 # TODO: Get info on whether this algo supports extended training from some global module. 
 extendedTraining = extendedTrainingList.getAll()[classifierName]
@@ -165,7 +165,5 @@ if extendedTraining:
 else:
     if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    # if classifierName == 'clXGBoost':
-    #     gridSearch.best_estimator_.dump_model('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.txt')
     else:
         joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
