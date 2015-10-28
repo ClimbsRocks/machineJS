@@ -94,13 +94,22 @@ y = np.array(y)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-# if we're developing, train on only 1% of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-# if dev:
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
-#         # extendedTraining = False
+# if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
+if dev:
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
+        # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
+
+# XGBoost requires data to be in it's own particular format. 
+if classifierName == 'clXGBoost':
+    try:
+        # we may need to do the same with y_train as well. 
+        X_train = classifier.DMatrix( X_train )
+    except:
+        pass
+
 
 # create features that are custom to the size of the input data. 
 # Each individual paramaterMaker file sits in the paramaterMakers folder. If you want to modify what the parameters are, or submit a PR with a better combination of parameters to try, that is the place to start. 
@@ -113,7 +122,6 @@ printParent(parameters_to_try)
 
 gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1)
 
-printParent('made it past grid search definition')
 
 gridSearch.fit(X_train, y_train)
 printParent('\n')
@@ -157,4 +165,7 @@ if extendedTraining:
 else:
     if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+    # if classifierName == 'clXGBoost':
+    #     gridSearch.best_estimator_.dump_model('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.txt')
+    else:
+        joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')

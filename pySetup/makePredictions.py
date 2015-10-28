@@ -7,6 +7,7 @@ import time
 import joblib
 import numpy as np
 import logging
+import xgboost
 
 from sendMessages import printParent
 from sendMessages import messageParent
@@ -67,8 +68,9 @@ with open(y_file_name, 'rU') as y_file:
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
-if nn:
+if nn or classifierName == 'clXGBoost':
     X = np.array(X)
+
 
 # get predictions for each item in the prediction data set
 predictedResults = classifier.predict_proba(X)
