@@ -7,7 +7,8 @@ classifier summary descriptions
 'clSVCFirst',  first SVC. SVC models train in quadratic time, and should only be used on datasets with fewer than a few tens of thousands of 
 'clSVCShrinking'  sets the shrinking parameter equal to true. SVC models train in quadratic time, and should only be used on datasets with han a few tens of thousands of rows 
 'clnnSknn' scikit-neuralnetwork's wrapper around pyLearn2's neueral network. this is designed to be compatible with scikit-learn. It had very active development through mid 2015, but does not appear to be supported since then. 
-
+'clKnn': k-nearest-neighbors. a relatively different way of approaching the problem
+'clLogisticRegression': standard logistic regression. right now though it is trying to cast from float(64) to S(32), and choking on that, so it is commented out for future development at some later point in time. 
 */
 
 module.exports = {
@@ -17,17 +18,16 @@ module.exports = {
     clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
     // clRfGini: 'clRfGini',
-    clLogisticRegression: 'clLogisticRegression'
   },
   shortDataSet: {
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
+    clnnSknn3Layer: 'clnnSknn3Layer',
+    clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
-    // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini', 
-    // clSVCFirst: 'clSVCFirst',
-    // clSVCShrinking: 'clSVCShrinking',
-    clLogisticRegression: 'clLogisticRegression'
+    clRfEntropy: 'clRfEntropy',
+    clRfGini: 'clRfGini', 
+    clSVCFirst: 'clSVCFirst',
+    clSVCShrinking: 'clSVCShrinking'
+    // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
     clnnSknn3Layer: 'clnnSknn3Layer',
@@ -35,6 +35,6 @@ module.exports = {
     clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini',
-    clLogisticRegression: 'clLogisticRegression'
+    // clLogisticRegression: 'clLogisticRegression'
   }
 };
