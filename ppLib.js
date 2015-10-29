@@ -37,7 +37,7 @@ argv.dataFileName = path.basename( argv.dataFile );
 argv.dataFilePretty = argv.dataFileName.slice(0,-4);
 argv.binaryOutput = argv.binaryOutput || false; //python doesn't like undefined, so explicitly set this to false if it does not exist
 argv.outputFileName = argv.dataFilePretty;
-if( argv.dataFileName === 'train' ) {
+if( argv.outputFileName === 'train' ) {
   dataFileFolder = path.parse(argv.dataFile).dir.split(path.sep).pop();
   argv.outputFileName = dataFileFolder + argv.dataFilePretty;
 }
@@ -46,12 +46,10 @@ argv.testFileName = path.basename( argv.kagglePredict );
 argv.testFilePretty = argv.testFileName.slice(0,-4);
 argv.testOutputFileName = argv.testFilePretty;
 
-if( argv.dataFileName === 'test' ) {
-  dataFileFolder = path.parse(argv.testFileName).dir.split(path.sep).pop();
+if( argv.testOutputFileName === 'test' ) {
+  dataFileFolder = path.parse(argv.dataFile).dir.split(path.sep).pop();
   argv.testOutputFileName = dataFileFolder + argv.testFilePretty;
 }
-console.log('argv.outputFileName');
-console.log(argv.outputFileName);
 
 var readyToMakePredictions = false;
 var numberOfClassifiers = require('./pySetup/classifierList');
