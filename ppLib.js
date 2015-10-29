@@ -11,6 +11,7 @@ if(argv.dev || argv.devKaggle) {
 
 var controllerPython = require('./pySetup/controllerPython.js');
 processShutdownListeners = require('./processShutdownListeners.js');
+var classifierOptions = require('./pySetup/classifierList.js');
 
 var ensembler = require('ensembler');
 var dataFile = process.argv[2];
@@ -51,10 +52,17 @@ if( argv.testOutputFileName === 'test' ) {
   argv.testOutputFileName = dataFileFolder + argv.testFilePretty;
 }
 
-var readyToMakePredictions = false;
-var numberOfClassifiers = require('./pySetup/classifierList');
-numberOfClassifiers = Object.keys(numberOfClassifiers).length;
 
+if( argv.dev ) {
+  var classifierList = classifierOptions.dev;
+} else if( utils.fileNames.trainingDataLength < 10000 ) {
+  var classifierList = classifierOptions.shortDataSet;
+} else {
+  var classifierList = classifierOptions.longDataSet;
+}
+classifierList = Object.keys( classifierList );
+
+var numberOfClassifiers = classifierList.length;
 
 if (argv.devEnsemble) {
   ensembler.startListeners(numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
