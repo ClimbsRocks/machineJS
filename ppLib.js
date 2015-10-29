@@ -53,17 +53,6 @@ if( argv.testOutputFileName === 'test' ) {
 }
 
 
-if( argv.dev ) {
-  var classifierList = classifierOptions.dev;
-} else if( utils.fileNames.trainingDataLength < 10000 ) {
-  var classifierList = classifierOptions.shortDataSet;
-} else {
-  var classifierList = classifierOptions.longDataSet;
-}
-classifierList = Object.keys( classifierList );
-
-var numberOfClassifiers = classifierList.length;
-
 if (argv.devEnsemble) {
   ensembler.startListeners(numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
   ensembler.createEnsemble( argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
@@ -75,7 +64,7 @@ if (argv.devEnsemble) {
   // **********************************************************************************
   controllerPython.startTraining(argv);
   
-  ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
+  // ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 }
 
 processShutdownListeners(controllerPython);

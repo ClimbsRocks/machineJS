@@ -14,34 +14,34 @@ classifier summary descriptions
 
 module.exports = {
   dev: {
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
-    // clKnn: 'clKnn',
-    // clAdaBoost: 'clAdaBoost'
-    clXGBoost: 'clXGBoost'
-    // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini',
+    clnnSknn3Layer: 'clnnSknn3Layer',
+    clnnSknn: 'clnnSknn',
+    clKnn: 'clKnn',
+    clAdaBoost: 'clAdaBoost',
+    clXGBoost: 'clXGBoost',
+    clRfEntropy: 'clRfEntropy',
+    clRfGini: 'clRfGini',
   },
   shortDataSet: {
+    clXGBoost: 'clXGBoost',
+    clKnn: 'clKnn',
+    clRfEntropy: 'clRfEntropy',
+    clAdaBoost: 'clAdaBoost',
+    clRfGini: 'clRfGini', 
+    clSVCFirst: 'clSVCFirst',
+    clSVCShrinking: 'clSVCShrinking',
+    clnnSknn: 'clnnSknn',
+    clnnSknn3Layer: 'clnnSknn3Layer'
+    // clLogisticRegression: 'clLogisticRegression'
+  },
+  longDataSet: {
     clnnSknn3Layer: 'clnnSknn3Layer',
     clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini', 
-    clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking',
+    clRfGini: 'clRfGini',
     clAdaBoost: 'clAdaBoost',
-    clXGBoost: 'clXGBoost'
     // clLogisticRegression: 'clLogisticRegression'
-  },
-  longDataSet: {
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
-    // clKnn: 'clKnn',
-    // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini',
-    // clAdaBoost: 'clAdaBoost',
-    // // clLogisticRegression: 'clLogisticRegression'
     clXGBoost: 'clXGBoost'
   }
 };

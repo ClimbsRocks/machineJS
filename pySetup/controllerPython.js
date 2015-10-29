@@ -1,5 +1,6 @@
 var py = global.pythonNamespace = {};
 var exec = require('child_process').exec;
+var ensembler = require('ensembler');
 
 var path = require('path');
 var rfLocation = path.dirname(__filename);
@@ -39,6 +40,10 @@ module.exports = {
       var classifierList = classifierOptions.longDataSet;
     }
     classifierList = Object.keys( classifierList );
+
+    numberOfClassifiers = classifierList.length;
+
+    ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 
 
     var startOneClassifier = function() {
