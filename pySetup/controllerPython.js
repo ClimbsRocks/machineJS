@@ -5,7 +5,7 @@ var path = require('path');
 var rfLocation = path.dirname(__filename);
 py.rfLocation= rfLocation;
 py.referencesToChildren= [];
-var processes = require('./processes.js');
+var utils = require('./utils.js');
 var classifierOptions = require('./classifierList.js');
 
 argv = global.argv;
@@ -25,36 +25,67 @@ module.exports = {
   },
 
   startTraining: function() {
-    argv.numCPUs = argv.numCPUs || -1;
-    console.log('in one part of your machine, we will be training a randomForest');
+    // each classifier is only allowed to take up half the CPUs on the machine.
+    // we will be training two in parallel
+    // this way, if a single classifier takes so long to train that it effectively fails, we can still train classifiers on the other cores
+    argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 );
+    console.log('we are starting to train all the machine learning algorithms!');
 
-    var startOneClassifier = function(classifierName) {
-      // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
-      processes.kickOffTraining( function() {
-        module.exports.makePredictions(classifierName);
-      }, classifierName);
+    if( argv.dev ) {
+      var classifierList = classifierOptions.dev;
+    } else if( utils.fileNames.trainingDataLength < 10000 ) {
+      var classifierList = classifierOptions.shortDataSet;
+    } else {
+      var classifierList = classifierOptions.longDataSet;
+    }
+    classifierList = Object.keys( classifierList );
+
+
+    var startOneClassifier = function() {
+
+      if( classifierList.length > 0 ) {
+
+        var classifierName = classifierList.shift();
+        // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
+        utils.kickOffTraining( function() {
+          module.exports.makePredictions(classifierName);
+        }, classifierName);
+        
+      }
     };
 
-    var startAllClassifiers = function() {
-      if( argv.dev ) {
-        var classifierList = classifierOptions.dev;
-      } else if( processes.fileNames.trainingDataLength < 10000 ) {
-        var classifierList = classifierOptions.shortDataSet;
-      } else {
-        var classifierList = classifierOptions.longDataSet;
-      }
 
-      for (var classifierName in classifierList) {
-        startOneClassifier(classifierName);
-      }
-    };
+    process.on('algoFinishedTraining', function() {
+      startOneClassifier();
+    });
+
+    // var startAllClassifiers = function() {
+    //   if( argv.dev ) {
+    //     var classifierList = classifierOptions.dev;
+    //   } else if( utils.fileNames.trainingDataLength < 10000 ) {
+    //     var classifierList = classifierOptions.shortDataSet;
+    //   } else {
+    //     var classifierList = classifierOptions.longDataSet;
+    //   }
+
+    //   for (var classifierName in classifierList) {
+    //     startOneClassifier(classifierName);
+    //   }
+    // };
 
     // if this is while we are developing, skip over the data formatting part, as that is already well tested and known. 
     if( argv.dev ) {
-      processes.fileNames = require('./testingFileNames');
-      startAllClassifiers();
+      utils.fileNames = require('./testingFileNames');
+      startOneClassifier();
+      startOneClassifier();
     } else {
-      processes.formatData( startAllClassifiers );
+      utils.formatData( function() {
+
+        // start two classifiers once the data is formatted, since each of them will only be able to use half the cores on the machine
+        startOneClassifier();
+        startOneClassifier();
+
+      });
     }
 
   },
@@ -62,8 +93,8 @@ module.exports = {
   makePredictions: function(classifierName) {
 
     // var madeNoise = false;
-    processes.makePredictions( function() {
-      process.emit('algoFinishedTraining');
+    utils.makePredictions( function() {
+      process.emit('algoFinishedPredicting');
       // if(!madeNoise) {
       //   console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');
       // }
