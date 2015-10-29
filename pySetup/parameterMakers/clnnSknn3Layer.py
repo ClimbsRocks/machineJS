@@ -6,7 +6,7 @@ def makeParams(X, y, globalArgs, dev):
     # TODO: break out each type into it's own classifier
     numFeatures = len( X[0] )
     parameters_to_try = {
-        'learning_rate': [0.001, 0.01, 0.1, 0.3],
+        'learning_rate': [0.001, 0.01, 0.03],
         'hidden0__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ],
         'hidden1__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ],
         'hidden2__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ]
