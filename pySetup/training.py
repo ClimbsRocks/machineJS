@@ -11,6 +11,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 
 from sendMessages import printParent
+from sendMessages import messageParent
 
 logging.basicConfig()
 
@@ -96,7 +97,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.97, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
         # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
@@ -121,7 +122,7 @@ printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
 # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
-gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=-1, error_score=0)
+gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=globalArgs['numCPUs'], error_score=0)
 
 
 gridSearch.fit(X_train, y_train)
@@ -168,3 +169,4 @@ else:
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
     else:
         joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+

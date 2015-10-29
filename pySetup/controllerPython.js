@@ -28,7 +28,7 @@ module.exports = {
     // each classifier is only allowed to take up half the CPUs on the machine.
     // we will be training two in parallel
     // this way, if a single classifier takes so long to train that it effectively fails, we can still train classifiers on the other cores
-    argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 );
+    argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
     console.log('we are starting to train all the machine learning algorithms!');
 
     if( argv.dev ) {
