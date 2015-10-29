@@ -106,6 +106,7 @@ classifier = classifierCreater[classifierName]
 if classifierName == 'clXGBoost':
     try:
         X_train = classifier.DMatrix( X_train )
+        X = classifier.DMatrix( X )
     except:
         pass
 
