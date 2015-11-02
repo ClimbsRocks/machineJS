@@ -4,7 +4,13 @@ def makeParams(X, y, globalArgs, dev):
         # follow a similar pattern to what we did for brainjs, basing the number of nodes on the size of the input
         # test number of hidden layers
     # TODO: break out each type into it's own classifier
-    numFeatures = len( X[0] )
+    try:
+        # if dense
+        numFeatures = len(X[0])
+    except:
+        # if sparse
+        numFeatures = X.shape[1]
+
     parameters_to_try = {
         'learning_rate': [0.001, 0.01, 0.03],
         'hidden0__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ]

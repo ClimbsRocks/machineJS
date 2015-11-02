@@ -1,7 +1,15 @@
 import math
 
 def makeParams(X, y, globalArgs, dev):
-    sqrtNum = int(math.sqrt(len(X[0])))
+
+    try:
+        # if dense
+        numColumns = len(X[0])
+    except:
+        # if sparse
+        numColumns = X.shape[1]
+    sqrtNum = int(math.sqrt(numColumns))
+
 
     max_features_to_try = [sqrtNum + x for x in (-2,0,2)]
     max_features_to_try.append('log2')
