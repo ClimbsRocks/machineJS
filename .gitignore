@@ -16,3 +16,4 @@ predictions/*
 *.xls
 *.xlsx
 data/*
+*.npz
