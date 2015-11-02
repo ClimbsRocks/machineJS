@@ -9,6 +9,7 @@ import time
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
+from scipy.sparse import csr_matrix
 
 from sendMessages import printParent
 from sendMessages import messageParent
@@ -49,29 +50,41 @@ else:
 # for neural networks, the y values to not need to be normalized
 y_file_name = fileNames['y_train']
 
-# our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
-# we need to remove this row form our actual dataset
-# none of our other files from data-formatter have header rows
-with open(X_file_name, 'rU') as openInputFile:
-    inputRows = csv.reader(openInputFile)
-    firstRow=False
-    for row in inputRows:
-        if(firstRow):
-            rowAsFloats = []
-            # make sure that floats that were saved as scientific notation are actually read in as floats
-            # this should be non-controversial, as by this point we should have turned all categorical data into binary representation (0 or 1).
-            for idx, val in enumerate(row):
-                try:
-                    val = float(val)
-                except:
-                    printParent(headerRow[idx])
-                    printParent(val)
-                rowAsFloats.append( val )
-            X.append(row)
-        else:
-            headerRow = row
-            firstRow=True
-        
+# the following block works for dense arrays
+try:
+    # our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
+    # we need to remove this row form our actual dataset
+    # none of our other files from data-formatter have header rows
+    with open(X_file_name, 'rU') as openInputFile:
+        inputRows = csv.reader(openInputFile)
+        firstRow=False
+        for row in inputRows:
+            if(firstRow):
+                rowAsFloats = []
+                # make sure that floats that were saved as scientific notation are actually read in as floats
+                # this should be non-controversial, as by this point we should have turned all categorical data into binary representation (0 or 1).
+                for idx, val in enumerate(row):
+                    try:
+                        val = float(val)
+                    except:
+                        printParent(headerRow[idx])
+                        printParent(val)
+                    rowAsFloats.append( val )
+                X.append(row)
+            else:
+                headerRow = row
+                firstRow=True
+            
+
+    X = np.array(X)
+except:
+    def load_sparse_csr(filename):
+        loader = np.load(filename)
+        printParent(loader.keys())
+        # printParent(loader.values())
+        return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
+    
+    X = load_sparse_csr(X_file_name)
 
 with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
@@ -89,9 +102,7 @@ with open(y_file_name, 'rU') as openOutputFile:
             # ignore the first row as it holds our header
             firstRow = True
 
-X = np.array(X)
 y = np.array(y)
-
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
