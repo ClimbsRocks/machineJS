@@ -9,6 +9,8 @@ import numpy as np
 import logging
 import xgboost
 
+from scipy.sparse import csr_matrix
+
 from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
@@ -33,15 +35,23 @@ X = []
 idColumn = []
 
 # load up the prediction data set, without the header row
-with open(X_file_name, 'rU') as x_file:
-    inputRows = csv.reader(x_file)
-    headerRow = False
-    for row in inputRows:
-        if(headerRow):
-            X.append(row)
-        else:
-            headerRow = True
-
+try:
+    with open(X_file_name, 'rU') as x_file:
+        inputRows = csv.reader(x_file)
+        headerRow = False
+        for row in inputRows:
+            if(headerRow):
+                X.append(row)
+            else:
+                headerRow = True
+except:
+    def load_sparse_csr(filename):
+        loader = np.load(filename)
+        printParent(loader.keys())
+        # printParent(loader.values())
+        return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
+    
+    X = load_sparse_csr(X_file_name)
 
 with open(id_file_name, 'rU') as id_file:
     inputRows = csv.reader(id_file)
