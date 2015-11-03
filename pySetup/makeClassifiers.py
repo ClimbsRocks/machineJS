@@ -18,8 +18,8 @@ def makeClassifiers(globalArgs, dev):
     #     n_estimators=5
 
     return {
-        'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=globalArgs['numCPUs'], criterion='gini'),
-        'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=globalArgs['numCPUs'], criterion='entropy'),
+        'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='gini'),
+        'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='entropy'),
         'clSVCFirst': SVC(probability=True, shrinking=False),
         'clSVCShrinking': SVC(probability=True, shrinking=True),
         'clKnn': KNeighborsClassifier(),

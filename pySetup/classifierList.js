@@ -14,8 +14,8 @@ classifier summary descriptions
 
 module.exports = {
   dev: {
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
     clAdaBoost: 'clAdaBoost',
     clXGBoost: 'clXGBoost',
@@ -30,13 +30,13 @@ module.exports = {
     clRfGini: 'clRfGini', 
     clSVCFirst: 'clSVCFirst',
     clSVCShrinking: 'clSVCShrinking',
-    clnnSknn: 'clnnSknn',
-    clnnSknn3Layer: 'clnnSknn3Layer'
+    // clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer'
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
     clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini',
