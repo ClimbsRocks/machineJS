@@ -1,6 +1,6 @@
 import math
 
-def makeParams(X, y, globalArgs, dev):
+def makeParams(X, y, globalArgs, dev, problemType):
 
     try:
         # if dense

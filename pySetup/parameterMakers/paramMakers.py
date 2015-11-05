@@ -20,18 +20,18 @@ import clAdaBoost
 import clXGBoost
 from sendMessages import printParent
 
-def makeAll(X,y,globalArgs, dev):
+def makeAll(X,y,globalArgs, dev, problemType):
     returnDict = {
-        'clRfGini':rfGiniParamMaker.makeParams(X,y,globalArgs, dev),
-        'clRfEntropy':rfEntropyParamMaker.makeParams(X,y,globalArgs, dev),
-        'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev),
-        'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev),
-        'clSVCShrinking':svcShrinking.makeParams(X,y,globalArgs, dev),
-        'clKnn':clKnn.makeParams(X,y,globalArgs, dev),
-        'clLogisticRegression':clLogisticRegression.makeParams(X,y,globalArgs, dev),
-        'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev),
-        'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev),
-        'clAdaBoost':clAdaBoost.makeParams(X,y,globalArgs, dev),
-        'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev)
+        'clRfGini':rfGiniParamMaker.makeParams(X,y,globalArgs, dev, problemType),
+        'clRfEntropy':rfEntropyParamMaker.makeParams(X,y,globalArgs, dev, problemType),
+        'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev, problemType),
+        'clSVCFirst':svcFirstParameterMaker.makeParams(X,y,globalArgs, dev, problemType),
+        'clSVCShrinking':svcShrinking.makeParams(X,y,globalArgs, dev, problemType),
+        'clKnn':clKnn.makeParams(X,y,globalArgs, dev, problemType),
+        'clLogisticRegression':clLogisticRegression.makeParams(X,y,globalArgs, dev, problemType),
+        'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev, problemType),
+        'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev, problemType),
+        'clAdaBoost':clAdaBoost.makeParams(X,y,globalArgs, dev, problemType),
+        'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType)
     }
     return returnDict

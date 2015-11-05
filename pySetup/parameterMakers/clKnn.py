@@ -1,4 +1,4 @@
-def makeParams(X, y, globalArgs, dev):
+def makeParams(X, y, globalArgs, dev, problemType):
 
     # TODO: knn breaks with sparse matrices. it consumes huge amounts of memory. 
     # https://github.com/ClimbsRocks/ppComplete/issues/74

@@ -1,4 +1,4 @@
-def makeParams(X, y, globalArgs, dev):
+def makeParams(X, y, globalArgs, dev, problemType):
 
     # other parameters to investigate that might only exist in the sklearn implementation:
         # learning_rate

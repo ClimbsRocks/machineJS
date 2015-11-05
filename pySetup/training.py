@@ -126,7 +126,7 @@ if classifierName == 'clXGBoost':
 
 # create features that are custom to the size of the input data. 
 # Each individual paramaterMaker file sits in the paramaterMakers folder. If you want to modify what the parameters are, or submit a PR with a better combination of parameters to try, that is the place to start. 
-allParams = paramMakers.makeAll(X,y,globalArgs, dev)
+allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
 parameters_to_try = allParams[classifierName]
 
 

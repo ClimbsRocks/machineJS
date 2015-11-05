@@ -1,4 +1,4 @@
-def makeParams(X, y, globalArgs, dev):
+def makeParams(X, y, globalArgs, dev, problemType):
 
     # TODO: figure out more interesting parameters to try
         # follow a similar pattern to what we did for brainjs, basing the number of nodes on the size of the input
