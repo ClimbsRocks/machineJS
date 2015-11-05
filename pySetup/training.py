@@ -24,6 +24,8 @@ globalArgs = json.loads(sys.argv[2])
 fileNames = json.loads(sys.argv[3])
 
 classifierName = sys.argv[4]
+problemType = sys.argv[5]
+
 sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
 import paramMakers
 
@@ -34,7 +36,7 @@ dev = False
 if( globalArgs['dev'] ):
     dev = True
 
-classifierCreater = makeClassifiers(globalArgs, dev)
+classifierCreater = makeClassifiers(globalArgs, dev, problemType)
 
 X = []
 y = []
@@ -52,6 +54,13 @@ y_file_name = fileNames['y_train']
 
 # the following block works for dense arrays
 try:
+    def load_sparse_csr(filename):
+        loader = np.load(filename)
+        return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
+    
+    X = load_sparse_csr(X_file_name)
+
+except:
     # our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
     # we need to remove this row form our actual dataset
     # none of our other files from data-formatter have header rows
@@ -77,15 +86,7 @@ try:
             
 
     X = np.array(X)
-except:
-    def load_sparse_csr(filename):
-        loader = np.load(filename)
-        printParent(loader.keys())
-        # printParent(loader.values())
-        return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
     
-    X = load_sparse_csr(X_file_name)
-
 with open(y_file_name, 'rU') as openOutputFile:
     outputRows = csv.reader(openOutputFile)
     # this might be unnecessary now that we have run our data through data-formatter
@@ -104,7 +105,7 @@ with open(y_file_name, 'rU') as openOutputFile:
 
 y = np.array(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
@@ -155,7 +156,7 @@ extendedTraining = extendedTrainingList.getAll()[classifierName]
 
 if extendedTraining:
     # create a dict with mappings from algo name ('clRandomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
-    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev)
+    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
     bigClassifier = allBigClassifiers[classifierName]
     bigClassifier.set_params(**gridSearch.best_params_)
     # obviousPrint('bigClassifier params:',bigClassifier.get_params())
@@ -178,6 +179,5 @@ if extendedTraining:
 else:
     if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    else:
-        joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+    joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
