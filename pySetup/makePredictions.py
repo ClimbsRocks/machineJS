@@ -20,6 +20,7 @@ logging.basicConfig()
 fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
+problemType = sys.argv[6]
 
 if( classifierName[0:4] == 'clnn' ):
     nn = True
@@ -47,8 +48,6 @@ try:
 except:
     def load_sparse_csr(filename):
         loader = np.load(filename)
-        printParent(loader.keys())
-        # printParent(loader.values())
         return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
     
     X = load_sparse_csr(X_file_name)
@@ -78,12 +77,21 @@ with open(y_file_name, 'rU') as y_file:
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
-if nn or classifierName == 'clXGBoost':
-    X = np.array(X)
+# if nn or classifierName == 'clXGBoost':
+#     X = np.array(X)
+# if nn:
+#     X = np.array(X)
 
+try:
+    classifier.set_params(n_jobs=-1)
+except:
+    pass
 
 # get predictions for each item in the prediction data set
-predictedResults = classifier.predict_proba(X)
+if problemType == 'category':
+    predictedResults = classifier.predict_proba(X)
+else:
+    predictedResults = classifier.predict(X)
 
 if not os.path.exists('predictions'):
     os.makedirs('predictions')

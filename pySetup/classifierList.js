@@ -15,30 +15,30 @@ classifier summary descriptions
 module.exports = {
   dev: {
     // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
-    clKnn: 'clKnn',
+    clnnSknn: 'clnnSknn',
+    // clKnn: 'clKnn',
     clAdaBoost: 'clAdaBoost',
     clXGBoost: 'clXGBoost',
-    clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini',
+    // clRfEntropy: 'clRfEntropy',
+    clRfGini: 'clRfGini'
   },
   shortDataSet: {
+    clnnSknn: 'clnnSknn',
     clXGBoost: 'clXGBoost',
-    clKnn: 'clKnn',
+    // clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clAdaBoost: 'clAdaBoost',
     clRfGini: 'clRfGini', 
     clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking',
-    // clnnSknn: 'clnnSknn',
+    clSVCShrinking: 'clSVCShrinking'
     // clnnSknn3Layer: 'clnnSknn3Layer'
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
     // clnnSknn3Layer: 'clnnSknn3Layer',
     // clnnSknn: 'clnnSknn',
-    clKnn: 'clKnn',
-    clRfEntropy: 'clRfEntropy',
+    // clKnn: 'clKnn',
+    // clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini',
     clAdaBoost: 'clAdaBoost',
     // clLogisticRegression: 'clLogisticRegression'
