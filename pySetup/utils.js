@@ -16,9 +16,10 @@ module.exports = {
     // y_train
     // X_test
     // y_test
-    // X_train_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
-    // X_test_normalized- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
+    // X_train_nn- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
+    // X_test_nn- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
     // trainingDataLength- technically not a file name, but fits much more logically here than reading in that file again in node.js
+    // problemType: 'regression' or 'category'
   },
 
   formatData: function( callback ) {
@@ -29,6 +30,7 @@ module.exports = {
       trainingPrettyName: argv.outputFileName,
       testingPrettyName: argv.testOutputFileName
     }, function(fileNames) {
+      console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
       callback();
@@ -39,7 +41,7 @@ module.exports = {
   kickOffTraining: function( callback, classifierName) {
     // console.log('fileNames:',module.exports.fileNames);
     // TODO: investigage if we have to refactor how we pass in file names?
-    var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
+    var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
 
     var emitFinishedTrainingCallback = function() {
       process.emit('algoFinishedTraining');
@@ -61,7 +63,7 @@ module.exports = {
 
     // TODO: 
     var startPredictionsScript = function() {
-      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName]);
+      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
 
       utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
     };
