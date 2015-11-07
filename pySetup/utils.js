@@ -24,12 +24,16 @@ module.exports = {
 
   formatData: function( callback ) {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
-    df({
+    var dataFormatterArgs = {
       trainingData: argv.dataFile,
       testingData: argv.kagglePredict,
       trainingPrettyName: argv.outputFileName,
-      testingPrettyName: argv.testOutputFileName
-    }, function(fileNames) {
+      testingPrettyName: argv.testOutputFileName,
+      joinFileName: argv.join,
+      on: argv.on
+    };
+
+    df(dataFormatterArgs, function(fileNames) {
       console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
