@@ -26,10 +26,10 @@ console.log('thanks for inviting us along on your machine learning journey!\n');
 if( argv.dev ) {
   require('longjohn');
   if (dataFile.slice(-4) !== '.csv') {
-    dataFile = '../data-formatter/data/rossShortTrain.csv';
+    dataFile = 'rossShortTrainDev.csv'
   }
   if ( (argv.devKaggle && !argv.kagglePredict) || argv.devEnsemble) {
-    argv.kagglePredict = '../data-formatter/data/rossTest.csv';
+    argv.kagglePredict = 'rossmantest.csv';
   }
 }
 

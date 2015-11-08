@@ -58,7 +58,7 @@ def makeParams(X, y, globalArgs, dev, problemType):
 
 
 
-
+    # the commented-out lines do not work for regressors
     parameters_to_try = {
         # 'num_round': [100, 250, 500],
         # 'eta': [0.05, 0.1, 0.3],
@@ -67,7 +67,9 @@ def makeParams(X, y, globalArgs, dev, problemType):
         'colsample_bytree': [0.9, 1.0]
     }
 
-    # if dev:
+    if dev:
+        parameters_to_try.pop('subsample', None)
+        parameters_to_try.pop('colsample_bytree', None)
         # parameters_to_try.pop('num_round', None)
         # parameters_to_try.pop('eta', None)
         

@@ -21,8 +21,9 @@ def makeParams(X, y, globalArgs, dev, problemType):
         # 'hidden2__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ]
     }
 
-    # if dev:
-    #     parameters_to_try.pop('learning_rate', None)
-    #     parameters_to_try.pop('hidden0__units', None)
+    if dev:
+        # parameters_to_try.pop('learning_rate', None)
+        parameters_to_try['learning_rate'] = [.001,.01]
+        parameters_to_try.pop('hidden0__units', None)
         
     return parameters_to_try

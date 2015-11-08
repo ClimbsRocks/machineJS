@@ -21,9 +21,9 @@ def makeClassifiers(globalArgs, dev, problemType):
 
     n_iter=15
     n_estimators=20
-    # if(dev):
-    #     n_iter=2
-    #     n_estimators=5
+    if(dev):
+        n_iter=2
+        n_estimators=5
 
     if problemType == 'category':
         return {

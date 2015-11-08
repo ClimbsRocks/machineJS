@@ -52,7 +52,6 @@ else:
 # for neural networks, the y values to not need to be normalized
 y_file_name = fileNames['y_train']
 
-# the following block works for dense arrays
 try:
     def load_sparse_csr(filename):
         loader = np.load(filename)
@@ -60,6 +59,7 @@ try:
     
     X = load_sparse_csr(X_file_name)
 
+# the following block works for dense arrays
 except:
     # our X_train file has a header row, so the user can see the results of data-formatter in a pretty way if they'd like.
     # we need to remove this row form our actual dataset
@@ -149,7 +149,8 @@ printParent('\n')
 
 printParent('total training time for this classifier:')
 # this will give time in minutes
-printParent( round((time.time() - startTime)/60, 1) )
+finishTrainTime = time.time()
+printParent( round((finishTrainTime - startTime)/60, 1) )
 
 # TODO: Get info on whether this algo supports extended training from some global module. 
 extendedTraining = extendedTrainingList.getAll()[classifierName]
@@ -162,7 +163,7 @@ if extendedTraining:
     # obviousPrint('bigClassifier params:',bigClassifier.get_params())
 
     if dev:
-        bigClassifier.fit(X, y)
+        bigClassifier.fit(X_train, y_train)
     else: 
         # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
         bigClassifier.fit(X, y)
@@ -180,4 +181,3 @@ else:
     if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
         os.makedirs('pySetup/bestClassifiers/best' + classifierName)
     joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
-

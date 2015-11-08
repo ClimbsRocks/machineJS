@@ -21,7 +21,8 @@ def makeParams(X, y, globalArgs, dev, problemType):
 
     if dev:
         parameters_to_try.pop('min_samples_leaf', None)
-    #     parameters_to_try.pop('max_features', None)
+        parameters_to_try.pop('max_features', None)
+        parameters_to_try['max_features'] = [sqrtNum, 'log2']
         
     return parameters_to_try
 
