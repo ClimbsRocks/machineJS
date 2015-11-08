@@ -1,5 +1,8 @@
 def makeParams(X, y, globalArgs, dev, problemType):
 
+    # guidance on params:
+        # http://www.slideshare.net/odsc/owen-zhangopen-sourcetoolsanddscompetitions1
+
     # TODO: figure out more interesting parameters to try
         # follow a similar pattern to what we did for brainjs, basing the number of nodes on the size of the input
         # test number of hidden layers
