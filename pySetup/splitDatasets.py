@@ -1,6 +1,7 @@
 import json
 import sys
 import random
+from os import path
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -12,6 +13,12 @@ from sendMessages import obviousPrint
 # TODO: Pass in these variables:
 args = json.loads(sys.argv[2])
 fileNames = json.loads(sys.argv[3])
+XFileName = fileNames['X_train']
+XnnFileName = fileNames['X_train_nn']
+idFileName = fileNames['id_train']
+yTrainFileName = fileNames['y_train']
+
+outputDirectory = path.dirname(XFileName)
 
 # what percent of our dataset should we use when running RandomizedSearchCV (sister to GridSearchCV) on our dataset to determine the optimal parameters?
 searchPercent = args['searchPercent']
@@ -19,26 +26,17 @@ searchPercent = args['searchPercent']
 validationPercent = args['validationPercent']
 
 
-
-X_file_name = fileNames['X_train']
-
-# this will only work on sparse matrices
+# we are not supporting dense matrices at the moment. 
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
 
-X = load_sparse_csr(X_file_name)
+X = load_sparse_csr(XFileName)
 
 numRows = X.shape[0]
 
 includeOrNot = [random.random() for x in range(0,numRows)]
 
-# create a function that takes in an idx and row, and based on includeOrNot and some logic, decides where to place it
-# we are going to have to repeat this process many times:
-    # idColumn
-    # X_train
-    # y_train
-    # X_train_nn
 
 searchIndices = []
 trainingDataIndices = []
@@ -52,19 +50,45 @@ for idx, randomNum in enumerate(includeOrNot):
     else:
         validationIndices.append(idx)
 
-def splitDataset(data):
+# continued callout to the person originally responsible for this function:
+# http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
+def save_sparse_csr(filename,array):
+    np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
 
+def splitDataset(data, name):
+
+    # uses slicing, one of the most useful and least-well-known features of scipy sparse matrices
+    # you pass in a list of row indices you want to keep, and it will create a sliced copy that includes only those rows
+    # slicing also works on column indices
+    # callout to the person who first opened my eyes to them:
+    # http://stackoverflow.com/questions/13352280/slicing-sparse-matrices-in-scipy-which-types-work-best
     search = data[searchIndices,:]
-    allTrainingData = data[trainingDataIndices,:]
+    longTrainingData = data[trainingDataIndices,:]
     validation = data[validationIndices,:]
 
     printParent('search.shape')
     printParent(search.shape)
-    printParent('allTrainingData.shape')
-    printParent(allTrainingData.shape)
+    printParent('longTrainingData.shape')
+    printParent(longTrainingData.shape)
     printParent('validation.shape')
     printParent(validation.shape)
+    # TODO: write to file
+    searchFile = path.join(outputDirectory, name + 'searchData.npz')
+    longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
+    validationFile = path.join(outputDirectory, name + 'validationData.npz')
+    printParent('searchFile')
+    printParent(searchFile)
+    save_sparse_csr(searchFile, search)
+    save_sparse_csr(longTrainingFile, longTrainingData)
+    save_sparse_csr(validationFile, validation)
 
-splitDataset(X)
+# we are going to have to repeat this process many times:
+    # idColumn
+    # X_train
+    # y_train
+    # X_train_nn
+
+splitDataset(X, 'X_train')
+del X
 
 
