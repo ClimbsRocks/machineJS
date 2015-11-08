@@ -3,8 +3,8 @@ var exec = require('child_process').exec;
 var ensembler = require('ensembler');
 
 var path = require('path');
-var rfLocation = path.dirname(__filename);
-py.rfLocation= rfLocation;
+var pySetupLocation = path.dirname(__filename);
+py.pySetupLocation= pySetupLocation;
 py.referencesToChildren= [];
 var utils = require('./utils.js');
 var classifierOptions = require('./classifierList.js');
@@ -45,23 +45,10 @@ module.exports = {
   },
 
   startClassifiers: function(classifierList) {
-    // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
-    if( argv.dev ) {
-      utils.fileNames = require('./testingFileNames');
-      startOneClassifier(classifierList);
-      startOneClassifier(classifierList);
-    } else {
-      // here is where we invoke data-formatter to handle all our data formatting needs
-        // for more information, please check out that repo!
-        // https://github.com/ClimbsRocks/data-formatter
-      utils.formatData( function() {
-        // start two classifiers once the data is formatted, since each of them will only be able to use half the cores on the machine
-        startOneClassifier(classifierList);
-        startOneClassifier(classifierList);
 
-      });
-    }
-
+    startOneClassifier(classifierList);
+    startOneClassifier(classifierList);
+    
     process.on('algoFinishedTraining', function() {
       startOneClassifier(classifierList);
     });
@@ -89,9 +76,23 @@ module.exports = {
 
     ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 
-    utils.splitData(function() {
-      module.exports.startClassifiers(classifierList);
-    });
+    // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
+    if( argv.dev ) {
+      utils.fileNames = require('./testingFileNames');
+      utils.splitData(function() {
+        module.exports.startClassifiers(classifierList);
+      });
+    } else {
+      // here is where we invoke data-formatter to handle all our data formatting needs
+        // for more information, please check out that repo!
+        // https://github.com/ClimbsRocks/data-formatter
+      utils.formatData( function() {
+        utils.splitData(function() {
+          module.exports.startClassifiers(classifierList);
+        });
+      });
+    }
+
 
   },
 
