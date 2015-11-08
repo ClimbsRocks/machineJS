@@ -45,5 +45,13 @@ module.exports = function() {
   argv.searchPercent = argv.searchPercent || .3;
   argv.validationPercent = argv.validationPercent || .2;
 
+  
+  if( argv.alreadyFormatted === undefined ) {
+    if( argv.dev ) {
+      argv.alreadyFormatted = true;
+    } else {
+      argv.alreadyFormatted = false;
+    }
+  }
 
 };
