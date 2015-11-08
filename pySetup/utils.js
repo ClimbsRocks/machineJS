@@ -22,6 +22,21 @@ module.exports = {
     // problemType: 'regression' or 'category'
   },
 
+  splitData: function(callback) {
+    var dfArgs = {
+      fileNames: module.exports.fileNames,
+      searchPercent: argv.searchPercent,
+      validationPercent: argv.validationPercent,
+    };
+
+    // generatePythonOptions assumes the first input is the name of a data file that training.py or makePredictions.py will be run on. Pass in ignoreMe.csv for now until we refactor that. 
+    var pythonOptions = utilsPyShell.generatePythonOptions('ignoreMe.csv', [JSON.stringify(argv), JSON.stringify(module.exports.fileNames) 
+      ] );
+    
+    var pyShell = utilsPyShell.startPythonShell('splitDatasets.py', callback, pythonOptions);
+
+  },
+
   formatData: function( callback ) {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
     var dataFormatterArgs = {
@@ -43,8 +58,6 @@ module.exports = {
   },
 
   kickOffTraining: function( callback, classifierName) {
-    // console.log('fileNames:',module.exports.fileNames);
-    // TODO: investigage if we have to refactor how we pass in file names?
     var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
 
     var emitFinishedTrainingCallback = function() {
