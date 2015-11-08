@@ -11,6 +11,25 @@ var classifierOptions = require('./classifierList.js');
 
 argv = global.argv;
 
+var startOneClassifier = function(classifierList) {
+
+  if( classifierList.length > 0 ) {
+    // for our last classifier, tell it to run on all cores on the machine
+    // this way, when the second-to-last classifier finishes, and those half the machine cores are empty, we can put them to use!
+    if( classifierList.length === 1 ) {
+      argv.numCPUs = argv.computerTotalCPUs;
+    }
+
+    var classifierName = classifierList.shift();
+    // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
+    utils.kickOffTraining( function() {
+      module.exports.makePredictions(classifierName);
+    }, classifierName);
+    
+  }
+};
+
+
 
 module.exports = {
   killAll: function() {
@@ -46,53 +65,26 @@ module.exports = {
     ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 
 
-    var startOneClassifier = function() {
-
-      if( classifierList.length > 0 ) {
-
-        var classifierName = classifierList.shift();
-        // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
-        utils.kickOffTraining( function() {
-          module.exports.makePredictions(classifierName);
-        }, classifierName);
-        
-      }
-    };
-
-
-    process.on('algoFinishedTraining', function() {
-      startOneClassifier();
-    });
-
-    // var startAllClassifiers = function() {
-    //   if( argv.dev ) {
-    //     var classifierList = classifierOptions.dev;
-    //   } else if( utils.fileNames.trainingDataLength < 10000 ) {
-    //     var classifierList = classifierOptions.shortDataSet;
-    //   } else {
-    //     var classifierList = classifierOptions.longDataSet;
-    //   }
-
-    //   for (var classifierName in classifierList) {
-    //     startOneClassifier(classifierName);
-    //   }
-    // };
-
-    // if this is while we are developing, skip over the data formatting part, as that is already well tested and known. 
+    // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.dev ) {
       utils.fileNames = require('./testingFileNames');
-      startOneClassifier();
-      startOneClassifier();
+      startOneClassifier(classifierList);
+      startOneClassifier(classifierList);
     } else {
+      // here is where we invoke data-formatter to handle all our data formatting needs
+        // for more information, please check out that repo!
+        // https://github.com/ClimbsRocks/data-formatter
       utils.formatData( function() {
-
         // start two classifiers once the data is formatted, since each of them will only be able to use half the cores on the machine
-        startOneClassifier();
-        startOneClassifier();
+        startOneClassifier(classifierList);
+        startOneClassifier(classifierList);
 
       });
     }
 
+    process.on('algoFinishedTraining', function() {
+      startOneClassifier(classifierList);
+    });
   },
 
   makePredictions: function(classifierName) {
