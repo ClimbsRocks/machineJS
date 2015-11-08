@@ -77,7 +77,7 @@ module.exports = {
     ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
 
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
-    if( argv.dev ) {
+    if( argv.alreadyFormatted ) {
       utils.fileNames = require('./testingFileNames');
       utils.splitData(function() {
         module.exports.startClassifiers(classifierList);
