@@ -18,8 +18,8 @@ def makeAll(globalArgs, dev, problemType):
     if problemType == 'category':
     
         return {
-            'clRfGini': RandomForestClassifier(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs'], criterion='gini'),
-            'clRfEntropy': RandomForestClassifier(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs'], criterion='entropy'),
+            'clRfGini': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='gini'),
+            'clRfEntropy': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='entropy'),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
@@ -43,8 +43,8 @@ def makeAll(globalArgs, dev, problemType):
     else:
     
         return {
-            'clRfGini': RandomForestRegressor(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs']),
-            'clRfEntropy': RandomForestRegressor(n_estimators=estimator_count, n_jobs=globalArgs['numCPUs']),
+            'clRfGini': RandomForestRegressor(n_estimators=estimator_count, n_jobs=-1),
+            'clRfEntropy': RandomForestRegressor(n_estimators=estimator_count, n_jobs=-1),
             'clnnSknn': Regressor(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
