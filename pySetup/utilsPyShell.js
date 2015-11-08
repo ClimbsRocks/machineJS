@@ -3,14 +3,18 @@ var py = global.pythonNamespace;
 var path = require('path');
 var PythonShell = require('ppc-python-shell');
 
-var rfLocation = py.rfLocation;
+var pySetupLocation = py.pySetupLocation;
 
 module.exports = {
+
+  // these are messages we expect to get from our python shell.
+  // anything not in this list is likely an error.
   expectedMessages: {
     dictVectMapping: true,
     fileNames: true,
     trainingResults: true
   },
+
   attachLogListener: function(referenceToShell) {
     referenceToShell.on('message', function(message) {
       if(message.type === 'console.log') {
@@ -28,7 +32,7 @@ module.exports = {
     var args = [];
     args = args.concat(fullPathToFile, otherArgs);
     return {
-      scriptPath: rfLocation,
+      scriptPath: pySetupLocation,
       args: args,
       mode:'json'
     };
