@@ -36,7 +36,7 @@ module.exports = {
   },
   longDataSet: {
     // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
+    clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini',
