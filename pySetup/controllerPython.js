@@ -44,27 +44,7 @@ module.exports = {
     exec('pkill -9 Python');
   },
 
-  startTraining: function() {
-    // each classifier is only allowed to take up half the CPUs on the machine.
-    // we will be training two in parallel
-    // this way, if a single classifier takes so long to train that it effectively fails, we can still train classifiers on the other cores
-    argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
-    console.log('we are starting to train all the machine learning algorithms!');
-
-    if( argv.dev ) {
-      var classifierList = classifierOptions.dev;
-    } else if( utils.fileNames.trainingDataLength < 10000 ) {
-      var classifierList = classifierOptions.shortDataSet;
-    } else {
-      var classifierList = classifierOptions.longDataSet;
-    }
-    classifierList = Object.keys( classifierList );
-
-    numberOfClassifiers = classifierList.length;
-
-    ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
-
-
+  startClassifiers: function(classifierList) {
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.dev ) {
       utils.fileNames = require('./testingFileNames');
@@ -85,6 +65,34 @@ module.exports = {
     process.on('algoFinishedTraining', function() {
       startOneClassifier(classifierList);
     });
+
+  },
+
+  startTraining: function() {
+    // each classifier is only allowed to take up half the CPUs on the machine.
+    // we will be training two in parallel
+    // this way, if a single classifier takes so long to train that it effectively fails, we can still train classifiers on the other cores
+    argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
+    console.log('we are starting to train all the machine learning algorithms!');
+
+
+    if( argv.dev ) {
+      var classifierList = classifierOptions.dev;
+    } else if( utils.fileNames.trainingDataLength < 10000 ) {
+      var classifierList = classifierOptions.shortDataSet;
+    } else {
+      var classifierList = classifierOptions.longDataSet;
+    }
+    classifierList = Object.keys( classifierList );
+
+    numberOfClassifiers = classifierList.length;
+
+    ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
+
+    utils.splitData(function() {
+      module.exports.startClassifiers(classifierList);
+    });
+
   },
 
   makePredictions: function(classifierName) {
