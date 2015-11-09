@@ -68,18 +68,18 @@ module.exports = {
     var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
 
     var emitFinishedTrainingCallback = function() {
+      global.finishedAlgos++;
       process.emit('algoFinishedTraining');
       callback();
     }
 
 
     var pyShell = utilsPyShell.startPythonShell('training.py', emitFinishedTrainingCallback, pythonOptions);
-    // pyShell.on('message', function(message) {
-    //   if(message.type === 'trainingResults') {
-    //     process.emit('algoFinishedTraining');
-    //     global.trainedAlgos[classifierName] = message.text;
-    //   }
-    // });
+    pyShell.on('message', function(message) {
+      if(message.type === 'trainingResults') {
+        global.trainedAlgos[classifierName] = message.text;
+      }
+    });
   },
 
   makePredictions: function( callback, classifierName) {
@@ -87,7 +87,12 @@ module.exports = {
 
     // TODO: 
     var startPredictionsScript = function() {
-      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
+      if( global.finishedAlgos === 1 ) {
+        var copyValidationData = true;
+      } else {
+        var copyValidationData = false;
+      }
+      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, global.trainedAlgos[classifierName], copyValidationData ]);
 
       utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
     };

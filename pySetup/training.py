@@ -214,6 +214,7 @@ if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
     os.makedirs('pySetup/bestClassifiers/best' + classifierName)
 joblib.dump(longTrainClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
 
+messageParent(longTrainClassifierScore, 'trainingResults')
 
     # if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
     #     os.makedirs('pySetup/bestClassifiers/best' + classifierName)

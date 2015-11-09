@@ -68,6 +68,10 @@ module.exports = function() {
     mkdirp(argv.kaggleBinaryOutputFolder);
   }
 
+  // we will eventually be storing information about our trained algorithms here.
+  global.trainedAlgos = {};
+  global.finishedAlgos = 0;
+
   
   if( argv.alreadyFormatted === undefined ) {
     if( argv.dev ) {

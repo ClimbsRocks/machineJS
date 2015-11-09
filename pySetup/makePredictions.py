@@ -21,7 +21,7 @@ fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 problemType = sys.argv[6]
-# trainingScore = sys.argv[7]
+trainingScore = sys.argv[7]
 
 if( classifierName[0:4] == 'clnn' ):
     nn = True
@@ -112,16 +112,18 @@ validationFile = fileNames['X_trainvalidationData']
 validationData = load_sparse_csr(validationFile)
 validationIdFile = fileNames['id_trainvalidationData']
 validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
+validationYFile = fileNames['y_trainvalidationData']
+validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
 
 if problemType == 'category':
     validationPredictions = classifier.predict_proba(validationData)
 else:
     validationPredictions = classifier.predict(validationData)
 
-try:
-    validationScore = classifier.score(X,y)
-except:
-    validationScore = 0
+# try:
+validationScore = classifier.score(validationData,validationY)
+# except:
+#     validationScore = 0
 
 
 # write our predictions on the test data to a file
@@ -157,8 +159,8 @@ with open( path.join(validationPath, validationFileName) , 'w+') as validationFi
     csvwriter = csv.writer(validationFile)
 
     # at the top of each validation file, write the score for that classifier on the validation set
-    # csvwriter.writerow([validationScore, trainingScore])
-    csvwriter.writerow([validationScore])
+    csvwriter.writerow([validationScore, trainingScore])
+    # csvwriter.writerow([validationScore])
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(totalPredictions):
