@@ -123,14 +123,9 @@ except:
     validationScore = 0
 
 
-if not os.path.exists('predictions'):
-    os.makedirs('predictions')
-
-
 # write our predictions on the test data to a file
-predictionsPath = path.join( 'predictions', argv['testFilePretty'])
-if not os.path.exists(predictionsPath):
-    os.makedirs(predictionsPath)
+predictionsPath = argv['predictionsFolder']
+# using the outputFileName ('train') here so that if people have different input files (different feature engineering), that will show up in our file names.
 predictionsFileName = argv['outputFileName'] + classifierName + str(time.time()) + '.csv'
 
 with open( path.join(predictionsPath, predictionsFileName) , 'w+') as predictionsFile:
@@ -150,8 +145,6 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
 
 # write our validation predictions to a file too
 validationPath = path.join( 'predictions', argv['testFilePretty'], 'validation')
-if not os.path.exists(validationPath):
-    os.makedirs(validationPath)
 validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
 
 with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
@@ -181,9 +174,7 @@ if argv[ 'binaryOutput'] == 'true':
                     
     # add kaggle to the front of the name to make it obvious that this is for kaggle
     # this also keeps the rest of our files consistent for ensembler
-    kagglePath = path.join( 'predictions', argv['testFilePretty'], 'kaggle')
-    if not os.path.exists(kagglePath):
-        os.makedirs(kagglePath)
+    kagglePath = argv['kaggleBinaryOutputFolder']
     kaggleFileName = argv['outputFileName'] + classifierName + str(time.time()) + '.csv'
     with open( path.join(kagglePath, kaggleFileName) , 'w+') as predictionsFile:
         csvwriter = csv.writer(predictionsFile)
