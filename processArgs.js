@@ -42,8 +42,14 @@ module.exports = function() {
     argv.testOutputFileName = dataFileFolder + argv.testFilePretty;
   }
 
-  argv.searchPercent = argv.searchPercent || .3;
-  argv.validationPercent = argv.validationPercent || .2;
+  if( arg.dev ) {
+    argv.searchPercent = argv.searchPercent || .2;
+    argv.validationPercent = argv.validationPercent || .6;
+  } else {
+    argv.searchPercent = argv.searchPercent || .3;
+    argv.validationPercent = argv.validationPercent || .2;
+  }
+
 
   
   if( argv.alreadyFormatted === undefined ) {
