@@ -38,6 +38,11 @@ dev = False
 if( globalArgs['dev'] ):
     dev = True
 
+def load_sparse_csr(filename):
+    loader = np.load(filename)
+    return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
+
+
 classifierCreater = makeClassifiers(globalArgs, dev, problemType)
 
 X = []
@@ -58,9 +63,6 @@ y_file_name = fileNames['y_trainsearchData']
 y_file_nameLongTraining = fileNames['y_trainlongTrainingData']
 
 try:
-    def load_sparse_csr(filename):
-        loader = np.load(filename)
-        return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
     
     X = load_sparse_csr(X_file_name)
 
@@ -145,10 +147,33 @@ printParent(parameters_to_try)
 # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
 gridSearch = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
 
+
+def load_sparse_csr_logging(filename):
+    printParent('filename')
+    printParent(filename)
+    loader = np.load(filename)
+    # obviousPrint("loader['indices']",loader['indices'])
+    return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
+
+if classifierName[0:4] == 'clnn':
+    y = load_sparse_csr_logging(fileNames['y_train_nnsearchData'])
+    
 if y.shape[0] == 1:
-    y = y.todense().tolist()
-    y = zip(*y)
-    y = np.ravel(y)    
+    y = y.todense().tolist()[0]
+    # y = np.ravel(y)
+    # obviousPrint('y.shape',y.shape)
+    # y = zip(*y)
+    # y = np.ravel(y)
+
+
+if classifierName[0:4] == 'clnn':
+    X = X.todense()
+    # obviousPrint('X.shape',X.shape)
+    y = np.array(y)
+    # obviousPrint('y.shape',y.shape)
+    # printParent(y.tolist())
+    # obviousPrint('len(X)',len(X))
+    # obviousPrint('len(X[0])',len(X[0]))
 
 gridSearch.fit(X, y ) 
 printParent('\n')
@@ -192,15 +217,21 @@ yLongData = load_sparse_csr(y_file_nameLongTraining)
 
 # handles cases where y is a single column, else multiple columns
 if yLongData.shape[0] == 1:
-    yLongData = yLongData.todense().tolist()
-    yLongData = zip(*yLongData)
-    yLongData = np.ravel(yLongData)
+    yLongData = yLongData.todense().tolist()[0]
+    # yLongData = zip(*yLongData)
+    # yLongData = np.ravel(yLongData)
     y = np.concatenate( (y, yLongData), axis=0 )
 
 else:
     y = vstack( [y, yLongData] )
 
 X = vstack( [X, xLongData] )
+
+if classifierName[0:4] == 'clnn':
+    X = X.todense()
+    obviousPrint('X.shape',X.shape)
+    y = np.array(y)
+    obviousPrint('y.shape',y.shape)
 
 longTrainClassifier.fit(X, y)
 
