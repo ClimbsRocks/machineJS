@@ -34,6 +34,13 @@ module.exports = {
       ] );
     
     var pyShell = utilsPyShell.startPythonShell('splitDatasets.py', callback, pythonOptions);
+    pyShell.on('message', function(message) {
+      if(message.type === 'splitFileNames') {
+        for( var key in message.text) {
+          module.exports.fileNames[key] = message.text[key];
+        }
+      }
+    });
 
   },
 
