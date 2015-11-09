@@ -21,7 +21,7 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
 5. Please don't run any other Python scripts while this is running.
 
 ## The Current State Of Advanced Options: 
-- `--alreadyFormatted`: A boolean value 'true' or 'false', noting if your data has already been formatted. Useful if you're just tweaking parameters and don't want to repeat the oftentimes time-expensive data formatting process again. 
+- `--alreadyFormatted`: A boolean value 'true' or 'false', noting if your data has already been formatted. Useful if you're just tweaking parameters and don't want to repeat the oftentimes time-expensive data formatting process again. If you pass in this flag, make sure your files are included in the  `pySetup/testingFileNames.js` json list. I've included a couple of examples. You can get the fileNames from `pySetup/utils.js`, inside of the formatData function. Just copy paste the fileNames obj data-formatter gives to the callback, into the `testingFileNames.js` file. 
 - `--join`: a path to a data file that will be joined in with your training and testing data, in the same way you'd join SQL tables. 
 - `--kagglePredict`: see above (Format of Prediction File).
 - `--dev`: This flag indicates that you are doing engineering work on ppComplete itself. It does things like:
