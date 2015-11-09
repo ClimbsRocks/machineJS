@@ -21,6 +21,7 @@ fileNames = json.loads(sys.argv[4])
 classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 problemType = sys.argv[6]
+# trainingScore = sys.argv[7]
 
 if( classifierName[0:4] == 'clnn' ):
     nn = True
@@ -101,9 +102,9 @@ except:
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
-    predictedResults = classifier.predict_proba(X)
+    testDataPredictions = classifier.predict_proba(X)
 else:
-    predictedResults = classifier.predict(X)
+    testDataPredictions = classifier.predict(X)
 
 del X
 
@@ -133,7 +134,7 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
-    for idx, prediction in enumerate(predictedResults):
+    for idx, prediction in enumerate(testDataPredictions):
         rowID = idColumn[idx]
 
         try:
@@ -143,19 +144,25 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
             csvwriter.writerow([rowID,prediction])
 
 
+
 # write our validation predictions to a file too
 validationPath = path.join( 'predictions', argv['testFilePretty'], 'validation')
 validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
+
+# to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
+totalPredictions = np.concatenate( (validationPredictions, testDataPredictions), axis=0 )
+totalIdColumn = np.concatenate( (validationIDs, idColumn), axis=0 )
 
 with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
     csvwriter = csv.writer(validationFile)
 
     # at the top of each validation file, write the score for that classifier on the validation set
+    # csvwriter.writerow([validationScore, trainingScore])
     csvwriter.writerow([validationScore])
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
-    for idx, prediction in enumerate(validationPredictions):
-        rowID = validationIDs[idx]
+    for idx, prediction in enumerate(totalPredictions):
+        rowID = totalIdColumn[idx]
         # I'm not sure why we're checking if prediction is already a list
             # or why we're taking the second item in that list
         try:
@@ -180,7 +187,7 @@ if argv[ 'binaryOutput'] == 'true':
         csvwriter = csv.writer(predictionsFile)
 
         csvwriter.writerow([idHeader,outputHeader])
-        for idx, prediction in enumerate(predictedResults):
+        for idx, prediction in enumerate(testDataPredictions):
 
             rowID = idColumn[idx]
             # I'm not sure why we're checking if prediction is already a list
