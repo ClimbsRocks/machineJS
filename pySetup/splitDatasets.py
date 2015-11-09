@@ -56,7 +56,7 @@ for idx, randomNum in enumerate(includeOrNot):
 def save_sparse_csr(filename,array):
     np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
 
-def splitDataset(data, name):
+def splitDataset(data, name, fileCategory):
 
     # uses slicing, one of the most useful and least-well-known features of scipy sparse matrices
     # you pass in a list of row indices you want to keep, and it will create a sliced copy that includes only those rows
@@ -79,13 +79,7 @@ def splitDataset(data, name):
     name = ntpath.basename(name)
     name = name[0:-4]
 
-    printParent('name')
-    printParent(name)
-    printParent('outputDirectory')
-    printParent(outputDirectory)
     searchFile = path.join(outputDirectory, name + 'searchData.npz')
-    printParent('searchFile')
-    printParent(searchFile)
     longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
     validationFile = path.join(outputDirectory, name + 'validationData.npz')
     # TODO: send a message back to parent telling them where the files are
@@ -94,9 +88,9 @@ def splitDataset(data, name):
     save_sparse_csr(validationFile, validation)
 
     fileNameDict = {
-        name + 'searchData': searchFile,
-        name + 'longTrainingData': longTrainingFile,
-        name + 'validationData': validationFile
+        fileCategory + 'searchData': searchFile,
+        fileCategory + 'longTrainingData': longTrainingFile,
+        fileCategory + 'validationData': validationFile
     }
     messageParent(fileNameDict, 'splitFileNames')
 
@@ -106,18 +100,18 @@ def splitDataset(data, name):
     # y_train
     # X_train_nn
 
-splitDataset(X, XFileName)
+splitDataset(X, XFileName, 'X_train')
 del X
 
 idColumn = load_sparse_csr(idFileName)
-splitDataset(idColumn, idFileName)
+splitDataset(idColumn, idFileName, 'id_train')
 del idColumn
 
 yColumn = load_sparse_csr(yTrainFileName)
-splitDataset(yColumn, yTrainFileName)
+splitDataset(yColumn, yTrainFileName, 'y_train')
 del yColumn
 
 Xnn = load_sparse_csr(XnnFileName)
-splitDataset(Xnn, XnnFileName)
+splitDataset(Xnn, XnnFileName, 'X_train_nn')
 del Xnn
 
