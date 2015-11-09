@@ -117,6 +117,11 @@ if problemType == 'category':
 else:
     validationPredictions = classifier.predict(validationData)
 
+try:
+    validationScore = classifier.score(X,y)
+except:
+    validationScore = 0
+
 
 if not os.path.exists('predictions'):
     os.makedirs('predictions')
@@ -135,8 +140,7 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(predictedResults):
         rowID = idColumn[idx]
-        # I'm not sure why we're checking if prediction is already a list
-            # or why we're taking the second item in that list
+
         try:
             len(prediction)
             csvwriter.writerow([rowID,prediction[1]])
@@ -153,6 +157,8 @@ validationFileName = argv['outputFileName'] + classifierName + str(time.time()) 
 with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
     csvwriter = csv.writer(validationFile)
 
+    # at the top of each validation file, write the score for that classifier on the validation set
+    csvwriter.writerow([validationScore])
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(validationPredictions):
