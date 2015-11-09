@@ -74,7 +74,14 @@ module.exports = {
 
     numberOfClassifiers = classifierList.length;
 
-    ensembler.startListeners( numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
+    var ensemblerArgs = {
+      inputFolder: argv.predictionsFolder,
+      outputFolder: argv.ppCompleteLocation,
+      validationFolder: argv.validationFolder,
+      fileNameIdentifier: argv.outputFileName
+    }
+
+    ensembler.startListeners( numberOfClassifiers, ensemblerArgs);
 
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.alreadyFormatted ) {
