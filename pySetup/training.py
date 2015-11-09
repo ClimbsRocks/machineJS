@@ -9,13 +9,15 @@ import time
 import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, vstack
 
 from sendMessages import printParent
 from sendMessages import messageParent
+from sendMessages import obviousPrint
 
 logging.basicConfig()
 
+import warnings
 startTime = time.time()
 
 # these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
@@ -45,12 +47,15 @@ headerRow = []
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
 if( classifierName[0:4] == 'clnn' ):
-    X_file_name = fileNames['X_train_nn']
+    X_file_name = fileNames['X_train_nnsearchData']
+    X_file_nameLongTraining = fileNames['X_train_nnlongTrainingData']
 else:    
-    X_file_name = fileNames['X_train']
+    X_file_name = fileNames['X_trainsearchData']
+    X_file_nameLongTraining = fileNames['X_trainlongTrainingData']
 
 # for neural networks, the y values to not need to be normalized
-y_file_name = fileNames['y_train']
+y_file_name = fileNames['y_trainsearchData']
+y_file_nameLongTraining = fileNames['y_trainlongTrainingData']
 
 try:
     def load_sparse_csr(filename):
@@ -86,31 +91,35 @@ except:
             
 
     X = np.array(X)
-    
-with open(y_file_name, 'rU') as openOutputFile:
-    outputRows = csv.reader(openOutputFile)
-    # this might be unnecessary now that we have run our data through data-formatter
-    # we might be able to load in the y_train data directly
-    firstRow = False
-    for row in outputRows:
-        if firstRow:
-            try:
-                row[0] = float(row[0])
-            except:
-                row[0] = row[0]
-            y.append(row[0])
-        else:
-            # ignore the first row as it holds our header
-            firstRow = True
 
-y = np.array(y)
+try:
+    y = load_sparse_csr(y_file_name)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+except:
+    # supports dense input
+    with open(y_file_name, 'rU') as openOutputFile:
+        outputRows = csv.reader(openOutputFile)
+        # this might be unnecessary now that we have run our data through data-formatter
+        # we might be able to load in the y_train data directly
+        firstRow = False
+        for row in outputRows:
+            if firstRow:
+                try:
+                    row[0] = float(row[0])
+                except:
+                    row[0] = row[0]
+                y.append(row[0])
+            else:
+                # ignore the first row as it holds our header
+                firstRow = True
+    y = np.array(y)
+
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-if dev:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
-        # extendedTraining = False
+# if dev:
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+#         # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -136,8 +145,12 @@ printParent(parameters_to_try)
 # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
 gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=globalArgs['numCPUs'], error_score=0)
 
+if y.shape[0] == 1:
+    y = y.todense().tolist()
+    y = zip(*y)
+    y = np.ravel(y)    
 
-gridSearch.fit(X_train, y_train)
+gridSearch.fit(X, y ) 
 printParent('\n')
 printParent('*********************************************************************************************************')
 printParent("this estimator's best prediction is:")
@@ -152,32 +165,56 @@ printParent('total training time for this classifier:')
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
 
-# TODO: Get info on whether this algo supports extended training from some global module. 
+# TODO: Get info on whether this algo supports creating a larger version of that classifier. 
+# for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
 extendedTraining = extendedTrainingList.getAll()[classifierName]
 
 if extendedTraining:
-    # create a dict with mappings from algo name ('clRandomForest') to a function that will return a newly instantiated version of that algo (with the proper n_estimators and other custom parameters for that classifier)
     allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
-    bigClassifier = allBigClassifiers[classifierName]
-    bigClassifier.set_params(**gridSearch.best_params_)
-    # obviousPrint('bigClassifier params:',bigClassifier.get_params())
+    longTrainClassifier = allBigClassifiers[classifierName]
 
-    if dev:
-        bigClassifier.fit(X_train, y_train)
-    else: 
-        # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
-        bigClassifier.fit(X, y)
-
-    bigClassifierscore = bigClassifier.score(X, y)
-    printParent('the bigger randomForest has a score of')
-    printParent(bigClassifierscore)
-
+# otherwise, just create a new classifier
+# we could possibly warmStart from the GridSearch version, but given that we have more than doubled the size of our dataset, I think we'd have the best luck starting from scratch
+else:
+    longTrainClassifier = classifierCreater[classifierName]
     
-    if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
-        os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    joblib.dump(bigClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+longTrainClassifier.set_params(**gridSearch.best_params_)
+
+    # if dev:
+    #     bigClassifier.fit(X_train, y_train)
+    # else: 
+    #     # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
+
+# now we train on the entire training data set, minus the validation data
+xLongData = load_sparse_csr(X_file_nameLongTraining)
+
+yLongData = load_sparse_csr(y_file_nameLongTraining)
+
+# handles cases where y is a single column, else multiple columns
+if yLongData.shape[0] == 1:
+    yLongData = yLongData.todense().tolist()
+    yLongData = zip(*yLongData)
+    yLongData = np.ravel(yLongData)
+    y = np.concatenate( (y, yLongData), axis=0 )
 
 else:
-    if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
-        os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+    y = vstack( [y, yLongData] )
+
+X = vstack( [X, xLongData] )
+
+longTrainClassifier.fit(X, y)
+
+
+longTrainClassifierScore = longTrainClassifier.score(X, y)
+printParent('the algorithm that we trained on a larger portion of the dataset has a score of')
+printParent(longTrainClassifierScore)
+
+    
+if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
+    os.makedirs('pySetup/bestClassifiers/best' + classifierName)
+joblib.dump(longTrainClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+
+
+    # if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
+    #     os.makedirs('pySetup/bestClassifiers/best' + classifierName)
+    # joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
