@@ -1,4 +1,5 @@
 var path = require('path');
+var mkdirp = require('mkdirp');
 
 module.exports = function() {
   if(argv.dev || argv.devKaggle) {
@@ -43,13 +44,22 @@ module.exports = function() {
   }
 
   if( argv.dev ) {
-    argv.searchPercent = argv.searchPercent || .2;
-    argv.validationPercent = argv.validationPercent || .7;
+    argv.searchPercent = argv.searchPercent || .1;
+    argv.validationPercent = argv.validationPercent || .85;
   } else {
     argv.searchPercent = argv.searchPercent || .3;
     argv.validationPercent = argv.validationPercent || .2;
   }
 
+  argv.predictionsFolder = path.join(argv.ppCompleteLocation, 'predictions', argv.testFilePretty);
+  argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
+  mkdirp(argv.predictionsFolder);
+  mkdirp(argv.validationFolder);
+
+  if( argv.binaryOutput ) {
+    argv.kaggleBinaryOutputFolder = path.join(predictionsFolder, 'kaggleBinaryOutput');
+    mkdirp(argv.kaggleBinaryOutputFolder);
+  }
 
   
   if( argv.alreadyFormatted === undefined ) {
