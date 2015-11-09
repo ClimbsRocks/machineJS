@@ -16,6 +16,7 @@ args = json.loads(sys.argv[2])
 fileNames = json.loads(sys.argv[3])
 XFileName = fileNames['X_train']
 XnnFileName = fileNames['X_train_nn']
+ynnFileName = fileNames['y_train_nn']
 idFileName = fileNames['id_train']
 yTrainFileName = fileNames['y_train']
 
@@ -114,4 +115,8 @@ del yColumn
 Xnn = load_sparse_csr(XnnFileName)
 splitDataset(Xnn, XnnFileName, 'X_train_nn')
 del Xnn
+
+ynn = load_sparse_csr(ynnFileName)
+splitDataset(ynn, ynnFileName, 'y_train_nn')
+del ynn
 
