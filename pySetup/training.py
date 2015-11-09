@@ -143,7 +143,7 @@ printParent('we are about to run a grid search over the following space:')
 printParent(parameters_to_try)
 
 # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
-gridSearch = GridSearchCV(classifier, parameters_to_try, cv=5, n_jobs=globalArgs['numCPUs'], error_score=0)
+gridSearch = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
 
 if y.shape[0] == 1:
     y = y.todense().tolist()
