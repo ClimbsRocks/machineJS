@@ -2,9 +2,10 @@ import json
 import sys
 import random
 from os import path
+import ntpath
 
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, csc_matrix
 
 from sendMessages import printParent
 from sendMessages import messageParent
@@ -62,25 +63,42 @@ def splitDataset(data, name):
     # slicing also works on column indices
     # callout to the person who first opened my eyes to them:
     # http://stackoverflow.com/questions/13352280/slicing-sparse-matrices-in-scipy-which-types-work-best
-    search = data[searchIndices,:]
-    longTrainingData = data[trainingDataIndices,:]
-    validation = data[validationIndices,:]
 
-    printParent('search.shape')
-    printParent(search.shape)
-    printParent('longTrainingData.shape')
-    printParent(longTrainingData.shape)
-    printParent('validation.shape')
-    printParent(validation.shape)
-    # TODO: write to file
+    # if this "sparse" matrix only has a single value for each row, we have to treat it as a column matrix, and slice it accordingly
+    # this is the case for our idColumn, and frequently our y values as well.
+    if data.shape[0] == 1:
+        search = data[:,searchIndices]
+        longTrainingData = data[:,trainingDataIndices]
+        validation = data[:,validationIndices]
+
+    else:
+        search = data[searchIndices,:]
+        longTrainingData = data[trainingDataIndices,:]
+        validation = data[validationIndices,:]
+
+    name = ntpath.basename(name)
+    name = name[0:-4]
+
+    printParent('name')
+    printParent(name)
+    printParent('outputDirectory')
+    printParent(outputDirectory)
     searchFile = path.join(outputDirectory, name + 'searchData.npz')
-    longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
-    validationFile = path.join(outputDirectory, name + 'validationData.npz')
     printParent('searchFile')
     printParent(searchFile)
+    longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
+    validationFile = path.join(outputDirectory, name + 'validationData.npz')
+    # TODO: send a message back to parent telling them where the files are
     save_sparse_csr(searchFile, search)
     save_sparse_csr(longTrainingFile, longTrainingData)
     save_sparse_csr(validationFile, validation)
+
+    fileNameDict = {
+        name + 'searchData': searchFile,
+        name + 'longTrainingData': longTrainingFile,
+        name + 'validationData': validationFile
+    }
+    messageParent(fileNameDict, 'splitFileNames')
 
 # we are going to have to repeat this process many times:
     # idColumn
@@ -88,7 +106,18 @@ def splitDataset(data, name):
     # y_train
     # X_train_nn
 
-splitDataset(X, 'X_train')
+splitDataset(X, XFileName)
 del X
 
+idColumn = load_sparse_csr(idFileName)
+splitDataset(idColumn, idFileName)
+del idColumn
+
+yColumn = load_sparse_csr(yTrainFileName)
+splitDataset(yColumn, yTrainFileName)
+del yColumn
+
+Xnn = load_sparse_csr(XnnFileName)
+splitDataset(Xnn, XnnFileName)
+del Xnn
 
