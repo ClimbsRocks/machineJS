@@ -58,6 +58,6 @@
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
-    "ppc-python-shell": "^0.2.0"
+    "python-shell": "^0.2.0"
   }
 }

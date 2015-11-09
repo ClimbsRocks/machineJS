@@ -1,7 +1,7 @@
 var py = global.pythonNamespace;
 
 var path = require('path');
-var PythonShell = require('ppc-python-shell');
+var PythonShell = require('python-shell');
 
 var pySetupLocation = py.pySetupLocation;
 
@@ -12,7 +12,8 @@ module.exports = {
   expectedMessages: {
     dictVectMapping: true,
     fileNames: true,
-    trainingResults: true
+    trainingResults: true,
+    splitFileNames: true
   },
 
   attachLogListener: function(referenceToShell) {

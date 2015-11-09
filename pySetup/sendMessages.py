@@ -7,12 +7,14 @@ def printParent(text):
     }
     print json.dumps(messageObj)
 
-def messageParent(text, type):
+
+def messageParent(messageText, type):
     messageObj = {
-        'text': text,
+        'text': messageText,
         'type': type
     }
     print json.dumps(messageObj)
+
 
 def obviousPrint(label, obj):
     printParent('#######################################################################################################################')

@@ -79,6 +79,9 @@ module.exports = {
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.alreadyFormatted ) {
       utils.fileNames = require('./testingFileNames');
+      // TODO: 
+      // if we already have the split file names, use those.
+      // that allows us to ensure more continuity as you make other tweaks, rather than introducing randomness through sample selection that might overwhelm the effects of other changes you're trying to make. 
       utils.splitData(function() {
         module.exports.startClassifiers(classifierList);
       });
