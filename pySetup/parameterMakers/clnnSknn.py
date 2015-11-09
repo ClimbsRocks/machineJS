@@ -15,8 +15,8 @@ def makeParams(X, y, globalArgs, dev, problemType):
         numFeatures = X.shape[1]
 
     parameters_to_try = {
-        'learning_rate': [0.001, 0.01, 0.03],
-        'hidden0__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ]
+        'learning_rate': [0.001, 0.01],
+        'hidden0__units': [ numFeatures / 2, numFeatures ]
         # 'hidden1__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ],
         # 'hidden2__units': [ numFeatures / 2, numFeatures, numFeatures * 3 ]
     }

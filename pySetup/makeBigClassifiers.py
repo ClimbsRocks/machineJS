@@ -11,7 +11,7 @@ def makeAll(globalArgs, dev, problemType):
     if dev:
         estimator_count=120
         
-    iterationCount=100
+    iterationCount=20
     if dev:
         iterationCount=2
 

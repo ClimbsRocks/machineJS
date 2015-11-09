@@ -19,7 +19,7 @@ from sklearn.linear_model import LinearRegression
 
 def makeClassifiers(globalArgs, dev, problemType):
 
-    n_iter=15
+    n_iter=10
     n_estimators=20
     if(dev):
         n_iter=2
