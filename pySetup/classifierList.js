@@ -15,10 +15,10 @@ classifier summary descriptions
 module.exports = {
   dev: {
     // clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
+    // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
-    clAdaBoost: 'clAdaBoost',
-    clXGBoost: 'clXGBoost',
+    // clAdaBoost: 'clAdaBoost',
+    // clXGBoost: 'clXGBoost',
     // clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini'
   },

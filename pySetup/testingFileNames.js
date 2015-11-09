@@ -33,5 +33,7 @@ module.exports = {
   X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_rossShortTrainDev.npz',
   X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
   trainingDataLength: 150333,
-  problemType: 'regression' 
+  problemType: 'regression',
+  idHeader: 'Id',
+  outputHeader: 'sales'
 };
