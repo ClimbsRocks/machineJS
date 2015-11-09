@@ -9,7 +9,7 @@ import numpy as np
 import logging
 import xgboost
 
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, vstack
 
 from sendMessages import printParent
 from sendMessages import messageParent
@@ -22,6 +22,7 @@ classifierName = sys.argv[5]
 argv = json.loads(sys.argv[3])
 problemType = sys.argv[6]
 trainingScore = sys.argv[7]
+copyValidationData = sys.argv[8]
 
 if( classifierName[0:4] == 'clnn' ):
     nn = True
@@ -31,7 +32,6 @@ else:
     X_file_name = fileNames['X_test']
 
 id_file_name = fileNames['id_test']
-y_file_name = fileNames['y_train']
 
 
 X = []
@@ -106,13 +106,15 @@ if problemType == 'category':
 else:
     testDataPredictions = classifier.predict(X)
 
-del X
-
 validationFile = fileNames['X_trainvalidationData']
 validationData = load_sparse_csr(validationFile)
 validationIdFile = fileNames['id_trainvalidationData']
 validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
-validationYFile = fileNames['y_trainvalidationData']
+
+if nn:
+    validationYFile = fileNames['y_train_nnvalidationData']
+else:
+    validationYFile = fileNames['y_trainvalidationData']
 validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
 
 if problemType == 'category':
@@ -143,12 +145,13 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
             len(prediction)
             csvwriter.writerow([rowID,prediction[1]])
         except:
+            printParent(prediction[0])
             csvwriter.writerow([rowID,prediction])
 
 
 
 # write our validation predictions to a file too
-validationPath = path.join( 'predictions', argv['testFilePretty'], 'validation')
+validationPath = path.join( 'predictions', argv['testOutputFileName'], 'validation')
 validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
 
 # to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
@@ -169,9 +172,38 @@ with open( path.join(validationPath, validationFileName) , 'w+') as validationFi
             # or why we're taking the second item in that list
         try:
             len(prediction)
+            printParent(prediction)
             csvwriter.writerow([rowID,prediction[1]])
         except:
             csvwriter.writerow([rowID,prediction])
+
+# continued callout to the person originally responsible for this function:
+# http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
+def save_sparse_csr(filename,array):
+    np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
+
+if copyValidationData and nn == False:
+    allValidationDataFile = path.join( validationPath, 'validationData.npz')
+    allValidationData = vstack( [validationData, X] )
+    save_sparse_csr(allValidationDataFile, allValidationData)
+
+    with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
+        csvwriter = csv.writer(validationFile)
+
+        # we are going to have to modify this when we allow it to make categorical predictions too. 
+        csvwriter.writerow([idHeader,outputHeader])
+        for idx, rowID in enumerate(totalIdColumn):
+            try:
+                yValue = validationY[idx]
+            except:
+                yValue = None
+            # I'm not sure why we're checking if prediction is already a list
+                # or why we're taking the second item in that list
+            try:
+                len(yValue)
+                csvwriter.writerow([rowID,yValue[1]])
+            except:
+                csvwriter.writerow([rowID,yValue])
 
 
 
