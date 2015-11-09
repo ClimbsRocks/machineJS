@@ -17,8 +17,8 @@ module.exports = {
     // clnnSknn3Layer: 'clnnSknn3Layer',
     // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
-    // clAdaBoost: 'clAdaBoost',
-    // clXGBoost: 'clXGBoost',
+    clAdaBoost: 'clAdaBoost',
+    clXGBoost: 'clXGBoost',
     // clRfEntropy: 'clRfEntropy',
     clRfGini: 'clRfGini'
   },

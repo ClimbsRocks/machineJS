@@ -14,13 +14,9 @@ console.log('thanks for inviting us along on your machine learning journey!\n');
 processArgs();
 
 if (argv.devEnsemble) {
-  // ensembler.startListeners(numberOfClassifiers, argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
-  ensembler.createEnsemble( argv.dataFilePretty, './predictions', argv.ppCompleteLocation );
+  ensembler.createEnsemble( argv.ensemblerArgs );
 } else {
-
-  // console.log('argv in ppLib.js:', argv);
-  controllerPython.startTraining(argv);
-  
+  controllerPython.startTraining(argv);  
 }
 
 processShutdownListeners(controllerPython);

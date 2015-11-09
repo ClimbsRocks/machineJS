@@ -2,7 +2,7 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 
 module.exports = function() {
-  if(argv.dev || argv.devKaggle) {
+  if(argv.dev || argv.devKaggle || argv.devEnsemble) {
     argv.dev = true;
   } else {
     argv.dev = false;
@@ -51,10 +51,17 @@ module.exports = function() {
     argv.validationPercent = argv.validationPercent || .2;
   }
 
-  argv.predictionsFolder = path.join(argv.ppCompleteLocation, 'predictions', argv.testFilePretty);
+  argv.predictionsFolder = path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
   argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
   mkdirp(argv.predictionsFolder);
   mkdirp(argv.validationFolder);
+
+  argv.ensemblerArgs = {
+    inputFolder: argv.predictionsFolder,
+    outputFolder: argv.ppCompleteLocation,
+    validationFolder: argv.validationFolder,
+    fileNameIdentifier: argv.outputFileName
+  };
 
   if( argv.binaryOutput ) {
     argv.kaggleBinaryOutputFolder = path.join(predictionsFolder, 'kaggleBinaryOutput');
