@@ -143,10 +143,10 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
 
         try:
             len(prediction)
-            csvwriter.writerow([rowID,prediction[1]])
+            csvwriter.writerow([int(rowID),prediction[1]])
         except:
-            printParent(prediction[0])
-            csvwriter.writerow([rowID,prediction])
+            # printParent(prediction[0])
+            csvwriter.writerow([int(rowID),prediction])
 
 
 
@@ -173,9 +173,9 @@ with open( path.join(validationPath, validationFileName) , 'w+') as validationFi
         try:
             len(prediction)
             printParent(prediction)
-            csvwriter.writerow([rowID,prediction[1]])
+            csvwriter.writerow([int(rowID),prediction[1]])
         except:
-            csvwriter.writerow([rowID,prediction])
+            csvwriter.writerow([int(rowID),prediction])
 
 # continued callout to the person originally responsible for this function:
 # http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
@@ -201,9 +201,9 @@ if copyValidationData and nn == False:
                 # or why we're taking the second item in that list
             try:
                 len(yValue)
-                csvwriter.writerow([rowID,yValue[1]])
+                csvwriter.writerow([int(rowID),yValue[1]])
             except:
-                csvwriter.writerow([rowID,yValue])
+                csvwriter.writerow([int(rowID),yValue])
 
 
 
