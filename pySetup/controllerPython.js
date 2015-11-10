@@ -3,6 +3,7 @@ var exec = require('child_process').exec;
 var ensembler = require('ensembler');
 
 var path = require('path');
+var fs = require('fs');
 var pySetupLocation = path.dirname(__filename);
 py.pySetupLocation= pySetupLocation;
 py.referencesToChildren= [];
@@ -79,6 +80,13 @@ module.exports = {
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.alreadyFormatted ) {
       utils.fileNames = require('./testingFileNames');
+      try {
+        utils.fileNames = JSON.parse(utils.fileNames);
+      } catch( err ) {
+        // do nothing! it's already valid JS
+        // console.error(err);
+      }
+      utils.fileNames 
       // TODO: 
       // if we already have the split file names, use those.
       // that allows us to ensure more continuity as you make other tweaks, rather than introducing randomness through sample selection that might overwhelm the effects of other changes you're trying to make. 
@@ -96,6 +104,27 @@ module.exports = {
       });
     }
 
+  },
+
+  makeAllPredictions: function(folderName) {
+    // eventually, we will take in a folderName where our bestClasifiers are stored, and only make predictions against those classifiers
+    // TODO: start listeners for ensembler
+    
+    fs.readdir(folderName, function(err,files) {
+      if (err) {
+        console.error('there are no files in the input folder',folderName);
+
+        console.error("We need the pickled (.pkl) results of the trained classifiers saved into their own folders within this folder. Please make sure that this is the right folder, and that you have properly saved each classifier into it's own directory within this folder.");
+      } else { 
+        var numberOfClassifiers = files.length;
+        ensembler.startListeners( numberOfClassifiers, argv.ensemblerArgs);
+        files.forEach(function(fileName) {
+          // our file names already have "best" in them, but our makePredictions script is just expecting the classifierName itself, without "best"
+          fileName = fileName.slice(4);
+          module.exports.makePredictions(fileName);
+        });
+      }
+    });
 
   },
 
