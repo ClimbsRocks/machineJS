@@ -1,5 +1,6 @@
 var path = require('path');
 var mkdirp = require('mkdirp');
+var utils = require(path.join('pySetup','utils.js'));
 
 module.exports = function() {
   if(argv.dev || argv.devKaggle || argv.devEnsemble) {
@@ -74,10 +75,20 @@ module.exports = function() {
 
   
   if( argv.alreadyFormatted === undefined ) {
-    if( argv.dev ) {
+    if( argv.dev || argv.makePredictions ) {
       argv.alreadyFormatted = true;
     } else {
       argv.alreadyFormatted = false;
+    }
+  }
+
+
+  if( argv.alreadyFormatted ) {
+    utils.fileNames = require(path.join('pySetup','testingFileNames.js'));
+    try{
+      utils.fileNames = JSON.parse(utils.fileNames);
+    } catch(err) {
+
     }
   }
 
