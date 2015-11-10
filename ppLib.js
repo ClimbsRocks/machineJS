@@ -15,6 +15,8 @@ processArgs();
 
 if (argv.devEnsemble) {
   ensembler.createEnsemble( argv.ensemblerArgs );
+} else if( argv.makePredictions ) {
+  controllerPython.makeAllPredictions( argv.makePredictions );
 } else {
   controllerPython.startTraining(argv);  
 }
