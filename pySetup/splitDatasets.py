@@ -41,17 +41,26 @@ numRows = X.shape[0]
 
 includeOrNot = [random.random() for x in range(0,numRows)]
 
+validationIndexFolder = path.dirname(args['kagglePredict'])
+validationIndexFileName = 'dfValidationIndices' + args['testFileOutputName'] + '.pkl'
 try:
-    validationIndexFolder = path.dirname(args['kagglePredict'])
-    validationIndexFileName = 'dfValidationIndices' + args['testFileOutputName'] + '.pkl'
     printParent('got to the point where we are attempting to read in the .pkl')
     validationIndices = pickle.load(path.join( validationIndexFolder, validationIndexFileName ))
+    # TODO: 
+        # check to make sure that the maximum number in validationIndices is less than the length of our X dataset
+            # if it isn't, create a new validationIndices for this dataset, but do not write it to file
+            # this lets us keep our larger validationIndices split (for the full training data set), while still having something to work with for this smaller dataset we're currently testing on.
+        # check to make sure that the maximum number in validationIndices is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the largest number in validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
+            # If it is not, create a new validationIndices and write that to file
+        # In both cases, fall into the except state below
+        # but create a variable that lays out whether to write that new validationIndices to file or not in the try block, and then use that in the except block below
 except:
     validationIndices = []
     for idx, randomNum in enumerate(includeOrNot):
         if randomNum > validationPercent:
             validationIndices.append(idx)
     # now save that file as a .pkl next to where our test data sits. 
+    pickle.dump(validationIndices, path.join( validationIndexFolder, validationIndexFileName))
 
 searchIndices = []
 trainingDataIndices = []
