@@ -3,6 +3,7 @@ import sys
 import random
 from os import path
 import ntpath
+import pickle
 
 import numpy as np
 from scipy.sparse import csr_matrix, csc_matrix
@@ -28,6 +29,7 @@ searchPercent = args['searchPercent']
 validationPercent = args['validationPercent']
 
 
+
 # we are not supporting dense matrices at the moment. 
 def load_sparse_csr(filename):
     loader = np.load(filename)
@@ -39,10 +41,20 @@ numRows = X.shape[0]
 
 includeOrNot = [random.random() for x in range(0,numRows)]
 
+try:
+    validationIndexFolder = path.dirname(args['kagglePredict'])
+    validationIndexFileName = 'dfValidationIndices' + args['testFileOutputName'] + '.pkl'
+    printParent('got to the point where we are attempting to read in the .pkl')
+    validationIndices = pickle.load(path.join( validationIndexFolder, validationIndexFileName ))
+except:
+    validationIndices = []
+    for idx, randomNum in enumerate(includeOrNot):
+        if randomNum > validationPercent:
+            validationIndices.append(idx)
+    # now save that file as a .pkl next to where our test data sits. 
 
 searchIndices = []
 trainingDataIndices = []
-validationIndices = []
 
 for idx, randomNum in enumerate(includeOrNot):
     if randomNum < searchPercent:
@@ -117,6 +129,7 @@ splitDataset(Xnn, XnnFileName, 'X_train_nn')
 del Xnn
 
 ynn = load_sparse_csr(ynnFileName)
+# obviousPrint('y neural net inside splitDatasets.py',ynn.toarray().tolist()[0][0:100])
 splitDataset(ynn, ynnFileName, 'y_train_nn')
 del ynn
 
