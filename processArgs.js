@@ -44,6 +44,19 @@ module.exports = function() {
     argv.testOutputFileName = dataFileFolder + argv.testFilePretty;
   }
 
+  // in splitDatasets.py, we are going to break our data out into three groups:
+    // 1. The group we run the hyperparameter search over (GridSearchCV or RandomizedSearchCV).
+      // Since the best hyperparameters for a random subset of the data are going to be the same as the entire dataset, 
+      // we run the search on only a subset of the data to drastically speed up search time
+    // 2. The training data we will train our (now-optimized) algorithm on. 
+      // Now that we have our best hyperparameters, create an algorithm with those parameters, and train it only a larger portion of our overall dataset. 
+    // 3. The validation set. This is a holdout set we do not include in the training set. 
+      // We use this to test how well our algorithm generalizes to data it hasn't seen yet. 
+      // We also use this, later down the road, for ensembler to create stacked/blended ensembles with.
+      // For a given test.csv dataset, we will determine the validation dataset once, and then use that each time.
+      // This means that we can include all the algorithms you've trained on this dataset in our ensembling. 
+      // This lets you change how you format the data (normalization, scaling, new feature engineering, etc.), and still use all these algorithms in the final ensemble.
+      // You can easily start over with a new validation set by simply deleting the validation.pkl file saved next to your test.csv file.
   if( argv.dev ) {
     argv.searchPercent = argv.searchPercent || .1;
     argv.validationPercent = argv.validationPercent || .85;
