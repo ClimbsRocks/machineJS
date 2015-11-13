@@ -44,26 +44,36 @@ includeOrNot = [random.random() for x in range(0,numRows)]
 validationIndexFolder = path.dirname(args['kagglePredict'])
 validationIndexFileName = 'dfValidationIndices' + args['testOutputFileName'] + '.pkl'
 validationIndicesFile = path.join( validationIndexFolder, validationIndexFileName )
+writeToFile = True
 try:
     with open(validationIndicesFile, 'rb') as openFile:
-        printParent('got to the point where we are attempting to read in the .pkl')
         validationIndices = pickle.load(openFile)
-    # TODO: 
+        maxVal = max( validationIndices )
         # check to make sure that the maximum number in validationIndices is less than the length of our X dataset
+        if maxVal > numRows * validationPercent:
             # if it isn't, create a new validationIndices for this dataset, but do not write it to file
             # this lets us keep our larger validationIndices split (for the full training data set), while still having something to work with for this smaller dataset we're currently testing on.
+            writeToFile = False
+            raise IndexError("this dataset is shorter than the one we built the validation split on previously")
+
         # check to make sure that the maximum number in validationIndices is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the largest number in validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
+        elif maxVal < numRows * validationPercent * .95:
             # If it is not, create a new validationIndices and write that to file
+            raise IndexError("this dataset is longer than the one we built the validation split on previously")
+            
         # In both cases, fall into the except state below
         # but create a variable that lays out whether to write that new validationIndices to file or not in the try block, and then use that in the except block below
+
 except:
-    with open(validationIndicesFile, 'w+') as writeFile:
-        validationIndices = []
-        for idx, randomNum in enumerate(includeOrNot):
-            if randomNum > validationPercent:
-                validationIndices.append(idx)
-        # now save that file as a .pkl next to where our test data sits. 
-        pickle.dump(validationIndices, writeFile)
+    validationIndices = []
+    for idx, randomNum in enumerate(includeOrNot):
+        if randomNum > validationPercent:
+            validationIndices.append(idx)
+
+    if writeToFile:
+        with open(validationIndicesFile, 'w+') as writeFile:
+            # now save that file as a .pkl next to where our test data sits. 
+            pickle.dump(validationIndices, writeFile)
 
 searchIndices = []
 trainingDataIndices = []
