@@ -4,7 +4,10 @@
   "description": "Automated machine learning structure. Ensembles random forests, XGBoost, neural networks, AdaBoost, KNN, SVM together, handling data formatting ensembling, and running predictions for you. Feel free to tweak the settings if you want a lot of control, or just start it up and let it run if you're looking for a push-button MVP solution.",
   "main": "ppLib.js",
   "scripts": {
-    "test": "node ppLib.js --devKaggle"
+    "test": "npm run test:regression && npm run test:categorical",
+    "test:regression": "mocha test/regression/test.js",
+    "test:categorical": "mocha test/categorical/test.js",
+    "dev": "node ppLib.js --devKaggle"
   },
   "repository": {
     "type": "git",
