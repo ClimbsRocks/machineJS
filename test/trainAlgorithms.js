@@ -16,8 +16,13 @@ describe('training and tuning algorithms', function() {
     // TODO: probably break this out into separate tests, one for each algo. that way it will be easier to find which one failed.
   });
 
-  
+  it('should write each algorithm to a file in the correct directory', function() {
 
+  });
+
+  it('should name the trained algorithm file after the algorithm\'s name', function() {
+
+  });
 
 
 });
