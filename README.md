@@ -20,6 +20,8 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
 4. Don't expect to be able to do anything intense while this is running. Internet browsing or code editing is fine, but watching a movie may get challenging.
 5. Please don't run any other Python scripts while this is running.
 
+
+# Refactor this entire section out into it's own file- keep README.md as pure and unintimidating as possible. 
 ## The Current State Of Advanced Options: 
 - `--alreadyFormatted`: A boolean value 'true' or 'false', noting if your data has already been formatted. Useful if you're just tweaking parameters and don't want to repeat the oftentimes time-expensive data formatting process again. If you pass in this flag, make sure your files are included in the  `pySetup/testingFileNames.js` json list. I've included a couple of examples. You can get the fileNames from `pySetup/utils.js`, inside of the formatData function. Just copy paste the fileNames obj data-formatter gives to the callback, into the `testingFileNames.js` file. 
 - `--join`: a path to a data file that will be joined in with your training and testing data, in the same way you'd join SQL tables. 
@@ -31,4 +33,8 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
 - `--devKaggle`: Does all the same things as `--dev`, but also runs `--kagglePredict` on the default dataset kaggleGiveCreditTest.csv
 - `--devEnsemble`: Assumes that we already have predictions made for us by the rest of the module and present in predictions/*.csv. Allows you to focus on assembling your ensemble without having to retrain the models each time :)
 
+### Validation Splits
+The `ensembler` module, which uses machine learning to aggregate together all the results of each trained algorithm, will always benefit from more information, and thus, more trained algorithms. To support this, we are using a consistent valdiation data split for a given test.csv dataset. This means you can change your training.csv data (new feature engineering, new ways of normalizing the data, etc.), but still use the predictions from previous training data sets. 
+
+If you ever want to ask machineJS to create a new validation split for you, simply delete the `*validationData.npz` files from the data-formatterResults directory.
 
