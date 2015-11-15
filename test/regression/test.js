@@ -13,7 +13,7 @@ describe('data-formatter', function() {
     // remove any folder of testResults that might exist
 
     // TODO: pass in the outputFolder
-    execSync('node ../ppLib.js ../node_modules/data-for-tests/rossman/tinyTrain.csv --kagglePredict ../node_modules/data-for-tests/rossman/test.csv --join ../node_modules/data-for-tests/rossman/store.csv');
+    execSync('node ppLib.js node_modules/data-for-tests/rossman/tinyTrain.csv --kagglePredict node_modules/data-for-tests/rossman/test.csv --join node_modules/data-for-tests/rossman/store.csv');
 
     done();
 
