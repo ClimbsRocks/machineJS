@@ -96,8 +96,9 @@ module.exports = {
 
     // TODO: 
     var startPredictionsScript = function() {
-      if( global.finishedAlgos === 1 ) {
+      if( global.copyValidationData && classifierName.slice(0,4) !== 'clnn' ) {
         var copyValidationData = true;
+        global.copyValidationData = false;
       } else {
         var copyValidationData = false;
       }

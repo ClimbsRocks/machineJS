@@ -90,6 +90,7 @@ module.exports = function() {
   // we will eventually be storing information about our trained algorithms here.
   global.trainedAlgos = {};
   global.finishedAlgos = 0;
+  global.copyValidationData = true;
 
   
   if( argv.alreadyFormatted === undefined ) {
