@@ -19,8 +19,14 @@ describe('regression problems', function() {
   before(function(done) {
     // remove any folder of testResults that might exist
 
-    // TODO: pass in the outputFolder
-    execSync('node ppLib.js ' + path.join(dataLocation,'tinyTrain.csv') + ' --kagglePredict ' + path.join(dataLocation,'test.csv') + ' --join ' + path.join(dataLocation, 'store.csv') );
+    execSync('node ppLib.js ' 
+      + path.join(dataLocation,'tinyTrain.csv') 
+      + ' --kagglePredict ' + path.join(dataLocation,'test.csv') 
+      + ' --join ' + path.join(dataLocation, 'store.csv') 
+      + ' --dfOutputFolder ' + path.join(testFileLocation, 'dfTestResults')
+      + ' --predictionsFolder ' + path.join(testFileLocation, 'regressionTestPredictions')
+      + ' --ensemblerOutputFolder ' + testFileLocation
+    );
 
     done();
 
