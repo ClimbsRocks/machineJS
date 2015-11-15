@@ -63,5 +63,10 @@
     "minimist": "^1.1.2",
     "mkdirp": "^0.5.1",
     "python-shell": "^0.2.0"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "data-for-tests": "0.0.3",
+    "mocha": "^2.3.3"
   }
 }
