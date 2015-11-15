@@ -7,3 +7,8 @@ BeforEach: copy the exact classifier name to your clipboard so we can be consist
 5. paramMakers folder: if this is just a new split of the same algorith (rf with gini, and rf with entropy), go back to paramMakers/classifierName and make sure the new one is mutually exclusive with the old one
 6. extendedTrainingList.py: state whether there is an extended training version of this classifier available. This step is somewhat redundent, but makes it clear that a classifier not being in makeBigClassifiers.py is intentional
 7. makeBigClassifiers.py: add in a 'larger' version of the classifier- typically by bumping up n_estimators dramatically
+8. Update test suites to support this new algorithm
+    A. For each problemType that is supported:
+        a) add it in as an expected file
+        b) run the test dataset against this algorithm, to find it's expected error rates
+        c) create a new test expecting the error rate to be roughly that
