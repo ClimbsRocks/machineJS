@@ -2,6 +2,7 @@ var expect = require('chai').expect;
 var mocha = require('mocha');
 var execSync = require('child_process').execSync;
 var path = require('path');
+var rimraf = require('rimraf');
 
 var makePredictions = require('./makePredictions');
 var splitDataset = require('./splitDataset');
@@ -17,7 +18,10 @@ describe('regression problems', function() {
   this.timeout(600000);
 
   before(function(done) {
-    // remove any folder of testResults that might exist
+    // remove any folders we might have created when running the test suite previously
+    // rimraf is `rm -rf` for node
+    rimraf.sync(path.join(testFileLocation, 'dfTestResults'));
+    rimraf.sync(path.join(testFileLocation, 'regressionTestPredictions'));
 
     execSync('node ppLib.js ' 
       + path.join(dataLocation,'tinyTrain.csv') 
