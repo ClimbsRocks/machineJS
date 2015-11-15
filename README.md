@@ -32,6 +32,8 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
   c) if no data is passed in, automatically use the kaggleGiveCredit.csv dataset
 - `--devKaggle`: Does all the same things as `--dev`, but also runs `--kagglePredict` on the default dataset kaggleGiveCreditTest.csv
 - `--devEnsemble`: Assumes that we already have predictions made for us by the rest of the module and present in predictions/*.csv. Allows you to focus on assembling your ensemble without having to retrain the models each time :)
+- `--dfOutputFolder`: if, for some reason, you want the results of `data-formatter` written to a different directory. We use this for the test suite, but it probably isn't useful for much other than that. 
+- `--ensemblerOutputFolder`: much like the `dfOutputFolder` option above, you can choose to overwrite the default location for the output results. Used in our test suite, but probably not useful for many other cases.
 
 ### Validation Splits
 The `ensembler` module, which uses machine learning to aggregate together all the results of each trained algorithm, will always benefit from more information, and thus, more trained algorithms. To support this, we are using a consistent valdiation data split for a given test.csv dataset. This means you can change your training.csv data (new feature engineering, new ways of normalizing the data, etc.), but still use the predictions from previous training data sets. 
