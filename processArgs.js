@@ -65,14 +65,17 @@ module.exports = function() {
     argv.validationPercent = argv.validationPercent || .2;
   }
 
-  argv.predictionsFolder = path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
+
+  argv.predictionsFolder = argv.predictionsFolder || path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
   argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
   mkdirp(argv.predictionsFolder);
   mkdirp(argv.validationFolder);
 
+  argv.ensemblerOutputFolder = argv.ensemblerOutputFolder || argv.ppCompleteLocation;
+
   argv.ensemblerArgs = {
     inputFolder: argv.predictionsFolder,
-    outputFolder: argv.ppCompleteLocation,
+    outputFolder: argv.ensemblerOutputFolder,
     validationFolder: argv.validationFolder,
     fileNameIdentifier: argv.outputFileName
   };

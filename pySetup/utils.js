@@ -55,6 +55,10 @@ module.exports = {
       on: argv.on
     };
 
+    if( argv.dfOutputFolder ) {
+      dataFormatterArgs.outputFolder = argv.dfOutputFolder;
+    }
+
     df(dataFormatterArgs, function(fileNames) {
       console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
