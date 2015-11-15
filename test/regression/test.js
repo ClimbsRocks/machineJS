@@ -2,14 +2,20 @@ var expect = require('chai').expect;
 var mocha = require('mocha');
 var execSync = require('child_process').execSync;
 
+var makePredictions = require('./makePredictions');
+var splitDataset = require('./splitDataset');
+var trainAlgorithms = require('./trainAlgorithms');
+
 // this block will contain all the tests for the entire data-formatter package
 describe('data-formatter', function() {
 
-  before(function() {
+  before(function(done) {
     // remove any folder of testResults that might exist
 
     // TODO: pass in the outputFolder
     execSync('node ../ppLib.js ../node_modules/data-for-tests/rossman/tinyTrain.csv --kagglePredict ../node_modules/data-for-tests/rossman/test.csv --join ../node_modules/data-for-tests/rossman/store.csv');
+
+    done();
 
   });
 
@@ -21,13 +27,13 @@ describe('data-formatter', function() {
   // TODO: run this separately for each type of problem we're solving (regression, category, then eventually multi-labe, etc.)
   // global.testNamespace.mjsChildProcess = 
 
-  setDefaultArgs();
+  // setDefaultArgs();
 
-  // splitDataset();
+  splitDataset();
 
-  // trainAlgos();
+  trainAlgorithms();
 
-  // makePredictions();
+  makePredictions();
 
 
 });
