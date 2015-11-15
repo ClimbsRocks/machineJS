@@ -1,26 +1,32 @@
 var expect = require('chai').expect;
 var mocha = require('mocha');
 var execSync = require('child_process').execSync;
+var path = require('path');
 
 var makePredictions = require('./makePredictions');
 var splitDataset = require('./splitDataset');
 var trainAlgorithms = require('./trainAlgorithms');
 
+var testFileLocation = path.dirname(__filename);
+var dataLocation = path.join(testFileLocation, '..','..','node_modules','data-for-tests','rossman');
+
+console.log('dataLocation',dataLocation);
+
 // this block will contain all the tests for the entire data-formatter package
-describe('data-formatter', function() {
+describe('regression problems', function() {
+  this.timeout(600000);
 
   before(function(done) {
     // remove any folder of testResults that might exist
 
     // TODO: pass in the outputFolder
-    execSync('node ppLib.js node_modules/data-for-tests/rossman/tinyTrain.csv --kagglePredict node_modules/data-for-tests/rossman/test.csv --join node_modules/data-for-tests/rossman/store.csv');
+    execSync('node ppLib.js ' + path.join(dataLocation,'tinyTrain.csv') + ' --kagglePredict ' + path.join(dataLocation,'test.csv') + ' --join ' + path.join(dataLocation, 'store.csv') );
 
     done();
 
   });
 
   // this timeout should be long enough to handle tests on a variety of machines. If you are getting a timeout error, consider bumping this up even more. 
-  this.timeout(600000);
 
   // TODO: it might make the most sense to just run machineJS all the way through, and then run tests on the final output results
     // this would contrast with what we're doing in data-formatter, where the childProcess is emitting events at the end of each step.
