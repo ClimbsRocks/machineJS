@@ -4,11 +4,6 @@ var mocha = require('mocha');
 module.exports = function() {
   
   describe('training and tuning algorithms', function() {
-    before(function(done) {
-        global.testNamespace.mjsChildProcess.on('trained', function() {
-          done();
-        });
-    });
 
     it('should successfully train one instance of all algorithms in classifierList, for this problemType', function() {
 

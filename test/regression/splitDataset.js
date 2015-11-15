@@ -4,11 +4,6 @@ var mocha = require('mocha');
 module.exports = function() {
   
   describe('splitting the formatted dataset', function() {
-    before(function(done) {
-        global.testNamespace.mjsChildProcess.on('splitDatasets', function() {
-          done();
-        });
-    });
 
     it('should create a new validation split when we do not have one already', function() {
 
