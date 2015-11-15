@@ -32,6 +32,11 @@ module.exports = {
     // generatePythonOptions assumes the first input is the name of a data file that training.py or makePredictions.py will be run on. Pass in ignoreMe.csv for now until we refactor that. 
     var pythonOptions = utilsPyShell.generatePythonOptions('ignoreMe.csv', [JSON.stringify(argv), JSON.stringify(module.exports.fileNames) 
       ] );
+
+    if( argv.splitDataTest ) {
+      // if this is being run from within our test suite, pass in a blank callback to halt executtion after splitDatasets
+      callback = function() {};
+    }
     
     var pyShell = utilsPyShell.startPythonShell('splitDatasets.py', callback, pythonOptions);
     pyShell.on('message', function(message) {
