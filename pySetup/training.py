@@ -1,6 +1,7 @@
 import sys
 import csv
 import os
+import os.path as path
 import json
 import joblib
 import logging
@@ -241,13 +242,10 @@ longTrainClassifierScore = longTrainClassifier.score(X, y)
 printParent('the algorithm that we trained on a larger portion of the dataset has a score of')
 printParent(longTrainClassifierScore)
 
-    
-if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
-    os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-joblib.dump(longTrainClassifier, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+
+classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
+if not os.path.exists(classifierFolder):
+    os.makedirs(classifierFolder)
+joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
 
 messageParent(longTrainClassifierScore, 'trainingResults')
-
-    # if not os.path.exists('pySetup/bestClassifiers/best' + classifierName):
-    #     os.makedirs('pySetup/bestClassifiers/best' + classifierName)
-    # joblib.dump(gridSearch.best_estimator_, 'pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')

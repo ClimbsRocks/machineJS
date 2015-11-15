@@ -68,8 +68,10 @@ module.exports = function() {
 
   argv.predictionsFolder = argv.predictionsFolder || path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
   argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
+  argv.bestClassifiersFolder = argv.bestClassifiersFolder || path.join(argv.ppCompleteLocation, 'pySetup','bestClassifiers',argv.outputFileName);
   mkdirp(argv.predictionsFolder);
   mkdirp(argv.validationFolder);
+  mkdirp(argv.bestClassifiersFolder);
 
   argv.ensemblerOutputFolder = argv.ensemblerOutputFolder || argv.ppCompleteLocation;
 

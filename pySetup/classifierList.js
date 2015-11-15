@@ -38,13 +38,13 @@ module.exports = {
   },
   longDataSet: {
     // clnnNoLearn: 'clnnNoLearn',
-    clnnSknn3Layer: 'clnnSknn3Layer',
-    clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini',
-    // clAdaBoost: 'clAdaBoost',
+    clRfGini: 'clRfGini',
+    clAdaBoost: 'clAdaBoost',
     // clLogisticRegression: 'clLogisticRegression'
-    // clXGBoost: 'clXGBoost'
+    clXGBoost: 'clXGBoost'
   }
 };

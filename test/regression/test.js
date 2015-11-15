@@ -2,6 +2,7 @@ var expect = require('chai').expect;
 var mocha = require('mocha');
 var execSync = require('child_process').execSync;
 var path = require('path');
+var fs = require('fs');
 var rimraf = require('rimraf');
 
 var makePredictions = require('./makePredictions');
@@ -18,11 +19,21 @@ describe('regression problems', function() {
   this.timeout(600000);
 
   before(function(done) {
-    // remove any folders we might have created when running the test suite previously
-    // rimraf is `rm -rf` for node
-    rimraf.sync(path.join(testFileLocation, 'dfTestResults'));
-    rimraf.sync(path.join(testFileLocation, 'regressionTestPredictions'));
 
+    try {
+      // remove any folders we might have created when running the test suite previously
+      // rimraf is `rm -rf` for node
+      rimraf.sync(path.join(testFileLocation, 'dfTestResults'));
+      rimraf.sync(path.join(testFileLocation, 'regressionTestPredictions'));
+      rimraf.sync(path.join(testFileLocation, 'bestClassifiersTest'));
+      fs.unlinkSync(path.join(dataLocation, 'dfValidationIndicesrossmantest.pkl'));
+      
+    } catch(err) {
+    }
+
+    // to see detailed output while running the tests, use node-inspector.
+      // npm install -g node-inspector
+      // change "node" below to be "node-debug"
     execSync('node ppLib.js ' 
       + path.join(dataLocation,'tinyTrain.csv') 
       + ' --kagglePredict ' + path.join(dataLocation,'test.csv') 
@@ -30,6 +41,7 @@ describe('regression problems', function() {
       + ' --dfOutputFolder ' + path.join(testFileLocation, 'dfTestResults')
       + ' --predictionsFolder ' + path.join(testFileLocation, 'regressionTestPredictions')
       + ' --ensemblerOutputFolder ' + testFileLocation
+      + ' --bestClassifiersFolder ' + path.join(testFileLocation, 'bestClassifiersTest')
     );
 
     done();

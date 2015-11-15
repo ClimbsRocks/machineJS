@@ -88,7 +88,7 @@ except:
 
 
 # load up the previously trained (and tuned!) classifier
-classifier = joblib.load('pySetup/bestClassifiers/best' + classifierName + '/best' + classifierName + '.pkl')
+classifier = joblib.load(path.join( argv['bestClassifiersFolder'] ,'best' + classifierName, 'best' + classifierName + '.pkl') )
 
 # if nn or classifierName == 'clXGBoost':
 #     X = np.array(X)
@@ -161,7 +161,7 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
 
 
 # write our validation predictions to a file too
-validationPath = path.join( 'predictions', argv['testOutputFileName'], 'validation')
+validationPath = path.join( predictionsPath, 'validation')
 validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
 
 # to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
