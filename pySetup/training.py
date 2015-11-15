@@ -20,7 +20,10 @@ logging.basicConfig()
 import warnings
 startTime = time.time()
 
-# these three lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
+from randomizedSearchList import rsList
+randomizedSearchCVList = rsList()
+
+# these lines will give us an object with keys for each classifier name, and values that will return classifiers to us. 
 from makeClassifiers import makeClassifiers
 globalArgs = json.loads(sys.argv[2])
 fileNames = json.loads(sys.argv[3])
@@ -149,14 +152,12 @@ gridSearch = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numC
 
 
 def load_sparse_csr_logging(filename):
-    printParent('filename')
-    printParent(filename)
     loader = np.load(filename)
     # obviousPrint("loader['indices']",loader['indices'])
     return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
 
-if classifierName[0:4] == 'clnn':
-    y = load_sparse_csr_logging(fileNames['y_train_nnsearchData'])
+# if classifierName[0:4] == 'clnn':
+#     y = load_sparse_csr_logging(fileNames['y_train_nnsearchData'])
     
 if y.shape[0] == 1:
     y = y.todense().tolist()[0]
@@ -168,9 +169,9 @@ if y.shape[0] == 1:
 
 if classifierName[0:4] == 'clnn':
     X = X.todense()
-    # obviousPrint('X.shape',X.shape)
+    obviousPrint('X.shape',X.shape)
     y = np.array(y)
-    # obviousPrint('y.shape',y.shape)
+    obviousPrint('y.shape before gridsearch',y.shape)
     # printParent(y.tolist())
     # obviousPrint('len(X)',len(X))
     # obviousPrint('len(X[0])',len(X[0]))
@@ -229,9 +230,9 @@ X = vstack( [X, xLongData] )
 
 if classifierName[0:4] == 'clnn':
     X = X.todense()
-    obviousPrint('X.shape',X.shape)
+    obviousPrint('X.shape right before long training in training.py',X.shape)
     y = np.array(y)
-    obviousPrint('y.shape',y.shape)
+    obviousPrint('y.shape right before long training in training.py',y.shape)
 
 longTrainClassifier.fit(X, y)
 

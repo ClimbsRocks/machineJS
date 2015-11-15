@@ -102,9 +102,12 @@ except:
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
-    testDataPredictions = classifier.predict_proba(X)
+    testDataPredictions = classifier.predict_proba(X)    
 else:
+    printParent('X.shape right before making predictions')
+    printParent(X.shape)
     testDataPredictions = classifier.predict(X)
+    obviousPrint('testDataPredictions right after making them in makePredictions.py',testDataPredictions[0:100].tolist())
 
 validationFile = fileNames['X_trainvalidationData']
 validationData = load_sparse_csr(validationFile)
@@ -112,10 +115,13 @@ validationIdFile = fileNames['id_trainvalidationData']
 validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
 
 if nn:
+    printParent('loading up the y data for a neural network')
     validationYFile = fileNames['y_train_nnvalidationData']
 else:
     validationYFile = fileNames['y_trainvalidationData']
 validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
+
+obviousPrint('validationY inside makePredictions.py', validationY)
 
 if problemType == 'category':
     validationPredictions = classifier.predict_proba(validationData)
@@ -126,11 +132,15 @@ else:
 validationScore = classifier.score(validationData,validationY)
 # except:
 #     validationScore = 0
+obviousPrint('the classifier', classifierName)
+# printParent(classifierName)
+obviousPrint('had a score on the validation set of:', validationScore)
+# printParent(validationScore)
 
 
 # write our predictions on the test data to a file
 predictionsPath = argv['predictionsFolder']
-# using the outputFileName ('train') here so that if people have different input files (different feature engineering), that will show up in our file names.
+# using the outputFileName here so that if people have different input files (different feature engineering), that will show up in our file names.
 predictionsFileName = argv['outputFileName'] + classifierName + str(time.time()) + '.csv'
 
 with open( path.join(predictionsPath, predictionsFileName) , 'w+') as predictionsFile:
