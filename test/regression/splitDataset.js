@@ -13,6 +13,29 @@ module.exports = function() {
       expect( new Date(fileStats.ctime) ).to.be.above(rTest.startTime);
     });
 
+
+    it('should copy the validation dataset to the valdiation folder in predictions', function(done) {
+      fs.readFile(path.join(rTest.rTestPredictionsLocation, 'validation','validationData.npz'), function(err, data) {
+        console.log('err',err);
+        expect(err).to.be.null;
+        done();
+      });
+    });
+
+
+    it('should copy the validation IDs and Y to the valdiation folder in predictions', function(done) {
+      fs.readFile(path.join(rTest.rTestPredictionsLocation, 'validation','validationIDsAndY.csv'), function(err, data) {
+        console.log('err',err);
+        expect(err).to.be.null;
+
+        console.log('data.length', data.length);
+
+        expect(data.length).to.equal(50925);
+        done();
+      });
+    });
+
+
     it('should use the existing validation split if it already exists', function() {
       var secondStartTime = Date.now();
       // TODO: try running the test again, and 
@@ -31,8 +54,6 @@ module.exports = function() {
       expect( new Date(fileStats.ctime) ).to.be.below(secondStartTime);
 
     });
-
-
 
   });
   
