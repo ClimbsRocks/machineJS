@@ -1,8 +1,0 @@
-load up a sample data set with known behavior
-1. error rate should go down on each iteration
-2. error rate should be between x and y on the 0th iteration
-3. error rate should be between z and aa on the 10th iteration
-4. test the formatting of the input. a lot
-5. dataSummary should say...
-6. making predictions- results of known input should be within x range
-7. certain functions should be called a certain number of times to make sure it ends properly
