@@ -9,7 +9,7 @@ import time
 
 import numpy as np
 from sklearn.cross_validation import train_test_split
-from sklearn.grid_search import GridSearchCV
+from sklearn.grid_search import GridSearchCV, RandomizedSearchCV
 from scipy.sparse import csr_matrix, vstack
 
 from sendMessages import printParent
@@ -144,12 +144,24 @@ if classifierName == 'clXGBoost':
 allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
 parameters_to_try = allParams[classifierName]
 
+try:
+    printParent('we are about to run a grid search over the following space:')
+    printParent(parameters_to_try)
+    printParent(classifierName)
+except:
+    printParent('we are about to run a Randomized Search for the following algorithm:')
+    printParent(classifierName)
 
-printParent('we are about to run a grid search over the following space:')
-printParent(parameters_to_try)
 
-# error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
-gridSearch = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
+try:
+    if randomizedSearchCVList[classifierName]:
+        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=20)
+    else:
+        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
+except:
+        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
 
 
 def load_sparse_csr_logging(filename):
@@ -177,14 +189,14 @@ if classifierName[0:4] == 'clnn':
     # obviousPrint('len(X)',len(X))
     # obviousPrint('len(X[0])',len(X[0]))
 
-gridSearch.fit(X, y ) 
+searchCV.fit(X, y ) 
 printParent('\n')
 printParent('*********************************************************************************************************')
 printParent("this estimator's best prediction is:")
-printParent(gridSearch.best_score_)
+printParent(searchCV.best_score_)
 printParent('*********************************************************************************************************')
 printParent("this estimator's best parameters are:")
-printParent(gridSearch.best_params_)
+printParent(searchCV.best_params_)
 printParent('\n')
 
 printParent('total training time for this classifier:')
@@ -205,7 +217,7 @@ if extendedTraining:
 else:
     longTrainClassifier = classifierCreater[classifierName]
     
-longTrainClassifier.set_params(**gridSearch.best_params_)
+longTrainClassifier.set_params(**searchCV.best_params_)
 
     # if dev:
     #     bigClassifier.fit(X_train, y_train)
