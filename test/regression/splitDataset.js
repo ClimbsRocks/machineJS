@@ -3,6 +3,7 @@ var mocha = require('mocha');
 var fs = require('fs');
 var path = require('path');
 var execSync = require('child_process').execSync;
+csv = require('csv');
 
 module.exports = function() {
   
@@ -24,14 +25,17 @@ module.exports = function() {
 
 
     it('should copy the validation IDs and Y to the valdiation folder in predictions', function(done) {
-      fs.readFile(path.join(rTest.rTestPredictionsLocation, 'validation','validationIDsAndY.csv'), function(err, data) {
-        console.log('err',err);
+      var validationFilePath = path.join(rTest.rTestPredictionsLocation, 'validation','validationIDsAndY.csv');
+      fs.readFile(validationFilePath, function(err, data) {
+
         expect(err).to.be.null;
 
-        console.log('data.length', data.length);
+        data = csv.parse(data.toString('utf8'), function(err, output) {
 
-        expect(data.length).to.equal(50925);
-        done();
+          expect(output.length).to.be.within(51000 - 200, 51000 + 200);
+          done();
+
+        });
       });
     });
 
