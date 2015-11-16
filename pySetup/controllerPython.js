@@ -72,8 +72,28 @@ module.exports = {
       var classifierList = classifierOptions.longDataSet;
     }
     classifierList = Object.keys( classifierList );
+    var classifiersByRound = [];
 
-    numberOfClassifiers = classifierList.length;
+    // we are going to get many trained classifiers from this!
+    // let's talk through an example:
+    // say we want to run 100 iterations of RandomizedSearchCV
+      // we could run a single round of rsCV with 100 iterations, and get a single trained classifier out of it at the end
+      // or, we could run 10 rounds, with 10 iterations each, and have 10 trained classifiers at the end!
+    // ensembler works best when it has more predictions to work with, so this second option is immediately appealling
+    // the second option is also appealling in that we will have a bunch of midway results
+      // say running 100 iterations takes 100 hours
+      // and we end up only having 90 hours
+      // if we split this up into multiple rounds, we will now have 8 or 9 algorithms trained by this point, one of which is likely the best one
+      // whereas if it were an all-or-nothing game of having to get to all 100, we would have nothing.
+    // another thing that's appealling about running multiple rounds is it let's us test more algorithms against the valdiation data set. it's somewhat difficult to predict how each algorithm is going to generalize, so having a chance to actually test them against the validation data set gives us more options
+    // the drawback is that it will take more time (training a "bigger" version of the selected algorithm 10 times is not trivial, nor is running 10 rounds of predictions against the validation and test data sets)
+    for( var i = 0; i < argv.numRounds; i++) {
+      for( var j = 0; j < classifierList.length; j++) {
+        classifiersByRound.push(classifierList[j]);
+      }
+    }
+
+    numberOfClassifiers = classifiersByRound.length;
 
     ensembler.startListeners( numberOfClassifiers, argv.ensemblerArgs);
 
@@ -91,7 +111,7 @@ module.exports = {
       // if we already have the split file names, use those.
       // that allows us to ensure more continuity as you make other tweaks, rather than introducing randomness through sample selection that might overwhelm the effects of other changes you're trying to make. 
       utils.splitData(function() {
-        module.exports.startClassifiers(classifierList);
+        module.exports.startClassifiers(classifiersByRound);
       });
     } else {
       // here is where we invoke data-formatter to handle all our data formatting needs
@@ -99,7 +119,7 @@ module.exports = {
         // https://github.com/ClimbsRocks/data-formatter
       utils.formatData( function() {
         utils.splitData(function() {
-          module.exports.startClassifiers(classifierList);
+          module.exports.startClassifiers(classifiersByRound);
         });
       });
     }
