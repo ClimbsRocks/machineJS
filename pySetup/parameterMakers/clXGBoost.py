@@ -1,3 +1,6 @@
+import scipy
+import numpy as np
+
 def makeParams(X, y, globalArgs, dev, problemType):
 
 
@@ -57,14 +60,15 @@ def makeParams(X, y, globalArgs, dev, problemType):
 
 
 
-
+    # RandomSearchCV parameters:
     # the commented-out lines do not work for regressors
     parameters_to_try = {
         # 'num_round': [100, 250, 500],
         # 'eta': [0.05, 0.1, 0.3],
-        'max_depth': [6, 9, 12],
-        'subsample': [0.9, 1.0],
-        'colsample_bytree': [0.9, 1.0]
+        'max_depth': scipy.stats.randint(2,50),
+        'subsample': scipy.stats.uniform(.80,1),
+        'max_delta_step': scipy.stats.randint(0,1),
+        'colsample_bytree': scipy.stats.uniform(.80,1)
     }
 
     if dev:

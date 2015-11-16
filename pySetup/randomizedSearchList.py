@@ -5,13 +5,13 @@ def rsList():
     return {
         'clnnSknn': False,
         'clnnNoLearn': False,
-        'clXGBoost': False,
         'clKnn': False,
         'clRfEntropy': False,
-        'clRfGini': False,
         'clSVCFirst': False,
         'clSVCShrinking': False,
         'clnnSknn3Layer': False,
         'clLogisticRegression': False,
+        'clXGBoost': True,
+        'clRfGini': True,
         'clAdaBoost': True
     }
