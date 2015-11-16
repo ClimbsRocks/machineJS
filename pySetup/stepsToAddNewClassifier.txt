@@ -5,6 +5,7 @@ BeforEach: copy the exact classifier name to your clipboard so we can be consist
 3. paramMakers.py: add the new file as a module to be imported and as a part of the returned dict. make sure to add a comma in between properties :)
 4. makeClassifiers.py: add the instantiated classifier here with the parameters it should have. make sure to add a comma in between properties :)
 5. paramMakers folder: if this is just a new split of the same algorith (rf with gini, and rf with entropy), go back to paramMakers/classifierName and make sure the new one is mutually exclusive with the old one
+6. randomizedSearchList.py: add in this classifier, and whether it supports RandomizedSearchCV (it should- training goes much faster that way!)
 6. extendedTrainingList.py: state whether there is an extended training version of this classifier available. This step is somewhat redundent, but makes it clear that a classifier not being in makeBigClassifiers.py is intentional
 7. makeBigClassifiers.py: add in a 'larger' version of the classifier- typically by bumping up n_estimators dramatically
 8. Update test suites to support this new algorithm
