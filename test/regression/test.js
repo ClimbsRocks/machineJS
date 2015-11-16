@@ -17,7 +17,7 @@ describe('regression problems', function() {
 
   rTest.startTime = Date.now();
 
-  // before(deleteRemnantsAndRunNewTest);
+  before(deleteRemnantsAndRunNewTest);
 
 
   // TODO: run this separately for each type of problem we're solving (regression, category, then eventually multi-labe, etc.)
