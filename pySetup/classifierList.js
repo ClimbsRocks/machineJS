@@ -42,9 +42,9 @@ module.exports = {
     // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
-    clRfGini: 'clRfGini',
-    clAdaBoost: 'clAdaBoost',
     // clLogisticRegression: 'clLogisticRegression'
-    clXGBoost: 'clXGBoost'
+    // clXGBoost: 'clXGBoost',
+    // clRfGini: 'clRfGini',
+    clAdaBoost: 'clAdaBoost'
   }
 };

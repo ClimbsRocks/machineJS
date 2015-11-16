@@ -1,18 +1,24 @@
+// ******************************************************************************************************************************
+// Whenever you uncomment one section, be sure to comment out the other sections
+// ******************************************************************************************************************************
+
+
+
 // Rossman Short Train Dev Data:
-// module.exports = { 
-//   idHeader: 'Id',
-//   outputHeader: 'sales',
-//   id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_rossShortTrainDev.npz',
-//   y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_rossShortTrainDev.npz',
-//   id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_rossmantest.npz',
-//   X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_rossmantest.npz',
-//   X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_rossShortTrainDev.npz',
-//   X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_rossShortTrainDev.npz',
-//   y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_rossShortTrainDev.npz',
-//   X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
-//   trainingDataLength: 150333,
-//   problemType: 'regression' 
-// };
+module.exports = { 
+  idHeader: 'Id',
+  outputHeader: 'sales',
+  id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_rossShortTrainDev.npz',
+  y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_rossShortTrainDev.npz',
+  id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_rossmantest.npz',
+  X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_rossmantest.npz',
+  X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_rossShortTrainDev.npz',
+  X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_rossShortTrainDev.npz',
+  y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_rossShortTrainDev.npz',
+  X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
+  trainingDataLength: 150333,
+  problemType: 'regression'
+};
 
 // Rossman full data
 // module.exports = { 
@@ -62,18 +68,18 @@
 // };
 
 
-// Rossman Tiny training data
-module.exports = { 
-  idHeader: 'Id',
-  outputHeader: 'sales',
-  id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_rossTinyTrain.npz',
-  y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_rossTinyTrain.npz',
-  id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_rossmantest.npz',
-  X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_rossmantest.npz',
-  X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_rossTinyTrain.npz',
-  X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_rossTinyTrain.npz',
-  y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_rossTinyTrain.npz',
-  X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
-  trainingDataLength: 10000,
-  problemType: 'regression' 
-};
+// // Rossman Tiny training data
+// module.exports = { 
+//   idHeader: 'Id',
+//   outputHeader: 'sales',
+//   id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_rossTinyTrain.npz',
+//   y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_rossTinyTrain.npz',
+//   id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_rossmantest.npz',
+//   X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_rossmantest.npz',
+//   X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_rossTinyTrain.npz',
+//   X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_rossTinyTrain.npz',
+//   y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_rossTinyTrain.npz',
+//   X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
+//   trainingDataLength: 10000,
+//   problemType: 'regression' 
+// };

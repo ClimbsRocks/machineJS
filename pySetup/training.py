@@ -155,7 +155,7 @@ except:
 
 try:
     if randomizedSearchCVList[classifierName]:
-        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=20)
+        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=40)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)

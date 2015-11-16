@@ -107,7 +107,7 @@ else:
     printParent('X.shape right before making predictions')
     printParent(X.shape)
     testDataPredictions = classifier.predict(X)
-    obviousPrint('testDataPredictions right after making them in makePredictions.py',testDataPredictions[0:100].tolist())
+    # obviousPrint('testDataPredictions right after making them in makePredictions.py',testDataPredictions[0:100].tolist())
 
 validationFile = fileNames['X_trainvalidationData']
 validationData = load_sparse_csr(validationFile)
@@ -121,7 +121,7 @@ else:
     validationYFile = fileNames['y_trainvalidationData']
 validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
 
-obviousPrint('validationY inside makePredictions.py', validationY)
+# obviousPrint('validationY inside makePredictions.py', validationY)
 
 if problemType == 'category':
     validationPredictions = classifier.predict_proba(validationData)
