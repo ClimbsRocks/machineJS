@@ -65,6 +65,9 @@ module.exports = function() {
     argv.validationPercent = argv.validationPercent || .2;
   }
 
+  argv.numRounds = argv.numRounds || 10;
+  argv.numIterationsPerRound = argv.numIterationsPerRound || 10;
+
 
   argv.predictionsFolder = argv.predictionsFolder || path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
   argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
