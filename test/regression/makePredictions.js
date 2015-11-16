@@ -1,14 +1,94 @@
 var expect = require('chai').expect;
 var mocha = require('mocha');
+var fs = require('fs');
+var path = require('path');
+var rTest = global.rTest;
+var csv = require('csv');
+
 
 module.exports = function() {
+
+  // If you have added a new classifier, and it works for regressions, add it here!
+  var expectedMinimumScores = {
+    clRfGini: 0.6,
+    clAdaBoost: 0.6,
+    clXGBoost: 0.6
+  };
+
+  var validationFiles;
+  var predictionsFiles;
+
+
+  before(function() {
+    validationFiles = fs.readdirSync(path.join(rTest.rTestPredictionsLocation, 'validation'));
+    predictionsFiles = fs.readdirSync(rTest.rTestPredictionsLocation);
+
+  });
+
+  // run the following tests for each classifier we expect to have trained
+  for( var clName in expectedMinimumScores ) {
+    describe('predictions for ' + clName, function() {
+
+     var validationFileName;
+     var csvData;
+
+      before(function(done) {
+
+        for(var i = 0; i < validationFiles.length; i++) {
+          if( validationFiles[i].indexOf(clName) !== -1 ) {
+            validationFileName = validationFiles[i];
+          }
+        }
+
+        fs.readFile(path.join(rTest.rTestPredictionsLocation, 'validation', validationFileName), function(err, data) {
+          csv.parse(data, function(err, output) {
+            csvData = output;
+            console.log(output.length);
+            done();
+          });
+        });
+
+      });
+
+      it('should have validation error and training error in the first row', function() {
+        var errorRow = csvData.shift();
+        console.log(errorRow[0])
+        console.log(errorRow[1])
+        expect(errorRow[0]).to.be.above(expectedMinimumScores[clName])
+        expect(errorRow[1]).to.be.above(expectedMinimumScores[clName])
+      });
+
+      it('should have the pretty names for this dataset in the second row', function() {
+        var headerRow = csvData.shift();
+        console.log(headerRow[0])
+        console.log(headerRow[1])
+        expect(headerRow[0]).to.be.above(expectedMinimumScores[clName])
+        expect(headerRow[1]).to.be.above(expectedMinimumScores[clName])
+      });
+
+      it('should have made predictions against the validation data set', function() {
+
+
+      });
+
+
+    });
+  }
+
+  /*
+    1. read in the trained classifier
+    2. run it against the validation data set?
+    3. read in the predictions file 
+    4. look for validation error rate and training error rate
+    5. make sure we have a predictions file
+    6. make sure the format of everything in the predictions file is what we would expect
+
+  */
+  // 
 
   describe('the logistics of making predictions with a trained algorithm', function() {
 
     // these are the tests that are relatively generic, and will be run for each algorithm:
-    it('should copy the validation dataset to the folder holding our predictions',function() {
-
-    });
     
     it('should write all predictions to a specific folder for this test.csv dataset',function() {
 
