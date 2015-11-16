@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "chai": "^3.4.1",
+    "csv": "^0.4.6",
     "data-for-tests": "0.0.3",
     "mocha": "^2.3.3",
     "rimraf": "^2.4.3"
