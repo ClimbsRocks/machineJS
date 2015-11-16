@@ -62,12 +62,21 @@ module.exports = function() {
         var headerRow = csvData.shift();
         console.log(headerRow[0])
         console.log(headerRow[1])
-        expect(headerRow[0]).to.be.above(expectedMinimumScores[clName])
-        expect(headerRow[1]).to.be.above(expectedMinimumScores[clName])
+        expect(headerRow[0].toLowerCase()).to.equal('id');
+        expect(headerRow[1].toLowerCase()).to.equal('sales');
       });
 
       it('should have made predictions against the validation data set', function() {
+        expect(csvData.length).to.be.within(51000 - 200, 51000 + 200);
 
+        var shortestRowLength = Infinity;
+        for(var i = 0; i < csvData.length; i++) {
+          if( csvData[i].length < shortestRowLength ) {
+            shortestRowLength = csvData[i].length;
+          }
+        }
+
+        expect(shortestRowLength).to.equal(2);
 
       });
 

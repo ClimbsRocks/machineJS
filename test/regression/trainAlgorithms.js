@@ -9,9 +9,11 @@ module.exports = function() {
   describe('training and tuning algorithms', function() {
 
     it('should successfully train one instance of all algorithms in classifierList, for this problemType', function() {
+      
       var classifierList = require(path.join(rTest.mjsLocation, 'pySetup', 'classifierList'));
       classifierList = Object.keys(classifierList.longDataSet);
       var trainedAlgos = fs.readdirSync(rTest.bestClassifiersTestLocation);
+
       function verifyAllClassifiersTrained() {
         var foundClassifiers = [];
         // for each classifier we expected to train:
