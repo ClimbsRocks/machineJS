@@ -7,7 +7,7 @@
     "test": "npm run test:regression",
     "test:regression": "mocha test/regression/test.js",
     "test:categorical": "mocha test/categorical/test.js",
-    "dev": "node ppLib.js --devKaggle"
+    "dev": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted"
   },
   "repository": {
     "type": "git",
