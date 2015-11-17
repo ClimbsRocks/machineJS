@@ -19,6 +19,7 @@ import clLogisticRegression
 import clAdaBoost
 import clXGBoost
 import clRfBootstrapBoth
+import clAdaLossAll
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev, problemType):
@@ -33,6 +34,9 @@ def makeAll(X,y,globalArgs, dev, problemType):
         'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev, problemType),
         'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev, problemType),
         'clAdaBoost':clAdaBoost.makeParams(X,y,globalArgs, dev, problemType),
+        'clAdaLossLinear':clAdaLossAll.makeParams(X,y,globalArgs, dev, problemType),
+        'clAdaLossSquare':clAdaLossAll.makeParams(X,y,globalArgs, dev, problemType),
+        'clAdaLossExponential':clAdaLossAll.makeParams(X,y,globalArgs, dev, problemType),
         'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType),
         'clRfBootstrapTrue': clRfBootstrapBoth.makeParams(X,y,globalArgs, dev, problemType)
     }

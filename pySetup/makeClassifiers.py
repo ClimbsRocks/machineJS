@@ -60,13 +60,16 @@ def makeClassifiers(globalArgs, dev, problemType):
     else:
         return {
             'clRfGini': RandomForestRegressor(n_estimators=n_estimators, n_jobs=1),
-            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True),
+            'clRfBootstrapTrue': RandomForestRegressor(n_estimators=n_estimators, n_jobs=1, bootstrap=True),
             # 'clRfEntropy': RandomForestRegressor(n_estimators=n_estimators, n_jobs=1, criterion='entropy'),
             'clSVCFirst': SVR(shrinking=False),
             'clSVCShrinking': SVR(shrinking=True),
             'clKnn': KNeighborsRegressor(),
             'clLogisticRegression': LinearRegression(),
             'clAdaBoost': AdaBoostRegressor(),
+            'clAdaLossLinear': AdaBoostRegressor(loss='linear'),
+            'clAdaLossSquare': AdaBoostRegressor(loss='square'),
+            'clAdaLossExponential': AdaBoostRegressor(loss='exponential'),
             'clXGBoost': xgboost.XGBRegressor(),
             'clnnSknn': Regressor(
                 layers=[

@@ -11,5 +11,8 @@ def getAll():
         'clnnSknn3Layer':True,
         'clnnSknn':True,
         'clAdaBoost':False,
+        'clAdaLossLinear':False,
+        'clAdaLossSquare':False,
+        'clAdaLossExponential':False,
         'clXGBoost':False
     }

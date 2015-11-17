@@ -14,5 +14,8 @@ def rsList():
         'clXGBoost': True,
         'clRfGini': True,
         'clRfBootstrapTrue': True,
-        'clAdaBoost': True
+        'clAdaBoost': True,
+        'clAdaLossLinear': True,
+        'clAdaLossSquare': True,
+        'clAdaLossExponential': True,
     }
