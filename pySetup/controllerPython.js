@@ -39,7 +39,7 @@ module.exports = {
       py.referencesToChildren[i].childProcess.kill();
     }
 
-    // this is frequently not killing all the child processes of that child process. so if our python shell is running 8 other python scripts to spread the training out around all the cores, those 8 other python scripts are continuing to run after the above. 
+    // following the .kill() routine for each child is frequently not killing all the child processes of that child process. so if our python shell is running 8 other python scripts to spread the training out around all the cores, those 8 other python scripts are continuing to run after the above. 
     // the following command will be executed on the command line and will kill all Python processes. 
     // the unfortunate side effect is that any unrelated Python processes running on this machine will also be killed. But since this library takes up all the cores on the machine anyways, the user would likely have a very hard time running other Python scripts simultaneously regardless. 
     exec('pkill -9 Python');
@@ -99,15 +99,7 @@ module.exports = {
 
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.alreadyFormatted ) {
-      // utils.fileNames = require('./testingFileNames');
-      // try {
-      //   utils.fileNames = JSON.parse(utils.fileNames);
-      // } catch( err ) {
-      //   // do nothing! it's already valid JS
-      //   // console.error(err);
-      // }
-      // if we already have the split file names, use those.
-      // that allows us to ensure more continuity as you make other tweaks, rather than introducing randomness through sample selection that might overwhelm the effects of other changes you're trying to make. 
+
       utils.splitData(function() {
         module.exports.startClassifiers(classifiersByRound);
       });
@@ -125,8 +117,7 @@ module.exports = {
   },
 
   makeAllPredictions: function(folderName) {
-    // eventually, we will take in a folderName where our bestClasifiers are stored, and only make predictions against those classifiers
-    // TODO: start listeners for ensembler
+    // we are taking in a folderName where our results are stored, and only making predictions against those classifiers
     
     fs.readdir(folderName, function(err,files) {
       if (err) {
@@ -148,12 +139,8 @@ module.exports = {
 
   makePredictions: function(classifierName) {
 
-    // var madeNoise = false;
     utils.makePredictions( function() {
       process.emit('algoFinishedPredicting');
-      // if(!madeNoise) {
-      //   console.log('when you came to a fork in the woods, you trained a machine to explore not just all the immediate possibilities down either side, but all the forks that came after that.');
-      // }
     }, classifierName);
   }
 
