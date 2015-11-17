@@ -66,25 +66,27 @@ try:
 
 except:
     validationIndices = []
+    trainingIndices = []
     for idx, randomNum in enumerate(includeOrNot):
         if randomNum > validationPercent:
             validationIndices.append(idx)
+        else:trainingIndices.append(idx)
 
     if writeToFile:
         with open(validationIndicesFile, 'w+') as writeFile:
             # now save that file as a .pkl next to where our test data sits. 
             pickle.dump(validationIndices, writeFile)
 
-searchIndices = []
-trainingDataIndices = []
+# searchIndices = []
+# trainingDataIndices = []
 
-for idx, randomNum in enumerate(includeOrNot):
-    if randomNum < searchPercent:
-        searchIndices.append(idx)
-    elif randomNum < 1 - validationPercent:
-        trainingDataIndices.append(idx)
-    else:
-        validationIndices.append(idx)
+# for idx, randomNum in enumerate(includeOrNot):
+#     if randomNum < searchPercent:
+#         searchIndices.append(idx)
+#     elif randomNum < 1 - validationPercent:
+#         trainingDataIndices.append(idx)
+#     else:
+#         validationIndices.append(idx)
 
 # continued callout to the person originally responsible for this function:
 # http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
@@ -102,29 +104,32 @@ def splitDataset(data, name, fileCategory):
     # if this "sparse" matrix only has a single value for each row, we have to treat it as a column matrix, and slice it accordingly
     # this is the case for our idColumn, and frequently our y values as well.
     if data.shape[0] == 1:
-        search = data[:,searchIndices]
-        longTrainingData = data[:,trainingDataIndices]
+        # search = data[:,searchIndices]
+        # longTrainingData = data[:,trainingDataIndices]
         validation = data[:,validationIndices]
+        trainingData = data[:,trainingIndices]
 
     else:
-        search = data[searchIndices,:]
-        longTrainingData = data[trainingDataIndices,:]
+        # search = data[searchIndices,:]
+        # longTrainingData = data[trainingDataIndices,:]
         validation = data[validationIndices,:]
+        trainingData = data[trainingIndices,:]
 
     name = ntpath.basename(name)
     name = name[0:-4]
 
-    searchFile = path.join(outputDirectory, name + 'searchData.npz')
-    longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
+    # searchFile = path.join(outputDirectory, name + 'searchData.npz')
+    # longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
     validationFile = path.join(outputDirectory, name + 'validationData.npz')
-    # TODO: send a message back to parent telling them where the files are
-    save_sparse_csr(searchFile, search)
-    save_sparse_csr(longTrainingFile, longTrainingData)
+    trainingDataFile = path.join(outputDirectory, name + 'trainingData.npz')
+
+    # save_sparse_csr(searchFile, search)
+    # save_sparse_csr(longTrainingFile, longTrainingData)
     save_sparse_csr(validationFile, validation)
+    save_sparse_csr(trainingDataFile, trainingData)
 
     fileNameDict = {
-        fileCategory + 'searchData': searchFile,
-        fileCategory + 'longTrainingData': longTrainingFile,
+        fileCategory + 'trainingData': trainingDataFile,
         fileCategory + 'validationData': validationFile
     }
     messageParent(fileNameDict, 'splitFileNames')
