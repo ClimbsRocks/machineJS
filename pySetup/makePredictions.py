@@ -104,8 +104,8 @@ except:
 if problemType == 'category':
     testDataPredictions = classifier.predict_proba(X)    
 else:
-    printParent('X.shape right before making predictions')
-    printParent(X.shape)
+    # printParent('X.shape right before making predictions')
+    # printParent(X.shape)
     testDataPredictions = classifier.predict(X)
     # obviousPrint('testDataPredictions right after making them in makePredictions.py',testDataPredictions[0:100].tolist())
 

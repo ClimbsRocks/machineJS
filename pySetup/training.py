@@ -162,8 +162,8 @@ parameters_to_try = allParams[classifierName]
     # printParent(parameters_to_try)
     # printParent(classifierName)
 # except:
-printParent('we are about to run a cross-validated search for the best hyperparameters for the following algorithm:')
-printParent(classifierName)
+printParent('we are about to run a cross-validated search for the best hyperparameters for ' + classifierName)
+# printParent(classifierName)
 
 
 try:

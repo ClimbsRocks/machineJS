@@ -47,8 +47,8 @@ module.exports = {
     clAdaLossLinear: 'clAdaLossLinear',
     clAdaLossSquare: 'clAdaLossSquare',
     clAdaLossExponential: 'clAdaLossExponential',
-    // clRfGini: 'clRfGini',
-    // clXGBoost: 'clXGBoost',
-    // clRfBootstrapTrue: 'clRfBootstrapTrue'
+    clRfGini: 'clRfGini',
+    clXGBoost: 'clXGBoost',
+    clRfBootstrapTrue: 'clRfBootstrapTrue'
   }
 };
