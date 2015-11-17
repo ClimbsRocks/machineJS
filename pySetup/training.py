@@ -57,14 +57,11 @@ headerRow = []
 # data-formatter did that for us already, so we just have to load in the correct feature data
 if( classifierName[0:4] == 'clnn' ):
     X_file_name = fileNames['X_train_nntrainingData']
-    # X_file_nameLongTraining = fileNames['X_train_nnlongTrainingData']
 else:    
     X_file_name = fileNames['X_traintrainingData']
-    # X_file_nameLongTraining = fileNames['X_trainlongTrainingData']
 
 # for neural networks, the y values to not need to be normalized
 y_file_name = fileNames['y_traintrainingData']
-# y_file_nameLongTraining = fileNames['y_trainlongTrainingData']
 
 try:
     
@@ -123,10 +120,6 @@ except:
 try:
     if y.shape[0] == 1:
         y = y.todense().tolist()[0]
-        # y = np.ravel(y)
-        # obviousPrint('y.shape',y.shape)
-        # y = zip(*y)
-        # y = np.ravel(y)
 except:
     pass
 
@@ -138,7 +131,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.625, rando
 # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
 if dev:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
-        # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -157,13 +149,7 @@ if classifierName == 'clXGBoost':
 allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
 parameters_to_try = allParams[classifierName]
 
-# try:
-    # printParent('we are about to run a grid search over the following space:')
-    # printParent(parameters_to_try)
-    # printParent(classifierName)
-# except:
 printParent('we are about to run a cross-validated search for the best hyperparameters for ' + classifierName)
-# printParent(classifierName)
 
 
 try:
@@ -176,17 +162,7 @@ try:
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
 except:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
-        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
-
-
-def load_sparse_csr_logging(filename):
-    loader = np.load(filename)
-    # obviousPrint("loader['indices']",loader['indices'])
-    return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
-
-# if classifierName[0:4] == 'clnn':
-#     y = load_sparse_csr_logging(fileNames['y_train_nnsearchData'])
-    
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)    
 
 
 if classifierName[0:4] == 'clnn':
@@ -194,9 +170,6 @@ if classifierName[0:4] == 'clnn':
     obviousPrint('X.shape',X.shape)
     y = np.array(y)
     obviousPrint('y.shape before gridsearch',y.shape)
-    # printParent(y.tolist())
-    # obviousPrint('len(X)',len(X))
-    # obviousPrint('len(X[0])',len(X[0]))
 
 searchCV.fit(X_train, y_train ) 
 printParent('\n')
@@ -209,11 +182,11 @@ printParent(searchCV.best_params_)
 printParent('\n')
 
 printParent(classifierName + "'s total training time (before training the bigger version on the larger data set) is:")
-# this will give time in minutes
+# this will give time in minutes, to one decimal point
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
 
-# TODO: Get info on whether this algo supports creating a larger version of that classifier. 
+# Get info on whether this algo supports creating a larger version of that classifier. 
 # for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
 extendedTraining = extendedTrainingList.getAll()[classifierName]
 
@@ -228,30 +201,6 @@ else:
     
 longTrainClassifier.set_params(**searchCV.best_params_)
 
-    # if dev:
-    #     bigClassifier.fit(X_train, y_train)
-    # else: 
-    #     # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
-
-# now we train on the entire training data set, minus the validation data
-# xLongData = load_sparse_csr(X_file_nameLongTraining)
-
-# yLongData = load_sparse_csr(y_file_nameLongTraining)
-
-# handles cases where y is a single column, else multiple columns
-# if yLongData.shape[0] == 1:
-#     yLongData = yLongData.todense().tolist()[0]
-#     # yLongData = zip(*yLongData)
-#     # yLongData = np.ravel(yLongData)
-#     y = np.concatenate( (y, yLongData), axis=0 )
-
-# else:
-#     y = vstack( [y, yLongData] )
-
-# X = vstack( [X, xLongData] )
-
-# if y.shape[0] == 1:
-#     y = y.todense().tolist()[0]
 
 if classifierName[0:4] == 'clnn':
     X = X.todense()
