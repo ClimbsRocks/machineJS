@@ -106,7 +106,8 @@ module.exports = function() {
 
 
   if( argv.alreadyFormatted ) {
-    utils.fileNames = require(path.join('pySetup','testingFileNames.js'));
+    var fileNamesOptions = require(path.join('pySetup','testingFileNames.js'));
+    utils.fileNames = fileNamesOptions[argv.outputFileName];
     try{
       utils.fileNames = JSON.parse(utils.fileNames);
     } catch(err) {
