@@ -13,5 +13,6 @@ def rsList():
         'clLogisticRegression': False,
         'clXGBoost': True,
         'clRfGini': True,
+        'clRfBootstrapTrue': True,
         'clAdaBoost': True
     }

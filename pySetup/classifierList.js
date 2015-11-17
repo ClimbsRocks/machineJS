@@ -43,8 +43,9 @@ module.exports = {
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
     // clLogisticRegression: 'clLogisticRegression'
-    // clXGBoost: 'clXGBoost',
-    // clRfGini: 'clRfGini',
-    clAdaBoost: 'clAdaBoost'
+    clAdaBoost: 'clAdaBoost',
+    clRfGini: 'clRfGini',
+    clXGBoost: 'clXGBoost',
+    clRfBoostrapTrue: 'clRfBoostrapTrue'
   }
 };

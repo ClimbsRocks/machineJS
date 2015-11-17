@@ -18,6 +18,7 @@ import clKnn
 import clLogisticRegression
 import clAdaBoost
 import clXGBoost
+import clRfBootstrapBoth
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev, problemType):
@@ -32,6 +33,7 @@ def makeAll(X,y,globalArgs, dev, problemType):
         'clnnSknn3Layer':clnnSknn3Layer.makeParams(X,y,globalArgs, dev, problemType),
         'clnnSknn':clnnSknn.makeParams(X,y,globalArgs, dev, problemType),
         'clAdaBoost':clAdaBoost.makeParams(X,y,globalArgs, dev, problemType),
-        'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType)
+        'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType),
+        'clRfBootstrapTrue': clRfBootstrapBoth.makeParams(X,y,globalArgs, dev, problemType)
     }
     return returnDict

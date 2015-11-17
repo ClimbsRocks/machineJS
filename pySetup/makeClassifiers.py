@@ -28,6 +28,7 @@ def makeClassifiers(globalArgs, dev, problemType):
     if problemType == 'category':
         return {
             'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='gini'),
+            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True),
             'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='entropy'),
             'clSVCFirst': SVC(probability=True, shrinking=False),
             'clSVCShrinking': SVC(probability=True, shrinking=True),
@@ -59,6 +60,7 @@ def makeClassifiers(globalArgs, dev, problemType):
     else:
         return {
             'clRfGini': RandomForestRegressor(n_estimators=n_estimators, n_jobs=1),
+            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True),
             # 'clRfEntropy': RandomForestRegressor(n_estimators=n_estimators, n_jobs=1, criterion='entropy'),
             'clSVCFirst': SVR(shrinking=False),
             'clSVCShrinking': SVR(shrinking=True),

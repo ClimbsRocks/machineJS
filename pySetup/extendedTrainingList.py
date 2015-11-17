@@ -3,6 +3,7 @@ def getAll():
     return {
         'clRfEntropy':True,
         'clRfGini':True,
+        'clRfBootstrapTrue':True,
         'clSVCFirst':False,
         'clSVCShrinking':False,
         'clKnn':False,
