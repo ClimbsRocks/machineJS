@@ -56,15 +56,15 @@ headerRow = []
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
 if( classifierName[0:4] == 'clnn' ):
-    X_file_name = fileNames['X_train_nnsearchData']
-    X_file_nameLongTraining = fileNames['X_train_nnlongTrainingData']
+    X_file_name = fileNames['X_train_nntrainingData']
+    # X_file_nameLongTraining = fileNames['X_train_nnlongTrainingData']
 else:    
-    X_file_name = fileNames['X_trainsearchData']
-    X_file_nameLongTraining = fileNames['X_trainlongTrainingData']
+    X_file_name = fileNames['X_traintrainingData']
+    # X_file_nameLongTraining = fileNames['X_trainlongTrainingData']
 
 # for neural networks, the y values to not need to be normalized
-y_file_name = fileNames['y_trainsearchData']
-y_file_nameLongTraining = fileNames['y_trainlongTrainingData']
+y_file_name = fileNames['y_traintrainingData']
+# y_file_nameLongTraining = fileNames['y_trainlongTrainingData']
 
 try:
     
@@ -120,12 +120,25 @@ except:
                 firstRow = True
     y = np.array(y)
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+try:
+    if y.shape[0] == 1:
+        y = y.todense().tolist()[0]
+        # y = np.ravel(y)
+        # obviousPrint('y.shape',y.shape)
+        # y = zip(*y)
+        # y = np.ravel(y)
+except:
+    pass
+
+# we have already separated out our validation data (currently 20% of the entire training data set by default)
+# the data that we have loaded in here is the 80% that is not our validation data
+# we want to have 30% of our entire training data set used as our "search" data set, meaning it is 37.5% of this 80% data set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.625, random_state=0)
 
 # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-# if dev:
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
-#         # extendedTraining = False
+if dev:
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+        # extendedTraining = False
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -174,12 +187,6 @@ def load_sparse_csr_logging(filename):
 # if classifierName[0:4] == 'clnn':
 #     y = load_sparse_csr_logging(fileNames['y_train_nnsearchData'])
     
-if y.shape[0] == 1:
-    y = y.todense().tolist()[0]
-    # y = np.ravel(y)
-    # obviousPrint('y.shape',y.shape)
-    # y = zip(*y)
-    # y = np.ravel(y)
 
 
 if classifierName[0:4] == 'clnn':
@@ -191,7 +198,7 @@ if classifierName[0:4] == 'clnn':
     # obviousPrint('len(X)',len(X))
     # obviousPrint('len(X[0])',len(X[0]))
 
-searchCV.fit(X, y ) 
+searchCV.fit(X_train, y_train ) 
 printParent('\n')
 printParent('*********************************************************************************************************')
 printParent("this estimator's best prediction is:")
@@ -227,21 +234,24 @@ longTrainClassifier.set_params(**searchCV.best_params_)
     #     # note: we are testing grid search on 50% of the data (X_train and y_train), but fitting bigClassifier on the entire dataset (X,y)
 
 # now we train on the entire training data set, minus the validation data
-xLongData = load_sparse_csr(X_file_nameLongTraining)
+# xLongData = load_sparse_csr(X_file_nameLongTraining)
 
-yLongData = load_sparse_csr(y_file_nameLongTraining)
+# yLongData = load_sparse_csr(y_file_nameLongTraining)
 
 # handles cases where y is a single column, else multiple columns
-if yLongData.shape[0] == 1:
-    yLongData = yLongData.todense().tolist()[0]
-    # yLongData = zip(*yLongData)
-    # yLongData = np.ravel(yLongData)
-    y = np.concatenate( (y, yLongData), axis=0 )
+# if yLongData.shape[0] == 1:
+#     yLongData = yLongData.todense().tolist()[0]
+#     # yLongData = zip(*yLongData)
+#     # yLongData = np.ravel(yLongData)
+#     y = np.concatenate( (y, yLongData), axis=0 )
 
-else:
-    y = vstack( [y, yLongData] )
+# else:
+#     y = vstack( [y, yLongData] )
 
-X = vstack( [X, xLongData] )
+# X = vstack( [X, xLongData] )
+
+# if y.shape[0] == 1:
+#     y = y.todense().tolist()[0]
 
 if classifierName[0:4] == 'clnn':
     X = X.todense()
