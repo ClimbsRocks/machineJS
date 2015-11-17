@@ -54,22 +54,10 @@ except:
             else:
                 headerRow = True
 
-# try:
 # should be pretty safe to convert the idColumn to a list, since it is always going to be a single value per row
 # to get a single vector (in this case, our ID column) to be saved as a sparse matrix, we have to do some vaguely hacky stuff
 # the following line converts it to a normal python list
 idColumn = load_sparse_csr( id_file_name ).todense().tolist()[0]
-# except:
-#     with open(id_file_name, 'rU') as id_file:
-#         inputRows = csv.reader(id_file)
-#         idHeader = False
-#         for row in inputRows:
-#             if idHeader == False:
-#                 idHeader = row[0]
-#             else:
-#                 # the csv reader will read each row in as a list, even if that list only has a single item in it
-#                 # append each row ID value to idColumn
-#                 idColumn.append(row[0])
 
 
 try:
@@ -90,11 +78,6 @@ except:
 # load up the previously trained (and tuned!) classifier
 classifier = joblib.load(path.join( argv['bestClassifiersFolder'] ,'best' + classifierName, 'best' + classifierName + '.pkl') )
 
-# if nn or classifierName == 'clXGBoost':
-#     X = np.array(X)
-# if nn:
-#     X = np.array(X)
-
 try:
     classifier.set_params(n_jobs=-1)
 except:
@@ -104,10 +87,8 @@ except:
 if problemType == 'category':
     testDataPredictions = classifier.predict_proba(X)    
 else:
-    # printParent('X.shape right before making predictions')
-    # printParent(X.shape)
     testDataPredictions = classifier.predict(X)
-    # obviousPrint('testDataPredictions right after making them in makePredictions.py',testDataPredictions[0:100].tolist())
+
 
 validationFile = fileNames['X_trainvalidationData']
 validationData = load_sparse_csr(validationFile)
@@ -115,27 +96,18 @@ validationIdFile = fileNames['id_trainvalidationData']
 validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
 
 if nn:
-    printParent('loading up the y data for a neural network')
     validationYFile = fileNames['y_train_nnvalidationData']
 else:
     validationYFile = fileNames['y_trainvalidationData']
 validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
 
-# obviousPrint('validationY inside makePredictions.py', validationY)
 
 if problemType == 'category':
     validationPredictions = classifier.predict_proba(validationData)
 else:
     validationPredictions = classifier.predict(validationData)
 
-# try:
 validationScore = classifier.score(validationData,validationY)
-# except:
-#     validationScore = 0
-# obviousPrint('the classifier', classifierName)
-# printParent(classifierName)
-# obviousPrint('had a score on the validation set of:', validationScore)
-# printParent(validationScore)
 
 printParent('\n')
 printParent('***************')
@@ -162,7 +134,6 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
             len(prediction)
             csvwriter.writerow([int(rowID),prediction[1]])
         except:
-            # printParent(prediction[0])
             csvwriter.writerow([int(rowID),prediction])
 
 
@@ -180,16 +151,13 @@ with open( path.join(validationPath, validationFileName) , 'w+') as validationFi
 
     # at the top of each validation file, write the score for that classifier on the validation set
     csvwriter.writerow([validationScore, trainingScore])
-    # csvwriter.writerow([validationScore])
+
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(totalPredictions):
         rowID = totalIdColumn[idx]
-        # I'm not sure why we're checking if prediction is already a list
-            # or why we're taking the second item in that list
         try:
             len(prediction)
-            printParent(prediction)
             csvwriter.writerow([int(rowID),prediction[1]])
         except:
             csvwriter.writerow([int(rowID),prediction])
@@ -214,8 +182,6 @@ if copyValidationData and nn == False:
                 yValue = validationY[idx]
             except:
                 yValue = None
-            # I'm not sure why we're checking if prediction is already a list
-                # or why we're taking the second item in that list
             try:
                 len(yValue)
                 csvwriter.writerow([int(rowID),yValue[1]])
