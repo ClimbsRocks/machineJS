@@ -45,7 +45,7 @@ def makeAll(globalArgs, dev, problemType):
     
         return {
             'clRfGini': RandomForestRegressor(n_estimators=estimator_count, n_jobs=-1),
-            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, bootstrap=True),
+            'clRfBootstrapTrue': RandomForestRegressor(n_estimators=estimator_count, n_jobs=-1, bootstrap=True),
             'clRfEntropy': RandomForestRegressor(n_estimators=estimator_count, n_jobs=-1),
             'clnnSknn': Regressor(
                 layers=[
