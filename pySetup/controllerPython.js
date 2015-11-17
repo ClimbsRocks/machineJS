@@ -106,8 +106,6 @@ module.exports = {
         // do nothing! it's already valid JS
         // console.error(err);
       }
-      utils.fileNames 
-      // TODO: 
       // if we already have the split file names, use those.
       // that allows us to ensure more continuity as you make other tweaks, rather than introducing randomness through sample selection that might overwhelm the effects of other changes you're trying to make. 
       utils.splitData(function() {
