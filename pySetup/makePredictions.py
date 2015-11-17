@@ -132,10 +132,17 @@ else:
 validationScore = classifier.score(validationData,validationY)
 # except:
 #     validationScore = 0
-obviousPrint('the classifier', classifierName)
+# obviousPrint('the classifier', classifierName)
 # printParent(classifierName)
-obviousPrint('had a score on the validation set of:', validationScore)
+# obviousPrint('had a score on the validation set of:', validationScore)
 # printParent(validationScore)
+
+printParent('\n')
+printParent('***************')
+printParent(classifierName + "'s score on the validation set is:")
+printParent(validationScore)
+printParent('***************')
+
 
 
 # write our predictions on the test data to a file

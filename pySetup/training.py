@@ -157,13 +157,13 @@ if classifierName == 'clXGBoost':
 allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
 parameters_to_try = allParams[classifierName]
 
-try:
-    printParent('we are about to run a grid search over the following space:')
-    printParent(parameters_to_try)
-    printParent(classifierName)
-except:
-    printParent('we are about to run a Randomized Search for the following algorithm:')
-    printParent(classifierName)
+# try:
+    # printParent('we are about to run a grid search over the following space:')
+    # printParent(parameters_to_try)
+    # printParent(classifierName)
+# except:
+printParent('we are about to run a cross-validated search for the best hyperparameters for the following algorithm:')
+printParent(classifierName)
 
 
 try:
@@ -201,14 +201,14 @@ if classifierName[0:4] == 'clnn':
 searchCV.fit(X_train, y_train ) 
 printParent('\n')
 printParent('*********************************************************************************************************')
-printParent("this estimator's best prediction is:")
+printParent(classifierName + "'s best score from the hyperparameter search attempts is:")
 printParent(searchCV.best_score_)
 printParent('*********************************************************************************************************')
-printParent("this estimator's best parameters are:")
+printParent(classifierName + "'s best parameters this time are:")
 printParent(searchCV.best_params_)
 printParent('\n')
 
-printParent('total training time for this classifier:')
+printParent(classifierName + "'s total training time (before training the bigger version on the larger data set) is:")
 # this will give time in minutes
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
@@ -259,11 +259,17 @@ if classifierName[0:4] == 'clnn':
     y = np.array(y)
     obviousPrint('y.shape right before long training in training.py',y.shape)
 
+startLongTrainTime = time.time()
+
 longTrainClassifier.fit(X, y)
+
+finishLongTrainTime = time.time()
+printParent(classifierName + "'s training on the longer data set took:")
+printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
 
 
 longTrainClassifierScore = longTrainClassifier.score(X, y)
-printParent('the algorithm that we trained on a larger portion of the dataset has a score of')
+printParent(classifierName + "'s score against the larger training data set is:")
 printParent(longTrainClassifierScore)
 
 
