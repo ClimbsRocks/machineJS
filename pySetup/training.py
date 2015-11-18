@@ -181,50 +181,64 @@ printParent(classifierName + "'s best parameters this time are:")
 printParent(searchCV.best_params_)
 printParent('\n')
 
-printParent(classifierName + "'s total training time (before training the bigger version on the larger data set) is:")
+printParent(classifierName + "'s total hyperparameter searching time is:")
 # this will give time in minutes, to one decimal point
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
 
-# Get info on whether this algo supports creating a larger version of that classifier. 
-# for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
-extendedTraining = extendedTrainingList.getAll()[classifierName]
+# TODO: send over bestSearchScore
+longTrainThreshold = argv['bestSearchScore'] * globalArgs['longTrainThreshold']
+messageObj = {
+    "searchScore": searchCV.best_score_,
+    "algoName": classifierName
+}
 
-if extendedTraining:
-    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
-    longTrainClassifier = allBigClassifiers[classifierName]
+# only put in the (oftentimes considerable) effort of longTraining this algorithm if it meets the threshold defined by longTrainThreshold
+if searchCV.best_score_ > longTrainThreshold:
+    # Get info on whether this algo supports creating a larger version of that classifier. 
+    # for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
+    extendedTraining = extendedTrainingList.getAll()[classifierName]
 
-# otherwise, just create a new classifier
-# we could possibly warmStart from the GridSearch version, but given that we have more than doubled the size of our dataset, I think we'd have the best luck starting from scratch
+    if extendedTraining:
+        allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
+        longTrainClassifier = allBigClassifiers[classifierName]
+
+    # otherwise, just create a new classifier
+    # we could possibly warmStart from the GridSearch version, but given that we have more than doubled the size of our dataset, I think we'd have the best luck starting from scratch
+    else:
+        longTrainClassifier = classifierCreater[classifierName]
+        
+    longTrainClassifier.set_params(**searchCV.best_params_)
+
+
+    if classifierName[0:4] == 'clnn':
+        X = X.todense()
+        obviousPrint('X.shape right before long training in training.py',X.shape)
+        y = np.array(y)
+        obviousPrint('y.shape right before long training in training.py',y.shape)
+
+    startLongTrainTime = time.time()
+
+    longTrainClassifier.fit(X, y)
+
+    finishLongTrainTime = time.time()
+    printParent(classifierName + "'s training on the longer data set took:")
+    printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
+
+
+    longTrainClassifierScore = longTrainClassifier.score(X, y)
+    printParent(classifierName + "'s score against the larger training data set is:")
+    printParent(longTrainClassifierScore)
+    messageObj['longTrainScore'] = longTrainClassifierScore
+
+
+    classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
+    if not os.path.exists(classifierFolder):
+        os.makedirs(classifierFolder)
+    joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
+
 else:
-    longTrainClassifier = classifierCreater[classifierName]
-    
-longTrainClassifier.set_params(**searchCV.best_params_)
+    messageObj['longTrainScore'] = 0
 
-
-if classifierName[0:4] == 'clnn':
-    X = X.todense()
-    obviousPrint('X.shape right before long training in training.py',X.shape)
-    y = np.array(y)
-    obviousPrint('y.shape right before long training in training.py',y.shape)
-
-startLongTrainTime = time.time()
-
-longTrainClassifier.fit(X, y)
-
-finishLongTrainTime = time.time()
-printParent(classifierName + "'s training on the longer data set took:")
-printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
-
-
-longTrainClassifierScore = longTrainClassifier.score(X, y)
-printParent(classifierName + "'s score against the larger training data set is:")
-printParent(longTrainClassifierScore)
-
-
-classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
-if not os.path.exists(classifierFolder):
-    os.makedirs(classifierFolder)
-joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
-
-messageParent(longTrainClassifierScore, 'trainingResults')
+# TODO: collect trainingResults, and process them
+messageParent(messageObj, 'trainingResults')
