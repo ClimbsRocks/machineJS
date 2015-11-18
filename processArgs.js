@@ -95,6 +95,11 @@ module.exports = function() {
   global.finishedAlgos = 0;
   global.copyValidationData = true;
 
+  // we are setting the minimum threshold an algorithm must hit in order to justify us training that algorithm for an extended period of time.
+  // this comes into play for algorithms that have a considerably longer longTraining time than testing time, such as our random forests with 1200 trees. 
+  // it takes only ~3 minutes to do the hyperparameter search, but ~40 to do the long training. we obviously don't want to undertake that long training unless that algo is "good enough". 
+  // in this case, good enough is defined as being within 5% of our best algo at that stage in the process. 
+  argv.longTrainThreshold = argv.longTrainThreshold || .95;
   
   if( argv.alreadyFormatted === undefined ) {
     if( argv.dev || argv.makePredictions ) {
