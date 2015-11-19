@@ -129,6 +129,9 @@ module.exports = {
       // therefore, we only want to make predictions using this classifier if we actually trained an algorithm successfully (classifierTrainingScore > 0)
       if( classifierTrainingScore > 0 ) {
         utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
+      } else {
+        // ensembler needs to know to not listen for predictions results from this algorithm
+        process.emit('algoSkippedTraining');
       }
 
     };
