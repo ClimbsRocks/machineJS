@@ -74,7 +74,7 @@ module.exports = {
   },
 
   kickOffTraining: function( callback, classifierName) {
-    var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType]);
+    var pythonOptions = utilsPyShell.generatePythonOptions(argv.dataFile, [JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, global.bestSearchScore]);
 
     var emitFinishedTrainingCallback = function() {
       global.finishedAlgos++;
@@ -85,8 +85,25 @@ module.exports = {
 
     var pyShell = utilsPyShell.startPythonShell('training.py', emitFinishedTrainingCallback, pythonOptions);
     pyShell.on('message', function(message) {
+
+      // once we get a message back with the trained results, 
       if(message.type === 'trainingResults') {
-        global.trainedAlgos[classifierName] = message.text;
+        var classifierName = message.classifierName;
+
+        // save it into our allResults array
+        global.allTrainingResults.push(message.text);
+
+        // see if this is the best searchScore we've encountered so far
+        if( message.text.searchScore > global.bestSearchScore ) {
+          global.bestSearchScore = message.text.searchScore;
+        }
+
+        // see if this is the best search result for that algorithm so far
+        var prevBestResult = global.trainingResultsSummary[classifierName];
+        if( message.text.searchScore > prevBestResult || prevBestResult === undefined ) {
+          global.trainingResultsSummary[classifierName] = message.text.searchScore;
+        }
+        // global.trainedAlgos[classifierName] = message.text;
       }
     });
   },
@@ -102,9 +119,20 @@ module.exports = {
       } else {
         var copyValidationData = false;
       }
-      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, global.trainedAlgos[classifierName], copyValidationData ]);
 
-      utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
+      var classifierTrainingObj = global.allTrainingResults[global.allTrainingResults.length -1];
+      console.log('classifierTrainingObj',classifierTrainingObj);
+      var classifierTrainingScore = classifierTrainingObj.longTrainScore;
+      console.log('classifierTrainingScore',classifierTrainingScore);
+
+      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData ]);
+
+      // if this hyperparameter search did not yield an algorithm that was close enough to our best that it was worth investing in a longTraining, we did not train it and gave it a score of 0. 
+      // therefore, we only want to make predictions using this classifier if we actually trained an algorithm successfully (classifierTrainingScore > 0)
+      if( classifierTrainingScore > 0 ) {
+        utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
+      }
+
     };
 
     startPredictionsScript();
