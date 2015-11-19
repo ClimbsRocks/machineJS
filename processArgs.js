@@ -66,8 +66,19 @@ module.exports = function() {
     argv.validationPercent = argv.validationPercent || .2;
   }
 
-  argv.numRounds = argv.numRounds || 10;
-  argv.numIterationsPerRound = argv.numIterationsPerRound || 10;
+  // set out how many combinations of parameters we want to try. 
+  // numRounds is how many different times we will run RandomizedSearchCV for that algorithm.
+  // so if we have numRounds = 20, we will search for optimal hyperparameters for each algorithm 20 times
+  // numIterationsPerRound is how many different combinations of hyperparameters we will attempt for each of those rounds
+  if( argv.dev ) {
+    argv.numRounds = argv.numRounds || 10;
+    argv.numIterationsPerRound = argv.numIterationsPerRound || 5;
+
+  } else {
+    argv.numRounds = argv.numRounds || 30;
+    argv.numIterationsPerRound = argv.numIterationsPerRound || 10;
+    
+  }
 
 
   argv.predictionsFolder = argv.predictionsFolder || path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
