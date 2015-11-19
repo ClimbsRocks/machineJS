@@ -1,6 +1,7 @@
 var path = require('path');
 var mkdirp = require('mkdirp');
 var utils = require(path.join('pySetup','utils.js'));
+var classifierListOptions = require(path.join('pySetup', 'classifierList.js'));
 
 module.exports = function() {
   if(argv.dev || argv.devKaggle || argv.devEnsemble) {
@@ -94,15 +95,27 @@ module.exports = function() {
   // global.trainedAlgos = {};
   global.allTrainingResults = [];
   global.trainingResultsSummary = {};
+  global.trainedAlgoCounts = {};
   global.bestSearchScore = 0;
   global.finishedAlgos = 0;
   global.copyValidationData = true;
+
+
+  // we have several different objects in our classifierListOptions, depending on the length of dataset we're training against. 
+  // rather than trying to build in the logic of figuring out which one we want, just cycle through them all and add in all the possible options as keys.
+  for( var obj in classifierListOptions ) {
+    for( var algo in classifierListOptions[obj] ) {
+      global.trainedAlgoCounts[algo] = 0;
+    }
+  }
+
 
   // we are setting the minimum threshold an algorithm must hit in order to justify us training that algorithm for an extended period of time.
   // this comes into play for algorithms that have a considerably longer longTraining time than testing time, such as our random forests with 1200 trees. 
   // it takes only ~3 minutes to do the hyperparameter search, but ~40 to do the long training. we obviously don't want to undertake that long training unless that algo is "good enough". 
   // in this case, good enough is defined as being within 5% of our best algo at that stage in the process. 
   argv.longTrainThreshold = argv.longTrainThreshold || .95;
+  argv.continueToTrainThreshold = argv.continueToTrainThreshold || argv.longTrainThreshold;
   
   if( argv.alreadyFormatted === undefined ) {
     if( argv.dev || argv.makePredictions ) {
