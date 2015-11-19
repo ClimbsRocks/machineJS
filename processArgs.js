@@ -91,7 +91,10 @@ module.exports = function() {
   }
 
   // we will eventually be storing information about our trained algorithms here.
-  global.trainedAlgos = {};
+  // global.trainedAlgos = {};
+  global.allTrainingResults = [];
+  global.trainingResultsSummary = {};
+  global.bestSearchScore = 0;
   global.finishedAlgos = 0;
   global.copyValidationData = true;
 
