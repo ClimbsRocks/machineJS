@@ -22,10 +22,19 @@ var startOneClassifier = function(classifierList) {
     }
 
     var classifierName = classifierList.shift();
-    // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
-    utils.kickOffTraining( function() {
-      module.exports.makePredictions(classifierName);
-    }, classifierName);
+
+    var algosBestScore = global.allTrainingResults[classifierName];
+
+    // if we have trained more than three of this algorithm, and it's best score is not within X percent of the best we've found so far, don't both training another one. 
+    if( global.trainedAlgoCounts[classifierName] < 3 || algosBestScore > global.bestSearchScore * argv.continueToTrainThreshold ) {
+
+      // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
+      utils.kickOffTraining( function() {
+        module.exports.makePredictions(classifierName);
+      }, classifierName);
+      
+    }
+
     
   }
 };
