@@ -31,6 +31,7 @@ fileNames = json.loads(sys.argv[3])
 
 classifierName = sys.argv[4]
 problemType = sys.argv[5]
+bestSearchScore = float(sys.argv[6])
 
 sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
 import paramMakers
@@ -186,8 +187,7 @@ printParent(classifierName + "'s total hyperparameter searching time is:")
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
 
-# TODO: send over bestSearchScore
-longTrainThreshold = argv['bestSearchScore'] * globalArgs['longTrainThreshold']
+longTrainThreshold = bestSearchScore * globalArgs['longTrainThreshold']
 messageObj = {
     "searchScore": searchCV.best_score_,
     "algoName": classifierName
