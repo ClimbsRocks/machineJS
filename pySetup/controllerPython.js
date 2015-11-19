@@ -32,7 +32,10 @@ var startOneClassifier = function(classifierList) {
       utils.kickOffTraining( function() {
         module.exports.makePredictions(classifierName);
       }, classifierName);
-      
+
+    } else {
+      // since we said at the start to expect a certain number of algorithms to be trained, we must still emit an event to notify ensembler that we are skipping over an algorithm
+      process.emit('algoSkippedTraining');
     }
 
     
