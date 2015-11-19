@@ -80,7 +80,7 @@ module.exports = {
       global.finishedAlgos++;
       process.emit('algoFinishedTraining');
       callback();
-    }
+    };
 
 
     var pyShell = utilsPyShell.startPythonShell('training.py', emitFinishedTrainingCallback, pythonOptions);
@@ -92,6 +92,7 @@ module.exports = {
 
         // save it into our allResults array
         global.allTrainingResults.push(message.text);
+        global.trainedAlgoCounts[classifierName]++;
 
         // see if this is the best searchScore we've encountered so far
         if( message.text.searchScore > global.bestSearchScore ) {
@@ -111,7 +112,6 @@ module.exports = {
   makePredictions: function( callback, classifierName) {
     console.log('kicking off the process of making predictions on the predicting data set for:', classifierName);
 
-    // TODO: 
     var startPredictionsScript = function() {
       if( global.copyValidationData && classifierName.slice(0,4) !== 'clnn' ) {
         var copyValidationData = true;
@@ -121,9 +121,7 @@ module.exports = {
       }
 
       var classifierTrainingObj = global.allTrainingResults[global.allTrainingResults.length -1];
-      console.log('classifierTrainingObj',classifierTrainingObj);
       var classifierTrainingScore = classifierTrainingObj.longTrainScore;
-      console.log('classifierTrainingScore',classifierTrainingScore);
 
       var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData ]);
 
@@ -136,14 +134,6 @@ module.exports = {
     };
 
     startPredictionsScript();
-
-
-    // TODO: we will already have the data formatted for us by data-formatter, so we can probably skip right to invoking startPredictionsScript. 
-
-    // reads our predict file, formats it, and then invokes startPredictionsScript as it's callback
-    // right now we are formatting the file multiple times, where we should only have to format that data once. 
-    // former todo: throw in a flag for whether we've already formatted the prediction data or not. obviously, if we have, use it, skip over invoking formatData again, and just invoke startPredictionsScript directly. 
-    // module.exports.formatData( startPredictionsScript, 'predict')
 
   }
 
