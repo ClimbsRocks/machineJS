@@ -7,7 +7,9 @@
     "test": "npm run test:regression",
     "test:regression": "mocha test/regression/test.js",
     "test:categorical": "mocha test/categorical/test.js",
-    "dev": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted"
+    "dev": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --dev",
+    "devEnsemble": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
+    "train:rossman": "node ppLib.js data/rossman/tran_filled_gap.csv --kagglePredict data/rossman/test.csv --join store.csv --alreadyFormatted"
   },
   "repository": {
     "type": "git",
