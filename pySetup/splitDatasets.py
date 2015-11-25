@@ -39,6 +39,8 @@ X = load_sparse_csr(XFileName)
 
 numRows = X.shape[0]
 
+printParent('numRows: ' + str(numRows))
+
 includeOrNot = [random.random() for x in range(0,numRows)]
 
 validationIndexFolder = path.dirname(args['kagglePredict'])
@@ -49,15 +51,15 @@ try:
     with open(validationIndicesFile, 'rb') as openFile:
         validationIndices = pickle.load(openFile)
         maxVal = max( validationIndices )
-        # check to make sure that the maximum number in validationIndices is less than the length of our X dataset
-        if maxVal > numRows * validationPercent:
+        # check to make sure that the validation length is less than the length of our X dataset
+        if len(validationIndices) > numRows * ( validationPercent - .02):
             # if it isn't, create a new validationIndices for this dataset, but do not write it to file
             # this lets us keep our larger validationIndices split (for the full training data set), while still having something to work with for this smaller dataset we're currently testing on.
             writeToFile = False
             raise IndexError("this dataset is shorter than the one we built the validation split on previously")
 
-        # check to make sure that the maximum number in validationIndices is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the largest number in validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
-        elif maxVal < numRows * validationPercent * .95:
+        # check to make sure that the validation length is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the largest number in validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
+        elif len(validationIndices) < numRows * validationPercent * .98:
             # If it is not, create a new validationIndices and write that to file
             raise IndexError("this dataset is longer than the one we built the validation split on previously")
             
@@ -68,9 +70,10 @@ except:
     validationIndices = []
     trainingIndices = []
     for idx, randomNum in enumerate(includeOrNot):
-        if randomNum > validationPercent:
+        if randomNum < validationPercent:
             validationIndices.append(idx)
-        else:trainingIndices.append(idx)
+        else:
+            trainingIndices.append(idx)
 
     if writeToFile:
         with open(validationIndicesFile, 'w+') as writeFile:
