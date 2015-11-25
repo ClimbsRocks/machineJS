@@ -3,7 +3,7 @@ var path = require('path');
 global.rootDir = path.dirname(__filename);
 
 var controllerPython = require('./pySetup/controllerPython.js');
-var processShutdownListeners = require('./processShutdownListeners.js');
+var shutDown = require('./shutDown.js');
 var processArgs = require('./processArgs.js');
 
 var ensembler = require('ensembler');
@@ -21,5 +21,5 @@ if (argv.devEnsemble) {
   controllerPython.startTraining(argv);  
 }
 
-processShutdownListeners(controllerPython);
+shutDown(controllerPython);
 
