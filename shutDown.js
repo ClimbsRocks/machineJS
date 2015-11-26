@@ -1,3 +1,5 @@
+var exec = require('child_process').execSync;
+
 module.exports = function(controllerPython) {
 
 
@@ -31,7 +33,11 @@ module.exports = function(controllerPython) {
 
   process.on("SIGINT", function () {
     //graceful shutdown
+    console.log('heard sigint in machineJS')
     controllerPython.killAll();
+
+    // if we hear a Ctrl + c, we can safely assume the user wants to exit. 
+    // exec('pkill -9 node');
     process.exit();
   });
 

@@ -26,6 +26,9 @@ def makeParams(X, y, globalArgs, dev, problemType):
             parameters_to_try.pop('algorithm', None)
         except:
             pass
+    else:
+        parameters_to_try.pop('loss', None)
+        
 
     if dev:
         parameters_to_try.pop('learning_rate', None)

@@ -17,6 +17,7 @@ def makeParams(X, y, globalArgs, dev, problemType):
     parameters_to_try = {
         "n_estimators": scipy.stats.randint(25,500),
         "learning_rate": scipy.stats.expon(.001, 2),
+        # "loss": ['linear','square','exponential'],
         "algorithm": ['SAMME','SAMME.R']
     }
 

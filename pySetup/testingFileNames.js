@@ -34,6 +34,21 @@ module.exports = {
     X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_rossmantest.npz',
     trainingDataLength: 1050330,
     problemType: 'regression' 
+  },
+
+  numerai_training_data: { 
+    idHeader: 'uid',
+    outputHeader: 'target',
+    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_numerai_training_data.npz',
+    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_numerai_training_data.npz',
+    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_numerai_test_datanumerai_training_data.npz',
+    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_numerai_test_datanumerai_training_data.npz',
+    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_numerai_training_data.npz',
+    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_numerai_training_data.npz',
+    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_numerai_training_data.npz',
+    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_numerai_test_datanumerai_training_data.npz',
+    trainingDataLength: 55038,
+    problemType: 'category' 
   }
 
 };

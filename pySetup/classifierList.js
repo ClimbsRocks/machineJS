@@ -14,14 +14,9 @@ classifier summary descriptions
 
 module.exports = {
   dev: {
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnNoLearn: 'clnnNoLearn',
-    clnnSknn: 'clnnSknn',
-    // clKnn: 'clKnn',
-    // clAdaBoost: 'clAdaBoost',
-    // clXGBoost: 'clXGBoost',
-    // // clRfEntropy: 'clRfEntropy',
-    // clRfGini: 'clRfGini'
+    clRfGini: 'clRfGini',
+    clXGBoost: 'clXGBoost',
+    clRfBootstrapTrue: 'clRfBootstrapTrue'
   },
   shortDataSet: {
     clnnSknn: 'clnnSknn',
@@ -37,16 +32,18 @@ module.exports = {
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
+    // clSVCFirst: 'clSVCFirst',
+    // clSVCShrinking: 'clSVCShrinking',
     // clnnNoLearn: 'clnnNoLearn',
     // clnnSknn3Layer: 'clnnSknn3Layer',
     // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
-    // clLogisticRegression: 'clLogisticRegression'
-    // clAdaBoost: 'clAdaBoost',
-    clAdaLossLinear: 'clAdaLossLinear',
-    clAdaLossSquare: 'clAdaLossSquare',
-    clAdaLossExponential: 'clAdaLossExponential',
+    // clLogisticRegression: 'clLogisticRegression',
+    clAdaBoost: 'clAdaBoost',
+    // clAdaLossLinear: 'clAdaLossLinear',
+    // clAdaLossSquare: 'clAdaLossSquare',
+    // clAdaLossExponential: 'clAdaLossExponential',
     clRfGini: 'clRfGini',
     clXGBoost: 'clXGBoost',
     clRfBootstrapTrue: 'clRfBootstrapTrue'
