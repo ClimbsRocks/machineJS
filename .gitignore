@@ -19,3 +19,4 @@ data/*
 *.npz
 *.txt
 src/*
+.npmignore
