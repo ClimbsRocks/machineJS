@@ -44,6 +44,7 @@ module.exports = {
         for( var key in message.text) {
           module.exports.fileNames[key] = message.text[key];
         }
+        global.argv.fileNames = module.exports.fileNames;
       }
     });
 

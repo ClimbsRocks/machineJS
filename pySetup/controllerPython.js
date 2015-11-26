@@ -111,7 +111,11 @@ module.exports = {
 
     // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
     if( argv.alreadyFormatted ) {
-
+      // TODO TODO: do not start splitDatasets
+        // we need to get the fileNames
+          // grab them from within ensembler before invoking machineJS a second time
+            // make fileNames part of the global.argv object in machineJS
+        // and we will need to build in some logic to training.py to have it not split out the data, make predictions on the raw validation dataset, etc. 
       utils.splitData(function() {
         module.exports.startClassifiers(classifiersByRound);
       });
