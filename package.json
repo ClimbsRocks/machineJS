@@ -53,6 +53,9 @@
   ],
   "author": "Preston Parry",
   "license": "MIT",
+  "bin": {
+    "machineJS": "ppLib.js"
+  },
   "bugs": {
     "url": "https://github.com/ClimbsRocks/machineJS/issues"
   },
