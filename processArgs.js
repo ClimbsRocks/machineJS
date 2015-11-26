@@ -11,7 +11,7 @@ module.exports = function() {
   }
 
 
-  var dataFile = process.argv[2];
+  var dataFile = global.argv.dataFile || process.argv[2];
   argv.computerTotalCPUs = require('os').cpus().length;
   argv.ppCompleteLocation = path.dirname(__filename);
 
