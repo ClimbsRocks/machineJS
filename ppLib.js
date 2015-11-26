@@ -21,7 +21,15 @@
       }
     }
 
-    processArgs();
+    if( global.argv.validationRound ) {
+      console.log('global.argv before processArgs in machineJS validationRound');
+      console.log(global.argv);
+    }
+
+    console.log('argv.validationRound when deciding whether to invoke processArgs or not', argv.validationRound);
+    if( argv.validationRound !== true ) {
+      processArgs();
+    }
 
     if (argv.devEnsemble) {
       ensembler.createEnsemble( argv.ensemblerArgs );
