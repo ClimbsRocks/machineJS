@@ -94,18 +94,10 @@ module.exports = function() {
   // the first time we run machineJS, it will just make predictions for a ton of different algos
     // then ensembler will add all these algos on the validation data set.
     // and ask machineJS to try to train a new algo that takes these stage 0 predictions into account
-
-  if( argv.validationRound === true ) {
-    // if ensembler has already told us this is the validationRound, then that means that next time we pass data back to ensembler, it will no longer be the validation round for ensembler, it will be the finalRound where we simply average the results of machineJS's validationRound
-    var nextValidationRound = !argv.validationRound;
-    // TODO: make any changes we might want to make for the validationRound here
-    // think through if we want to train all the same algos, the same numRounds, the same numIterationsPerRound, etc. 
-  } else {
-    // if we don't have any value passed in, explicitly set validationRound to false to avoid any confusion
+  if( argv.validationRound !== true ) {
     argv.validationRound = false;
-    // similarly, if this is machineJS's first time running, it will be ensembler's validationRound the first time we pass ensembler data.
-    var nextValidationRound = !argv.validationRound;
   }
+  var nextValidationRound = !argv.validationRound;
 
 
   argv.ensemblerArgs = {
@@ -113,7 +105,7 @@ module.exports = function() {
     outputFolder: argv.ensemblerOutputFolder,
     validationFolder: argv.validationFolder,
     fileNameIdentifier: argv.outputFileName,
-    validationRound = !argv.validationRound
+    validationRound: nextValidationRound
   };
 
   if( argv.binaryOutput ) {
