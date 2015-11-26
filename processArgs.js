@@ -149,8 +149,14 @@ module.exports = function() {
 
 
   if( argv.alreadyFormatted ) {
-    var fileNamesOptions = require(path.join('pySetup','testingFileNames.js'));
-    utils.fileNames = fileNamesOptions[argv.outputFileName];
+    
+    if( argv.fileNames !== undefined ) {
+      utils.fileNames = argv.fileNames;
+    } else {
+      var fileNamesOptions = require(path.join('pySetup','testingFileNames.js'));
+      utils.fileNames = fileNamesOptions[argv.outputFileName];
+    }
+
     try{
       utils.fileNames = JSON.parse(utils.fileNames);
     } catch(err) {
