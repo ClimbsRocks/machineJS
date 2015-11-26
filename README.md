@@ -1,7 +1,7 @@
 # ppComplete
 > a library for optimizing your ML algorithms
 
-NOTE: This is still under active development, with Thanksgiving targeted for a release date. In the mean time, I'd love any PRs or feature requests you submit!
+NOTE: This is still under active development, with Thanksgiving weekend targeted for a release date. In the mean time, I'd love any PRs or feature requests you submit!
 
 ## How to use:
 1. `npm install machinejs`

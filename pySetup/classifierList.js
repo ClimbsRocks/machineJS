@@ -40,7 +40,7 @@ module.exports = {
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
     // clLogisticRegression: 'clLogisticRegression',
-    clAdaBoost: 'clAdaBoost',
+    // clAdaBoost: 'clAdaBoost',
     // clAdaLossLinear: 'clAdaLossLinear',
     // clAdaLossSquare: 'clAdaLossSquare',
     // clAdaLossExponential: 'clAdaLossExponential',
