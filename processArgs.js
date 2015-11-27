@@ -20,11 +20,9 @@ module.exports = function() {
     require('longjohn');
     if (dataFile === undefined) {
       dataFile = 'rossShortTrainDev.csv';
-      console.log('set dataFile = rossShortTrainDev')
     }
     if ( (argv.devKaggle && !argv.kagglePredict) || argv.devEnsemble) {
       argv.kagglePredict = argv.kagglePredict || 'rossmantest.csv';
-      console.log('set kagglePredict = rossmantest')
     }
   }
 
@@ -149,10 +147,7 @@ module.exports = function() {
     }
   }
 
-  console.log('inside processArgs');
   if( argv.alreadyFormatted ) {
-
-    console.log('argv.fileNames', argv.fileNames);
 
     if( argv.fileNames !== undefined ) {
       utils.fileNames = argv.fileNames;
@@ -160,7 +155,6 @@ module.exports = function() {
       var fileNamesOptions = require(path.join('pySetup','testingFileNames.js'));
       utils.fileNames = fileNamesOptions[argv.outputFileName];
       argv.fileNames = utils.fileNames;
-      console.log('argv.fileNames after setting them', argv.fileNames);
     }
 
     try{
