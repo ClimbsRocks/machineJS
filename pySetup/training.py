@@ -140,14 +140,36 @@ try:
 except:
     pass
 
-# we have already separated out our validation data (currently 20% of the entire training data set by default)
-# the data that we have loaded in here is the 80% that is not our validation data
-# we want to have 30% of our entire training data set used as our "search" data set, meaning it is 37.5% of this 80% data set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.625, random_state=0)
 
-# if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
-if dev:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
+if globalArgs['validationRound']:
+    # if this is the validation round, we do not want to split our data out any further. 
+    # TODO TODO: take only the validation portion of these datasets
+        # right now they are the combined validation + test datasets
+        # we want them to only be the validation portions
+    combinedLength = X.shape[0]
+    printParent('X.shape')
+    printParent(X.shape)
+    printParent('combinedLength:' + str(combinedLength))
+    validationLength = combinedLength - fileNames['testingDataLength']
+    printParent('validationLength:' + str(validationLength))
+    validationIndices = range( validationLength )
+    X_train = X[validationIndices , : ]
+
+    # unless we are doing multi-category or multi-label predictions, we have converted y to be a list, meaning we have to slice it differently
+    try:
+        y_train = y[validationIndices , : ]
+    except:
+        y_train = y[ 0 : validationLength ]
+else:
+    # if this is the stage 0 round
+    # we have already separated out our validation data (currently 20% of the entire training data set by default)
+    # the data that we have loaded in here is the 80% that is not our validation data
+    # we want to have 30% of our entire training data set used as our "search" data set, meaning it is 37.5% of this 80% data set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.625, random_state=0)
+
+    # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
+    if dev:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.99, random_state=0)
 
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
@@ -171,14 +193,14 @@ printParent('we are about to run a cross-validated search for the best hyperpara
 
 try:
     if randomizedSearchCVList[classifierName]:
-        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work.
+        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work.
         # numIterationsPerRound defaults to 10, unless the user has passed in a more specific value.
         searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=globalArgs['numIterationsPerRound'])
     else:
-        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
+        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
 except:
-        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the grid search process will work
+        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)    
 
 
@@ -203,11 +225,16 @@ printParent(classifierName + "'s total hyperparameter searching time is:")
 finishTrainTime = time.time()
 printParent( round((finishTrainTime - startTime)/60, 1) )
 
+
 longTrainThreshold = bestSearchScore * globalArgs['longTrainThreshold']
 messageObj = {
     "searchScore": searchCV.best_score_,
     "algoName": classifierName
 }
+
+# TODO TODO: 
+    # think through how we want to handle training or not training larger versions of these classifiers
+    # think through how we want to save these classifiers
 
 # only put in the (oftentimes considerable) effort of longTraining this algorithm if it meets the threshold defined by longTrainThreshold
 if searchCV.best_score_ > longTrainThreshold:
