@@ -29,9 +29,17 @@ module.exports = {
 
   generatePythonOptions: function(fileNameFromRoot, otherArgs) {
     // the first argument for all python shells is going to be a path to a file, relative to the root of ppLib
-    var fullPathToFile = global.rootDir + '/' + fileNameFromRoot;
+    var fullPathToFile = path.join(global.rootDir, fileNameFromRoot);
     var args = [];
     args = args.concat(fullPathToFile, otherArgs);
+
+    var pySetupLocation = path.join(argv.ppCompleteLocation, 'pySetup');
+
+    // TODO: remove this once we're done developing on the fature to stack stage 0 predictions
+    if(argv.validationRound) {
+      var pySetupLocation = path.join(argv.ppCompleteLocation, 'node_modules', 'ensembler','node_modules','machinejs', 'pySetup');
+    }
+
     return {
       scriptPath: pySetupLocation,
       args: args,
