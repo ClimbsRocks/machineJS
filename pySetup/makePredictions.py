@@ -89,38 +89,47 @@ if problemType == 'category':
 else:
     testDataPredictions = classifier.predict(XTest)
 
+if not argv['validationRound']:
+    validationFile = fileNames['X_trainvalidationData']
+    validationData = load_sparse_csr(validationFile)
+    validationIdFile = fileNames['id_trainvalidationData']
+    validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
 
-validationFile = fileNames['X_trainvalidationData']
-validationData = load_sparse_csr(validationFile)
-validationIdFile = fileNames['id_trainvalidationData']
-validationIDs = load_sparse_csr( validationIdFile ).todense().tolist()[0]
-
-if nn:
-    validationYFile = fileNames['y_train_nnvalidationData']
-else:
-    validationYFile = fileNames['y_trainvalidationData']
-validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
+    if nn:
+        validationYFile = fileNames['y_train_nnvalidationData']
+    else:
+        validationYFile = fileNames['y_trainvalidationData']
+    validationY = load_sparse_csr(validationYFile).todense().tolist()[0]
 
 
-if problemType == 'category':
-    validationPredictions = classifier.predict_proba(validationData)
-else:
-    validationPredictions = classifier.predict(validationData)
+    if problemType == 'category':
+        validationPredictions = classifier.predict_proba(validationData)
+    else:
+        validationPredictions = classifier.predict(validationData)
 
-validationScore = classifier.score(validationData,validationY)
+    validationScore = classifier.score(validationData,validationY)
 
-printParent('\n')
-printParent('***************')
-printParent(classifierName + "'s score on the validation set is:")
-printParent(validationScore)
-printParent('***************')
-
+    printParent('\n')
+    printParent('***************')
+    printParent(classifierName + "'s score on the validation set is:")
+    printParent(validationScore)
+    printParent('***************')
 
 
 # write our predictions on the test data to a file
-predictionsPath = argv['predictionsFolder']
+if argv['validationRound']:
+    predictionsPath = path.join( argv['predictionsFolder'], 'ensembledPredictions' )
+
+else:
+    predictionsPath = argv['predictionsFolder']
+
+
 # using the outputFileName here so that if people have different input files (different feature engineering), that will show up in our file names.
 predictionsFileName = argv['outputFileName'] + classifierName + str(time.time()) + '.csv'
+
+# create the directory if it doesn't exist already
+if not os.path.exists(predictionsPath):
+    os.makedirs(predictionsPath)
 
 with open( path.join(predictionsPath, predictionsFileName) , 'w+') as predictionsFile:
     csvwriter = csv.writer(predictionsFile)
