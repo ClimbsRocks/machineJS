@@ -34,8 +34,8 @@ else:
 id_file_name = fileNames['id_test']
 
 
-X = []
-idColumn = []
+XTest = []
+testIDColumn = []
 
 # load up the prediction data set, without the header row
 try:
@@ -43,21 +43,21 @@ try:
         loader = np.load(filename)
         return csr_matrix(( loader['data'], loader['indices'], loader['indptr']), shape=loader['shape']) 
     
-    X = load_sparse_csr(X_file_name)
+    XTest = load_sparse_csr(X_file_name)
 except:
     with open(X_file_name, 'rU') as x_file:
         inputRows = csv.reader(x_file)
         headerRow = False
         for row in inputRows:
             if(headerRow):
-                X.append(row)
+                XTest.append(row)
             else:
                 headerRow = True
 
-# should be pretty safe to convert the idColumn to a list, since it is always going to be a single value per row
+# should be pretty safe to convert the testIDColumn to a list, since it is always going to be a single value per row
 # to get a single vector (in this case, our ID column) to be saved as a sparse matrix, we have to do some vaguely hacky stuff
 # the following line converts it to a normal python list
-idColumn = load_sparse_csr( id_file_name ).todense().tolist()[0]
+testIDColumn = load_sparse_csr( id_file_name ).todense().tolist()[0]
 
 
 try:
@@ -85,9 +85,9 @@ except:
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
-    testDataPredictions = classifier.predict_proba(X)    
+    testDataPredictions = classifier.predict_proba(XTest)    
 else:
-    testDataPredictions = classifier.predict(X)
+    testDataPredictions = classifier.predict(XTest)
 
 
 validationFile = fileNames['X_trainvalidationData']
@@ -130,7 +130,7 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
     csvwriter.writerow([validationScore, trainingScore])
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(testDataPredictions):
-        rowID = idColumn[idx]
+        rowID = testIDColumn[idx]
 
         try:
             len(prediction)
@@ -146,7 +146,7 @@ validationFileName = argv['outputFileName'] + classifierName + str(time.time()) 
 
 # to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
 totalPredictions = np.concatenate( (validationPredictions, testDataPredictions), axis=0 )
-totalIdColumn = np.concatenate( (validationIDs, idColumn), axis=0 )
+validationAndTestIDs = np.concatenate( (validationIDs, testIDColumn), axis=0 )
 
 with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
     csvwriter = csv.writer(validationFile)
@@ -157,7 +157,7 @@ with open( path.join(validationPath, validationFileName) , 'w+') as validationFi
     # we are going to have to modify this when we allow it to make categorical predictions too. 
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(totalPredictions):
-        rowID = totalIdColumn[idx]
+        rowID = validationAndTestIDs[idx]
         try:
             len(prediction)
             csvwriter.writerow([int(rowID),prediction[1]])
@@ -171,7 +171,8 @@ def save_sparse_csr(filename,array):
 
 if copyValidationData and nn == False:
     allValidationDataFile = path.join( validationPath, 'validationData.npz')
-    allValidationData = vstack( [validationData, X] )
+    # TODO TODO: make sure that XTest is actually our test dataset. I'm relatively confident it is, based on working with the results previously and not noticing anything amiss, but verify this explicitly. 
+    allValidationData = vstack( [validationData, XTest] )
     save_sparse_csr(allValidationDataFile, allValidationData)
 
     with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
@@ -179,7 +180,8 @@ if copyValidationData and nn == False:
 
         # we are going to have to modify this when we allow it to make categorical predictions too. 
         csvwriter.writerow([idHeader,outputHeader])
-        for idx, rowID in enumerate(totalIdColumn):
+        for idx, rowID in enumerate(validationAndTestIDs):
+            # our test data will not have y values attached, so we will try to find a y value for this ID, but if we can't, we assume it is a test value, and we set the y value to None
             try:
                 yValue = validationY[idx]
             except:
@@ -208,7 +210,7 @@ if argv[ 'binaryOutput'] == 'true':
         csvwriter.writerow([idHeader,outputHeader])
         for idx, prediction in enumerate(testDataPredictions):
 
-            rowID = idColumn[idx]
+            rowID = testIDColumn[idx]
             # I'm not sure why we're checking if prediction is already a list
                 # or why we're taking the second item in that list
             try:
