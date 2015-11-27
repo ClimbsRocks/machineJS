@@ -54,29 +54,31 @@ X = []
 y = []
 headerRow = []
 
-printParent('fileNames inside of training.py')
-printParent(fileNames)
 
-
-
-
-
-
-
-
-
-
-
-
+# for the validationRound, we have saved the data into the dataFile property of globalArgs
+if globalArgs['validationRound']:
+    X_file_name = globalArgs['dataFile']
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
-if( classifierName[0:4] == 'clnn' ):
+elif( classifierName[0:4] == 'clnn' ):
     X_file_name = fileNames['X_train_nntrainingData']
 else:    
     X_file_name = fileNames['X_traintrainingData']
 
-# for neural networks, the y values to not need to be normalized
-y_file_name = fileNames['y_traintrainingData']
+
+if globalArgs['validationRound']:
+    y_file_name = globalArgs['validationYs']
+    # TODO: 
+        # save validationYs as a sparse matrix
+        # think about removing the ID column from the validationYs
+            # we don't have it in our training y dataset
+            # we already have the IDs for the testing y dataset saved
+        # split out the test data from the validation data for both X and y
+        # make sure we pass these correct variables into makePredictions (again, with test and validation separated out)
+else:
+    # for neural networks, the y values do not need to be normalized
+    y_file_name = fileNames['y_traintrainingData']
+
 
 try:
     
@@ -114,7 +116,7 @@ try:
     y = load_sparse_csr(y_file_name)
 
 except:
-    # supports dense input
+    # supports dense input, which is used in validationRound
     with open(y_file_name, 'rU') as openOutputFile:
         outputRows = csv.reader(openOutputFile)
         # this might be unnecessary now that we have run our data through data-formatter
