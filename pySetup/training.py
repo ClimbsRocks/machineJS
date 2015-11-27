@@ -69,11 +69,6 @@ else:
 if globalArgs['validationRound']:
     y_file_name = globalArgs['validationYs']
     # TODO: 
-        # save validationYs as a sparse matrix
-        # think about removing the ID column from the validationYs
-            # we don't have it in our training y dataset
-            # we already have the IDs for the testing y dataset saved
-        # split out the test data from the validation data for both X and y
         # make sure we pass these correct variables into makePredictions (again, with test and validation separated out)
 else:
     # for neural networks, the y values do not need to be normalized
@@ -143,22 +138,21 @@ except:
 
 if globalArgs['validationRound']:
     # if this is the validation round, we do not want to split our data out any further. 
-    # TODO TODO: take only the validation portion of these datasets
+    # take only the validation portion of these datasets
         # right now they are the combined validation + test datasets
         # we want them to only be the validation portions
     combinedLength = X.shape[0]
-    printParent('X.shape')
-    printParent(X.shape)
-    printParent('combinedLength:' + str(combinedLength))
     validationLength = combinedLength - fileNames['testingDataLength']
-    printParent('validationLength:' + str(validationLength))
     validationIndices = range( validationLength )
+
     X_train = X[validationIndices , : ]
 
     # unless we are doing multi-category or multi-label predictions, we have converted y to be a list, meaning we have to slice it differently
     try:
+        # slicing sparse matrices, if y is for multi-label or multi-category predictions
         y_train = y[validationIndices , : ]
     except:
+        # slicing standard python lists
         y_train = y[ 0 : validationLength ]
 else:
     # if this is the stage 0 round
@@ -283,5 +277,4 @@ if searchCV.best_score_ > longTrainThreshold:
 else:
     messageObj['longTrainScore'] = 0
 
-# TODO: collect trainingResults, and process them
 messageParent(messageObj, 'trainingResults')
