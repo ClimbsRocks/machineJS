@@ -35,11 +35,6 @@ module.exports = {
 
     var pySetupLocation = path.join(argv.ppCompleteLocation, 'pySetup');
 
-    // TODO: remove this once we're done developing on the fature to stack stage 0 predictions
-    if(argv.validationRound) {
-      var pySetupLocation = path.join(argv.ppCompleteLocation, 'node_modules', 'ensembler','node_modules','machinejs', 'pySetup');
-    }
-
     return {
       scriptPath: pySetupLocation,
       args: args,
