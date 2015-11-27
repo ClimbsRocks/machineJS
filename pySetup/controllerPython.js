@@ -109,8 +109,11 @@ module.exports = {
 
     ensembler.startListeners( numberOfClassifiers, argv.ensemblerArgs);
 
-    // if this is while we are developing, skip over the data-formatter part, as data-formatter is already well tested, and time-consuming.
-    if( argv.alreadyFormatted ) {
+    if( argv.validationRound ) {
+      module.exports.startClassifiers(classifiersByRound);
+      
+    } else if( argv.alreadyFormatted ) {
+    // if we have already formatted the data, skip over repeating that step. This allows us to train more classifiers rapidly without repeating the oftentimes lengthy data formatting process. 
       // TODO TODO: do not start splitDatasets
         // we need to get the fileNames
           // grab them from within ensembler before invoking machineJS a second time
