@@ -54,6 +54,20 @@ X = []
 y = []
 headerRow = []
 
+printParent('fileNames inside of training.py')
+printParent(fileNames)
+
+
+
+
+
+
+
+
+
+
+
+
 # for neural networks, we need to train on data normalized to the range of {0,1} or {-1,1}
 # data-formatter did that for us already, so we just have to load in the correct feature data
 if( classifierName[0:4] == 'clnn' ):
