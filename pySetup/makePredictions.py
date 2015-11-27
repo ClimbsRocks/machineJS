@@ -171,26 +171,42 @@ def save_sparse_csr(filename,array):
 
 if copyValidationData and nn == False:
     allValidationDataFile = path.join( validationPath, 'validationData.npz')
-    # TODO TODO: make sure that XTest is actually our test dataset. I'm relatively confident it is, based on working with the results previously and not noticing anything amiss, but verify this explicitly. 
+    allValidationIDsFile = path.join( validationPath, 'validationIDs.npz')
+    allValidationYsFile = path.join( validationPath, 'validationYs.npz')
+
+    # to make sure we keep everything consistent, we write the combined validation data and test data to a file
     allValidationData = vstack( [validationData, XTest] )
     save_sparse_csr(allValidationDataFile, allValidationData)
 
-    with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
-        csvwriter = csv.writer(validationFile)
+    # we already loaded in this data, but then immediately converted it to a dense list. 
+        # so we are going to load it in again, this time as a sparse csr matrix, and then immediately save it as a sparse csr matrix elsewhere
+        # we could just as easily copy the original file to a new location, but since we're not coyping anywhere else, this is slightly more consistent stylistically
+    validationSparseIDs = load_sparse_csr( validationIdFile )
+    save_sparse_csr( allValidationIDsFile, validationSparseIDs )
 
-        # we are going to have to modify this when we allow it to make categorical predictions too. 
-        csvwriter.writerow([idHeader,outputHeader])
-        for idx, rowID in enumerate(validationAndTestIDs):
-            # our test data will not have y values attached, so we will try to find a y value for this ID, but if we can't, we assume it is a test value, and we set the y value to None
-            try:
-                yValue = validationY[idx]
-            except:
-                yValue = None
-            try:
-                len(yValue)
-                csvwriter.writerow([int(rowID),yValue[1]])
-            except:
-                csvwriter.writerow([int(rowID),yValue])
+    validationSparseYs = load_sparse_csr(validationYFile)
+    save_sparse_csr( allValidationYsFile, validationSparseYs )
+
+    # TODO TODO: 
+        # write validationYs to a file as a sparse matrix
+        # write validationIDs to a file as a sparse matrix
+
+    # with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
+    #     csvwriter = csv.writer(validationFile)
+
+    #     # we are going to have to modify this when we allow it to make categorical predictions too. 
+    #     csvwriter.writerow([idHeader,outputHeader])
+    #     for idx, rowID in enumerate(validationAndTestIDs):
+    #         # our test data will not have y values attached, so we will try to find a y value for this ID, but if we can't, we assume it is a test value, and we set the y value to None
+    #         try:
+    #             yValue = validationY[idx]
+    #         except:
+    #             yValue = None
+    #         try:
+    #             len(yValue)
+    #             csvwriter.writerow([int(rowID),yValue[1]])
+    #         except:
+    #             csvwriter.writerow([int(rowID),yValue])
 
 
 
