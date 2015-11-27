@@ -1,6 +1,6 @@
 {
   "name": "machinejs",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Automated machine learning structure. Ensembles random forests, XGBoost, neural networks, AdaBoost, KNN, SVM together, handling data formatting ensembling, and running predictions for you. Feel free to tweak the settings if you want a lot of control, or just start it up and let it run if you're looking for a push-button MVP solution.",
   "main": "ppLib.js",
   "scripts": {
@@ -64,7 +64,7 @@
     "babyparse": "^0.4.3",
     "brain": "^0.7.0",
     "data-formatter": "^1.3.0",
-    "ensembler": "^0.5.5",
+    "ensembler": "^0.5.7",
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
