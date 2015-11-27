@@ -154,6 +154,12 @@ if globalArgs['validationRound']:
     except:
         # slicing standard python lists
         y_train = y[ 0 : validationLength ]
+
+    # set X and y equal to the versions of themselves that only have the validation data
+    # this makes our lives easier later on when we go to train the big classifier on the "full" dataset
+    X = X_train
+    y = y_train
+
 else:
     # if this is the stage 0 round
     # we have already separated out our validation data (currently 20% of the entire training data set by default)
@@ -183,6 +189,9 @@ allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
 parameters_to_try = allParams[classifierName]
 
 printParent('we are about to run a cross-validated search for the best hyperparameters for ' + classifierName)
+
+printParent('X.shape:')
+printParent(X.shape)
 
 
 try:
@@ -241,7 +250,7 @@ if searchCV.best_score_ > longTrainThreshold:
         longTrainClassifier = allBigClassifiers[classifierName]
 
     # otherwise, just create a new classifier
-    # we could possibly warmStart from the GridSearch version, but given that we have more than doubled the size of our dataset, I think we'd have the best luck starting from scratch
+    # we could possibly warmStart from the GridSearch version, but given that we have roughly doubled the size of our dataset, I think we'd have the best luck starting from scratch
     else:
         longTrainClassifier = classifierCreater[classifierName]
         
@@ -256,6 +265,9 @@ if searchCV.best_score_ > longTrainThreshold:
 
     startLongTrainTime = time.time()
 
+    # when doing the cross-validated search, we have of course been holding out a significant portion of the dataset
+    # once we have found the best hyperparameters, train on the entire dataset
+        # we have already verified that this is the best set of hyperparameters using cross-validation
     longTrainClassifier.fit(X, y)
 
     finishLongTrainTime = time.time()
@@ -268,8 +280,12 @@ if searchCV.best_score_ > longTrainThreshold:
     printParent(longTrainClassifierScore)
     messageObj['longTrainScore'] = longTrainClassifierScore
 
+    # save our classifiers from the validationRound to a separate folder
+    if globalArgs['validationRound']:
+        classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'ensemblingAlgos', 'best' + classifierName)
+    else:
+        classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
 
-    classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
     if not os.path.exists(classifierFolder):
         os.makedirs(classifierFolder)
     joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
