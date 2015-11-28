@@ -24,12 +24,16 @@ problemType = sys.argv[6]
 trainingScore = sys.argv[7]
 copyValidationData = sys.argv[8]
 
-if( classifierName[0:4] == 'clnn' ):
-    nn = True
-    X_file_name = fileNames['X_test_nn']
+if argv['validationRound']:
+    X_file_name = argv['dataFile']
+
 else:
-    nn = False
-    X_file_name = fileNames['X_test']
+    if( classifierName[0:4] == 'clnn' ):
+        nn = True
+        X_file_name = fileNames['X_test_nn']
+    else:
+        nn = False
+        X_file_name = fileNames['X_test']
 
 id_file_name = fileNames['id_test']
 
@@ -54,6 +58,15 @@ except:
             else:
                 headerRow = True
 
+if argv['validationRound']:
+    # in the validation file, we have combined the validationData and the test data
+    # split out to only have the test data
+    testLength = fileNames['testingDataLength']
+    combinedValidationLength = XTest.shape[0]
+    testIndices = range( combinedValidationLength - testLength, combinedValidationLength )
+
+    XTest = XTest[combinedValidationLength,:]
+
 # should be pretty safe to convert the testIDColumn to a list, since it is always going to be a single value per row
 # to get a single vector (in this case, our ID column) to be saved as a sparse matrix, we have to do some vaguely hacky stuff
 # the following line converts it to a normal python list
@@ -74,14 +87,26 @@ except:
             else:
                 pass
 
+if argv['validationRound']:
+    classifierFile = path.join( argv['bestClassifiersFolder'], 'ensemblingAlgos', 'best' + classifierName, 'best' + classifierName + '.pkl')
+else:
+    classifierFile = path.join( argv['bestClassifiersFolder'], 'best' + classifierName, 'best' + classifierName + '.pkl')
 
 # load up the previously trained (and tuned!) classifier
-classifier = joblib.load(path.join( argv['bestClassifiersFolder'] ,'best' + classifierName, 'best' + classifierName + '.pkl') )
+classifier = joblib.load( classifierFile )
 
 try:
     classifier.set_params(n_jobs=-1)
 except:
     pass
+
+printParent('XTest.shape')
+printParent(XTest.shape)
+
+# TODO TODO: 
+    # load in the data from the validation file
+    # split out only the testing portion of that file
+    # use that, rather than the raw testing files
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
