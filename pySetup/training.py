@@ -65,7 +65,8 @@ elif( classifierName[0:4] == 'clnn' ):
 else:    
     X_file_name = fileNames['X_traintrainingData']
 
-
+printParent('X_file_name')
+printParent(X_file_name)
 if globalArgs['validationRound']:
     y_file_name = globalArgs['validationYs']
     # TODO: 
@@ -194,13 +195,13 @@ try:
     if randomizedSearchCVList[classifierName]:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work.
         # numIterationsPerRound defaults to 10, unless the user has passed in a more specific value.
-        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=globalArgs['numIterationsPerRound'])
+        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=globalArgs['numIterationsPerRound'], refit=True)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
-        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)
 except:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
-        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0)    
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)    
 
 
 if classifierName[0:4] == 'clnn':
@@ -208,6 +209,9 @@ if classifierName[0:4] == 'clnn':
     obviousPrint('X.shape',X.shape)
     y = np.array(y)
     obviousPrint('y.shape before gridsearch',y.shape)
+
+printParent('X.shape before searchCV')
+printParent(X.shape)
 
 searchCV.fit(X_train, y_train ) 
 printParent('\n')
@@ -231,6 +235,14 @@ messageObj = {
     "algoName": classifierName
 }
 
+if globalArgs['validationRound']:
+    try:
+        printParent('feature_importances_ from searchCV:')
+        printParent(searchCV.best_estimator_.feature_importances_.tolist())
+    except:
+        printParent('we were not able to print feature_importances_ for this estimator')
+        pass
+
 # TODO TODO: 
     # think through how we want to handle training or not training larger versions of these classifiers
     # think through how we want to save these classifiers
@@ -246,42 +258,52 @@ if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0:
         allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
         longTrainClassifier = allBigClassifiers[classifierName]
 
+    longTrainClassifier.set_params(**searchCV.best_params_)
     # otherwise, just create a new classifier
     # we could possibly warmStart from the GridSearch version, but given that we have roughly doubled the size of our dataset, I think we'd have the best luck starting from scratch
-    else:
-        longTrainClassifier = classifierCreater[classifierName]
-        
-    longTrainClassifier.set_params(**searchCV.best_params_)
+    # else:
+    #     longTrainClassifier = classifierCreater[classifierName]
 
-
-    if classifierName[0:4] == 'clnn':
-        X = X.todense()
-        obviousPrint('X.shape right before long training in training.py',X.shape)
-        y = np.array(y)
-        obviousPrint('y.shape right before long training in training.py',y.shape)
-
-    startLongTrainTime = time.time()
-
-    # when doing the cross-validated search, we have of course been holding out a significant portion of the dataset
-    # once we have found the best hyperparameters, train on the entire dataset
-        # we have already verified that this is the best set of hyperparameters using cross-validation
-    longTrainClassifier.fit(X, y)
-
-    finishLongTrainTime = time.time()
-    printParent(classifierName + "'s training on the longer data set took:")
-    printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
-
-
-    longTrainClassifierScore = longTrainClassifier.score(X, y)
-    printParent(classifierName + "'s score against the larger training data set is:")
-    printParent(longTrainClassifierScore)
-    messageObj['longTrainScore'] = longTrainClassifierScore
-
-
+# grab the best esimator from our searchCV
+# attempt to tell it to warm_start, if it supports that option
+# this will tell it to start from it's already-trained point, and then just add new training on top, rather than starting to train again from scratch
 else:
-    messageObj['longTrainScore'] = 0
-    # if we did not longTrain, then just save the best esimator from our cross-validated search instead
     longTrainClassifier = searchCV.best_estimator_
+    try:
+        longTrainClassifier.set_params({warm_start: True})
+    except:
+        pass
+
+
+if classifierName[0:4] == 'clnn':
+    X = X.todense()
+    obviousPrint('X.shape right before long training in training.py',X.shape)
+    y = np.array(y)
+    obviousPrint('y.shape right before long training in training.py',y.shape)
+
+startLongTrainTime = time.time()
+
+# when doing the cross-validated search, we have of course been holding out a significant portion of the dataset
+# once we have found the best hyperparameters, train on the entire dataset
+    # we have already verified that this is the best set of hyperparameters using cross-validation
+longTrainClassifier.fit(X, y)
+
+finishLongTrainTime = time.time()
+printParent(classifierName + "'s training on the longer data set took:")
+printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
+
+
+longTrainClassifierScore = longTrainClassifier.score(X, y)
+printParent(classifierName + "'s score against the larger training data set is:")
+printParent(longTrainClassifierScore)
+messageObj['longTrainScore'] = longTrainClassifierScore
+
+
+# else:
+#     messageObj['longTrainScore'] = 0
+#     # if we did not longTrain, then just save the best esimator from our cross-validated search instead
+#     # TODO TODO: this part does not appear to be working.
+#     longTrainClassifier = searchCV.best_estimator_
 
 # save our classifiers from the validationRound to a separate folder
 if globalArgs['validationRound']:
@@ -291,6 +313,7 @@ else:
 
 if not os.path.exists(classifierFolder):
     os.makedirs(classifierFolder)
+# TODO TODO: Make sure we are writing classifier to file correctly
 joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
 
 messageParent(messageObj, 'trainingResults')
