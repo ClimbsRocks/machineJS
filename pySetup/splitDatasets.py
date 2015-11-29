@@ -12,9 +12,10 @@ from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
 
+printParent('inside splitDatasets.py')
 
-# TODO TODO: make sure we are only creating training files if we have not already created teh validation indices
-    # TODO TODO: this means we probably just grab all teh file names, message them to the parent, and then return so we're not doing anything else.
+# TODO TODO: make sure we are only creating training files if we have not already created the validation indices
+    # TODO TODO: this means we probably just grab all the file names, message them to the parent, and then return so we're not doing anything else.
 
 # TODO: Pass in these variables:
 args = json.loads(sys.argv[2])
@@ -41,6 +42,9 @@ def load_sparse_csr(filename):
 
 X = load_sparse_csr(XFileName)
 
+printParent('X.shape inside splitDatasets.py')
+printParent(X.shape)
+
 numRows = X.shape[0]
 
 includeOrNot = [random.random() for x in range(0,numRows)]
@@ -53,7 +57,7 @@ createNewSplit = False
 try:
     with open(validationIndicesFile, 'rb') as openFile:
         validationIndices = pickle.load(openFile)
-        maxVal = max( validationIndices )
+
         # check to make sure that the validation length is less than the length of our X dataset
         if len(validationIndices) > numRows * ( validationPercent + .02):
             printParent('validationIndices too long')
@@ -71,6 +75,21 @@ try:
         # In both cases, fall into the except state below
         # but create a variable that lays out whether to write that new validationIndices to file or not in the try block, and then use that in the except block below
 
+        trainingIndices = []
+        validationIndicesCopy = validationIndices[:]
+        # it should already be sorted, but we're being safe here in case of future changes
+        validationIndicesCopy.sort()
+        # printParent('len(validationIndices) right before converting them to a dense list in splitDatasets.py')
+        # printParent(len(validationIndices))
+        validationIndicesCounter = 0
+
+        for x in range(0,numRows):
+            if x == validationIndicesCopy[validationIndicesCounter]:
+                validationIndicesCounter += 1
+            else:
+                trainingIndices.append(x)
+        printParent('len(trainingIndices) right after creating them in splitDatasets.py')
+        printParent(len(trainingIndices))
 
 
 except:
@@ -88,14 +107,14 @@ except:
             # now save that file as a .pkl next to where our test data sits. 
             pickle.dump(validationIndices, writeFile)
 
-# searchIndices = []
-# trainingDataIndices = []
+searchIndices = []
+trainingDataIndices = []
 
-# for idx, randomNum in enumerate(includeOrNot):
-#     if randomNum < searchPercent:
-#         searchIndices.append(idx)
-#     elif randomNum < 1 - validationPercent:
-#         trainingDataIndices.append(idx)
+for idx, randomNum in enumerate(includeOrNot):
+    if randomNum < searchPercent:
+        searchIndices.append(idx)
+    elif randomNum < 1 - validationPercent:
+        trainingDataIndices.append(idx)
 #     else:
 #         validationIndices.append(idx)
 
@@ -104,6 +123,9 @@ except:
 def save_sparse_csr(filename,array):
     np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
 
+
+# we want to write the splits of the training data every time
+# but only create a new validationIndices in certain circumstances
 def splitDataset(data, name, fileCategory):
 
     # uses slicing, one of the most useful and least-well-known features of scipy sparse matrices
@@ -114,37 +136,44 @@ def splitDataset(data, name, fileCategory):
 
     # if this "sparse" matrix only has a single value for each row, we have to treat it as a column matrix, and slice it accordingly
     # this is the case for our idColumn, and frequently our y values as well.
-    if createNewSplit:
-        if data.shape[0] == 1:
-            # search = data[:,searchIndices]
-            # longTrainingData = data[:,trainingDataIndices]
-            validation = data[:,validationIndices]
-            trainingData = data[:,trainingIndices]
+    if data.shape[0] == 1:
+        if not args['validationRound']:
+            search = data[:,searchIndices]
+            longTrainingData = data[:,trainingDataIndices]
+        validation = data[:,validationIndices]
+        trainingData = data[:,trainingIndices]
 
-        else:
-            # search = data[searchIndices,:]
-            # longTrainingData = data[trainingDataIndices,:]
-            validation = data[validationIndices,:]
-            trainingData = data[trainingIndices,:]
+    else:
+        if not args['validationRound']:
+            search = data[searchIndices,:]
+            longTrainingData = data[trainingDataIndices,:]
+        validation = data[validationIndices,:]
+        trainingData = data[trainingIndices,:]
 
     name = ntpath.basename(name)
     name = name[0:-4]
 
-    # searchFile = path.join(outputDirectory, name + 'searchData.npz')
-    # longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
+    if not args['validationRound']:
+        searchFile = path.join(outputDirectory, name + 'searchData.npz')
+        longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
+
     validationFile = path.join(outputDirectory, name + 'validationData.npz')
     trainingDataFile = path.join(outputDirectory, name + 'trainingData.npz')
 
-    if createNewSplit:
-        # save_sparse_csr(searchFile, search)
-        # save_sparse_csr(longTrainingFile, longTrainingData)
-        save_sparse_csr(validationFile, validation)
+    if not args['validationRound']:
+        save_sparse_csr(searchFile, search)
+        save_sparse_csr(longTrainingFile, longTrainingData)
         save_sparse_csr(trainingDataFile, trainingData)
+
+    if createNewSplit:
+        save_sparse_csr(validationFile, validation)
 
     fileNameDict = {
         fileCategory + 'trainingData': trainingDataFile,
         fileCategory + 'validationData': validationFile
     }
+    printParent('fileNameDict')
+    printParent(fileNameDict)
     messageParent(fileNameDict, 'splitFileNames')
 
 # we are going to have to repeat this process many times:
