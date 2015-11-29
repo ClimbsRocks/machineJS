@@ -128,12 +128,12 @@ module.exports = {
 
       // if this hyperparameter search did not yield an algorithm that was close enough to our best that it was worth investing in a longTraining, we did not train it and gave it a score of 0. 
       // therefore, we only want to make predictions using this classifier if we actually trained an algorithm successfully (classifierTrainingScore > 0)
-      if( classifierTrainingScore > 0 ) {
-        utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
-      } else {
-        // ensembler needs to know to not listen for predictions results from this algorithm
-        process.emit('algoSkippedTraining');
-      }
+      // if( classifierTrainingScore > 0 ) {
+      utilsPyShell.startPythonShell('makePredictions.py', callback, pythonOptions);
+      // } else {
+      //   // ensembler needs to know to not listen for predictions results from this algorithm
+      //   process.emit('algoSkippedTraining');
+      // }
 
     };
 
