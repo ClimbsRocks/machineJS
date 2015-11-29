@@ -63,9 +63,9 @@ if argv['validationRound']:
     # split out to only have the test data
     testLength = fileNames['testingDataLength']
     combinedValidationLength = XTest.shape[0]
-    testIndices = range( combinedValidationLength - testLength, combinedValidationLength )
+    testIndices = range( combinedValidationLength - testLength, combinedValidationLength)
 
-    XTest = XTest[combinedValidationLength,:]
+    XTest = XTest[ testIndices , : ]
 
 # should be pretty safe to convert the testIDColumn to a list, since it is always going to be a single value per row
 # to get a single vector (in this case, our ID column) to be saved as a sparse matrix, we have to do some vaguely hacky stuff
@@ -100,19 +100,13 @@ try:
 except:
     pass
 
-printParent('XTest.shape')
-printParent(XTest.shape)
-
-# TODO TODO: 
-    # load in the data from the validation file
-    # split out only the testing portion of that file
-    # use that, rather than the raw testing files
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
     testDataPredictions = classifier.predict_proba(XTest)    
 else:
     testDataPredictions = classifier.predict(XTest)
+
 
 if not argv['validationRound']:
     validationFile = fileNames['X_trainvalidationData']
@@ -139,7 +133,9 @@ if not argv['validationRound']:
     printParent(classifierName + "'s score on the validation set is:")
     printParent(validationScore)
     printParent('***************')
-
+else:
+    # we still need something to write to the file. unfortunately, for now, that's just going to be another copy of the trainingScore, which we are now writing twice to the first row of the file
+    validationScore = trainingScore
 
 # write our predictions on the test data to a file
 if argv['validationRound']:
@@ -172,75 +168,71 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
         except:
             csvwriter.writerow([int(rowID),prediction])
 
+if not argv['validationRound']:
 
+    # write our validation predictions to a file too
+    validationPath = path.join( predictionsPath, 'validation')
+    validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
 
-# write our validation predictions to a file too
-validationPath = path.join( predictionsPath, 'validation')
-validationFileName = argv['outputFileName'] + classifierName + str(time.time()) +'.csv'
+    # to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
+    totalPredictions = np.concatenate( (validationPredictions, testDataPredictions), axis=0 )
+    validationAndTestIDs = np.concatenate( (validationIDs, testIDColumn), axis=0 )
 
-# to keep things super consistent, we will combine our test and validation data, so there's no risk of order getting mixed up in ensembler
-totalPredictions = np.concatenate( (validationPredictions, testDataPredictions), axis=0 )
-validationAndTestIDs = np.concatenate( (validationIDs, testIDColumn), axis=0 )
+    with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
+        csvwriter = csv.writer(validationFile)
 
-with open( path.join(validationPath, validationFileName) , 'w+') as validationFile:
-    csvwriter = csv.writer(validationFile)
+        # at the top of each validation file, write the score for that classifier on the validation set
+        csvwriter.writerow([validationScore, trainingScore])
 
-    # at the top of each validation file, write the score for that classifier on the validation set
-    csvwriter.writerow([validationScore, trainingScore])
+        # we are going to have to modify this when we allow it to make categorical predictions too. 
+        csvwriter.writerow([idHeader,outputHeader])
+        for idx, prediction in enumerate(totalPredictions):
+            rowID = validationAndTestIDs[idx]
+            try:
+                len(prediction)
+                csvwriter.writerow([int(rowID),prediction[1]])
+            except:
+                csvwriter.writerow([int(rowID),prediction])
 
-    # we are going to have to modify this when we allow it to make categorical predictions too. 
-    csvwriter.writerow([idHeader,outputHeader])
-    for idx, prediction in enumerate(totalPredictions):
-        rowID = validationAndTestIDs[idx]
-        try:
-            len(prediction)
-            csvwriter.writerow([int(rowID),prediction[1]])
-        except:
-            csvwriter.writerow([int(rowID),prediction])
+    # continued callout to the person originally responsible for this function:
+    # http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
+    def save_sparse_csr(filename,array):
+        np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
 
-# continued callout to the person originally responsible for this function:
-# http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
-def save_sparse_csr(filename,array):
-    np.savez(filename,data=array.data ,indices=array.indices, indptr=array.indptr, shape=array.shape )
+    if copyValidationData and nn == False:
+        allValidationDataFile = path.join( validationPath, 'validationData.npz')
+        allValidationIDsFile = path.join( validationPath, 'validationIDs.npz')
+        allValidationYsFile = path.join( validationPath, 'validationYs.npz')
 
-if copyValidationData and nn == False:
-    allValidationDataFile = path.join( validationPath, 'validationData.npz')
-    allValidationIDsFile = path.join( validationPath, 'validationIDs.npz')
-    allValidationYsFile = path.join( validationPath, 'validationYs.npz')
+        # to make sure we keep everything consistent, we write the combined validation data and test data to a file
+        allValidationData = vstack( [validationData, XTest] )
+        save_sparse_csr(allValidationDataFile, allValidationData)
 
-    # to make sure we keep everything consistent, we write the combined validation data and test data to a file
-    allValidationData = vstack( [validationData, XTest] )
-    save_sparse_csr(allValidationDataFile, allValidationData)
+        # we already loaded in this data, but then immediately converted it to a dense list. 
+            # so we are going to load it in again, this time as a sparse csr matrix, and then immediately save it as a sparse csr matrix elsewhere
+            # we could just as easily copy the original file to a new location, but since we're not coyping anywhere else, this is slightly more consistent stylistically
+        validationSparseIDs = load_sparse_csr( validationIdFile )
+        save_sparse_csr( allValidationIDsFile, validationSparseIDs )
 
-    # we already loaded in this data, but then immediately converted it to a dense list. 
-        # so we are going to load it in again, this time as a sparse csr matrix, and then immediately save it as a sparse csr matrix elsewhere
-        # we could just as easily copy the original file to a new location, but since we're not coyping anywhere else, this is slightly more consistent stylistically
-    validationSparseIDs = load_sparse_csr( validationIdFile )
-    save_sparse_csr( allValidationIDsFile, validationSparseIDs )
+        validationSparseYs = load_sparse_csr(validationYFile)
+        save_sparse_csr( allValidationYsFile, validationSparseYs )
 
-    validationSparseYs = load_sparse_csr(validationYFile)
-    save_sparse_csr( allValidationYsFile, validationSparseYs )
+        # with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
+        #     csvwriter = csv.writer(validationFile)
 
-    # TODO TODO: 
-        # write validationYs to a file as a sparse matrix
-        # write validationIDs to a file as a sparse matrix
-
-    # with open( path.join(validationPath, 'validationIDsAndY.csv') , 'w+') as validationFile:
-    #     csvwriter = csv.writer(validationFile)
-
-    #     # we are going to have to modify this when we allow it to make categorical predictions too. 
-    #     csvwriter.writerow([idHeader,outputHeader])
-    #     for idx, rowID in enumerate(validationAndTestIDs):
-    #         # our test data will not have y values attached, so we will try to find a y value for this ID, but if we can't, we assume it is a test value, and we set the y value to None
-    #         try:
-    #             yValue = validationY[idx]
-    #         except:
-    #             yValue = None
-    #         try:
-    #             len(yValue)
-    #             csvwriter.writerow([int(rowID),yValue[1]])
-    #         except:
-    #             csvwriter.writerow([int(rowID),yValue])
+        #     # we are going to have to modify this when we allow it to make categorical predictions too. 
+        #     csvwriter.writerow([idHeader,outputHeader])
+        #     for idx, rowID in enumerate(validationAndTestIDs):
+        #         # our test data will not have y values attached, so we will try to find a y value for this ID, but if we can't, we assume it is a test value, and we set the y value to None
+        #         try:
+        #             yValue = validationY[idx]
+        #         except:
+        #             yValue = None
+        #         try:
+        #             len(yValue)
+        #             csvwriter.writerow([int(rowID),yValue[1]])
+        #         except:
+        #             csvwriter.writerow([int(rowID),yValue])
 
 
 
