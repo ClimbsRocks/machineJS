@@ -277,17 +277,20 @@ if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0:
     printParent(longTrainClassifierScore)
     messageObj['longTrainScore'] = longTrainClassifierScore
 
-    # save our classifiers from the validationRound to a separate folder
-    if globalArgs['validationRound']:
-        classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'ensemblingAlgos', 'best' + classifierName)
-    else:
-        classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
-
-    if not os.path.exists(classifierFolder):
-        os.makedirs(classifierFolder)
-    joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
 
 else:
     messageObj['longTrainScore'] = 0
+    # if we did not longTrain, then just save the best esimator from our cross-validated search instead
+    longTrainClassifier = searchCV.best_estimator_
+
+# save our classifiers from the validationRound to a separate folder
+if globalArgs['validationRound']:
+    classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'ensemblingAlgos', 'best' + classifierName)
+else:
+    classifierFolder = path.join(globalArgs['bestClassifiersFolder'], 'best' + classifierName)
+
+if not os.path.exists(classifierFolder):
+    os.makedirs(classifierFolder)
+joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
 
 messageParent(messageObj, 'trainingResults')
