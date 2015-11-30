@@ -249,20 +249,15 @@ if globalArgs['validationRound']:
 
 # only put in the (oftentimes considerable) effort of longTraining this algorithm if it meets the threshold defined by longTrainThreshold
     # and do not train up a long version of the first two. that is a time-consuming process for an algorithm that is probably not very well optimized, it's just first
-if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0:
-    # Get info on whether this algo supports creating a larger version of that classifier. 
-    # for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
-    extendedTraining = extendedTrainingList.getAll()[classifierName]
+# Get info on whether this algo supports creating a larger version of that classifier. 
+# for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
+extendedTraining = extendedTrainingList.getAll()[classifierName]
+if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0 and extendedTraining:
 
-    if extendedTraining:
-        allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
-        longTrainClassifier = allBigClassifiers[classifierName]
+    allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
+    longTrainClassifier = allBigClassifiers[classifierName]
 
     longTrainClassifier.set_params(**searchCV.best_params_)
-    # otherwise, just create a new classifier
-    # we could possibly warmStart from the GridSearch version, but given that we have roughly doubled the size of our dataset, I think we'd have the best luck starting from scratch
-    # else:
-    #     longTrainClassifier = classifierCreater[classifierName]
 
 # grab the best esimator from our searchCV
 # attempt to tell it to warm_start, if it supports that option
