@@ -124,30 +124,22 @@ def splitDataset(data, name, fileCategory):
     # if this "sparse" matrix only has a single value for each row, we have to treat it as a column matrix, and slice it accordingly
     # this is the case for our idColumn, and frequently our y values as well.
     if data.shape[0] == 1:
-        if not args['validationRound']:
-            longTrainingData = data[:,trainingIndices]
         validation = data[:,validationIndices]
         trainingData = data[:,trainingIndices]
 
     else:
-        if not args['validationRound']:
-            longTrainingData = data[trainingIndices,:]
         validation = data[validationIndices,:]
         trainingData = data[trainingIndices,:]
 
+    # ntpath theoretically works really well across systems
     name = ntpath.basename(name)
+    # remove the file extension
     name = name[0:-4]
-
-    if not args['validationRound']:
-        longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
 
     validationFile = path.join(outputDirectory, name + 'validationData.npz')
     trainingDataFile = path.join(outputDirectory, name + 'trainingData.npz')
 
-    if not args['validationRound']:
-        save_sparse_csr(longTrainingFile, longTrainingData)
-        save_sparse_csr(trainingDataFile, trainingData)
-
+    save_sparse_csr(trainingDataFile, trainingData)
     save_sparse_csr(validationFile, validation)
 
     # send the file names back to the parent process, where we aggregate and save them
@@ -158,12 +150,12 @@ def splitDataset(data, name, fileCategory):
     messageParent(fileNameDict, 'splitFileNames')
 
 
-# we are going to have to repeat this process many times:
+# we are going to repeat this process several times:
     # idColumn
     # X_train
     # y_train
     # X_train_nn
-# they are just slightly different enough that i don't want to loop through them
+# they are just slightly different enough that i don't want to loop through them. The code below is super readable
 
 splitDataset(X, XFileName, 'X_train')
 del X
