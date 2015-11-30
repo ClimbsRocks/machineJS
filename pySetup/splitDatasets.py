@@ -29,7 +29,7 @@ yTrainFileName = fileNames['y_train']
 outputDirectory = path.dirname(XFileName)
 
 # what percent of our dataset should we use when running RandomizedSearchCV (sister to GridSearchCV) on our dataset to determine the optimal parameters?
-searchPercent = args['searchPercent']
+# searchPercent = args['searchPercent']
 # what percent of our dataset to not train on, but to set aside for validation and stacking/blending?
 validationPercent = args['validationPercent']
 
@@ -92,6 +92,7 @@ try:
         printParent(len(trainingIndices))
 
 
+# in this case, we want to write our validationIndices to file for all future runs to use
 except:
     createNewSplit = True
     validationIndices = []
@@ -107,16 +108,16 @@ except:
             # now save that file as a .pkl next to where our test data sits. 
             pickle.dump(validationIndices, writeFile)
 
-searchIndices = []
-trainingDataIndices = []
 
-for idx, randomNum in enumerate(includeOrNot):
-    if randomNum < searchPercent:
-        searchIndices.append(idx)
-    elif randomNum < 1 - validationPercent:
-        trainingDataIndices.append(idx)
-#     else:
-#         validationIndices.append(idx)
+# # create a 
+# searchIndices = []
+# trainingDataIndices = []
+
+# for idx, randomNum in enumerate(includeOrNot):
+#     if randomNum < searchPercent:
+#         searchIndices.append(idx)
+#     elif randomNum < 1 - validationPercent:
+#         trainingDataIndices.append(idx)
 
 # continued callout to the person originally responsible for this function:
 # http://stackoverflow.com/questions/8955448/save-load-scipy-sparse-csr-matrix-in-portable-data-format
@@ -138,15 +139,15 @@ def splitDataset(data, name, fileCategory):
     # this is the case for our idColumn, and frequently our y values as well.
     if data.shape[0] == 1:
         if not args['validationRound']:
-            search = data[:,searchIndices]
-            longTrainingData = data[:,trainingDataIndices]
+            # search = data[:,searchIndices]
+            longTrainingData = data[:,trainingIndices]
         validation = data[:,validationIndices]
         trainingData = data[:,trainingIndices]
 
     else:
         if not args['validationRound']:
-            search = data[searchIndices,:]
-            longTrainingData = data[trainingDataIndices,:]
+            # search = data[searchIndices,:]
+            longTrainingData = data[trainingIndices,:]
         validation = data[validationIndices,:]
         trainingData = data[trainingIndices,:]
 
@@ -154,19 +155,18 @@ def splitDataset(data, name, fileCategory):
     name = name[0:-4]
 
     if not args['validationRound']:
-        searchFile = path.join(outputDirectory, name + 'searchData.npz')
+        # searchFile = path.join(outputDirectory, name + 'searchData.npz')
         longTrainingFile = path.join(outputDirectory, name + 'longTrainingData.npz')
 
     validationFile = path.join(outputDirectory, name + 'validationData.npz')
     trainingDataFile = path.join(outputDirectory, name + 'trainingData.npz')
 
     if not args['validationRound']:
-        save_sparse_csr(searchFile, search)
+        # save_sparse_csr(searchFile, search)
         save_sparse_csr(longTrainingFile, longTrainingData)
         save_sparse_csr(trainingDataFile, trainingData)
 
-    if createNewSplit:
-        save_sparse_csr(validationFile, validation)
+    save_sparse_csr(validationFile, validation)
 
     fileNameDict = {
         fileCategory + 'trainingData': trainingDataFile,
