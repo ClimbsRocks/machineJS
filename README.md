@@ -1,11 +1,9 @@
-# ppComplete
-> a library for optimizing your ML algorithms
-
-NOTE: This is still under active development, with Thanksgiving weekend targeted for a release date. In the mean time, I'd love any PRs or feature requests you submit!
+# machineJS
+> build tools for machine learning- we give you an awesome structure to operate within so you can focus on the fun parts more!
 
 ## How to use:
 1. `npm install machinejs`
-2. npm install
+2. `npm install`
 3. `node ppLib.js path/to/trainData.csv --kagglePredict path/to/testData.csv`
 
 ### Format of Data Files:
@@ -26,7 +24,7 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
 - `--alreadyFormatted`: A boolean value 'true' or 'false', noting if your data has already been formatted. Useful if you're just tweaking parameters and don't want to repeat the oftentimes time-expensive data formatting process again. If you pass in this flag, make sure your files are included in the  `pySetup/testingFileNames.js` json list. I've included a couple of examples. You can get the fileNames from `pySetup/utils.js`, inside of the formatData function. Just copy paste the fileNames obj data-formatter gives to the callback, into the `testingFileNames.js` file, giving it a property of whatever the 'outputFileName' property is. You should be able to pick up the pattern pretty easily :)
 - `--join`: a path to a data file that will be joined in with your training and testing data, in the same way you'd join SQL tables. 
 - `--kagglePredict`: see above (Format of Prediction File).
-- `--dev`: This flag indicates that you are doing engineering work on ppComplete itself. It does things like:
+- `--dev`: This flag indicates that you are doing engineering work on machineJS itself. It does things like:
   a) set the number of iterations to 1
   b) set the number of nets trained to 2
   c) if no data is passed in, automatically use the kaggleGiveCredit.csv dataset
@@ -37,7 +35,9 @@ Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for 
 - `--bestClassifiersFolder`: much like the `dfOutputFolder` option above, you can choose to overwrite the default location for the bestClassifier. Used in our test suite, but probably not useful for many other cases.
 
 ### Validation Splits
-The `ensembler` module, which uses machine learning to aggregate together all the results of each trained algorithm, will always benefit from more information, and thus, more trained algorithms. To support this, we are using a consistent valdiation data split for a given test.csv dataset. This means you can change your training.csv data (new feature engineering, new ways of normalizing the data, etc.), but still use the predictions from previous training data sets. 
+The `ensembler` module, which uses machine learning to aggregate together all the results of each trained algorithm, will always benefit from more information, and thus, more trained algorithms. 
+
+To support this, we are using a consistent valdiation data split for a given test.csv dataset. This means you can change your training.csv data (new feature engineering, new ways of normalizing the data, etc.), but still use the predictions from previous training data sets. 
 
 If you ever want to ask machineJS to create a new validation split for you, simply delete the `*validationData.npz` files from the data-formatterResults directory.
 
