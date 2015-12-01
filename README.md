@@ -1,12 +1,32 @@
 # machineJS
 > build tools for machine learning- we give you an awesome structure to operate within so you can focus on the fun parts more!
 
-## How to use:
-1. `npm install machinejs`
-2. `npm install`
-3. `node ppLib.js path/to/trainData.csv --kagglePredict path/to/testData.csv`
+## Installation:
 
-### Format of Data Files:
+### As a standalone directory (recommended)
+If you want to install this in it's own standalone repo, and work on the source code directly:
+1. `git clone https://github.com/ClimbsRocks/machineJS.git`
+2. `cd machineJS`
+2. `npm install`
+
+### As a node_module
+If you are installing this as a node_module to be used within another repo:
+1. `npm install machinejs`
+
+## How to use
+You can use machineJS either from the command line, or as a node module by requiring it into files being run by node.js.
+
+### From the command line
+`node ppLib.js path/to/trainData.csv --kagglePredict path/to/testData.csv`
+
+### As a node_module
+var machineJS = require('machinejs');
+machineJS({
+  dataFile: 'path/to/trainData.csv',
+  kagglePredict: 'path/to/testData.csv'
+});
+
+## Format of Data Files:
 We use the `data-formatter` module to automatically format your data, and even perform some basic feature engineering on it. 
 Please refer to their [docs](https://github.com/ClimbsRocks/data-formatter) for information on the tiny bit of preparation you need to do for your dataset to be ready for `machineJS`.
 
