@@ -1,5 +1,20 @@
 # machineJS
-> build tools for machine learning- we give you an awesome structure to operate within so you can focus on the fun parts more!
+> a default process for machine learning- we give you an awesome structure to operate within so you can focus on the fun parts!
+
+## What is it?
+`machineJS` provides a fully automated framework for applying machine learning to a dataset.
+
+All you have to do is give it a .csv file, with some basic information about each column in the first row, and it will go off and do all the machine learning for you!
+
+If you've already done this kind of thing before, it's useful as an outline, putting in place a working structure for you to make modifications within, rather than having to build from scratch again every time. 
+
+machineJS will tell you:
+- Which algorithms are going to be most effective for this problem 
+- Which features are most useful
+- Whether this problem is solvable by machine learning at all (useful if you're not sure you've collected enough data yet)
+- How effective machine learning can be with this problem, to compare against other potential solutoins (like just taking a grouped average)
+
+If you haven't done much (or any) machine learning before- it does some fairly advanced stuff for you!
 
 ## Installation:
 
