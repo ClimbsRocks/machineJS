@@ -12,6 +12,78 @@ classifier summary descriptions
 'clAdaBoost': trains multiple classifiers, where each additional classifier focuses on the difficult test cases for the previous one.
 */
 
+module.exports = function(problemType, dataLength) {
+  // these algorithms work for all problemTypes and dataLengths we have encountered so far
+  var universalAlgorithms = {
+    clRfGini: 'clRfGini',
+    clXGBoost: 'clXGBoost',
+    clRfBootstrapTrue: 'clRfBootstrapTrue',
+    clAdaBoost: 'clAdaBoost',
+  };
+
+  // these algorithms only work on classification problems, due to being instantiated with classification-specific parameters 
+  var classifierOnlyAlgorithms = {
+    clnnSknn: 'clnnSknn',
+    clnnSknn3Layer: 'clnnSknn3Layer',
+    clLogisticRegression: 'clLogisticRegression',
+    clRfEntropy: 'clRfEntropy'
+  }
+
+  var regressionOnlyAlgorithms = {
+    clAdaLossLinear: 'clAdaLossLinear',
+    clAdaLossSquare: 'clAdaLossSquare',
+    clAdaLossExponential: 'clAdaLossExponential'
+  }
+
+  // these algorithms have a time coplexity that is prohibitive for long data sets
+  var delForLongDatasets = {    
+    clSVCFirst: 'clSVCFirst',
+    clSVCShrinking: 'clSVCShrinking'
+  };
+
+  // these algorithms just aren't working right now for one reason or another
+  var brokenRegressionAlgorithms = {
+    clnnSknn: 'clnnSknn',
+    clnnSknn3Layer: 'clnnSknn3Layer',
+    clKnn: 'clKnn',
+  };
+
+  var brokenClassifierAlgorithms = {
+    clKnn: 'clKnn'
+
+  };
+
+  // these are algorithms we are in the process of implementing now or shortly
+  var notImplementedYetAlgorithms = {
+    clnnNoLearn: 'clnnNoLearn',
+    clLinearRegression: 'clLinearRegression',
+    clLinearSVC: 'clLinearSVC'
+  }
+
+  // this entire next section is dedicated to extending the universalAlgorithms object, which we will eventually return
+
+  if( problemType === 'category' ) {
+    for(var key in classifierOnlyAlgorithms) {
+      universalAlgorithms[key] = classifierOnlyAlgorithms[key];
+    }
+  } else if(problemType === 'regression') {
+    for(var key in regressionOnlyAlgorithms) {
+      universalAlgorithms[key] = regressionOnlyAlgorithms[key];
+    }    
+  } else {
+    console.error('we heard a problemType, ' + problemType + ', that is not currently supported.');
+  }
+
+  if( dataLength === 'longDataSet' ) {
+    for( var key in delForLongDatasets ) {
+      delete universalAlgorithms[key];
+    }
+  }
+
+  return universalAlgorithms;
+
+}
+
 module.exports = {
   dev: {
     clRfGini: 'clRfGini',
@@ -19,16 +91,10 @@ module.exports = {
     clRfBootstrapTrue: 'clRfBootstrapTrue'
   },
   shortDataSet: {
-    clnnSknn: 'clnnSknn',
-    // clnnNoLearn: 'clnnNoLearn',
     clXGBoost: 'clXGBoost',
-    // clKnn: 'clKnn',
     clRfEntropy: 'clRfEntropy',
     clAdaBoost: 'clAdaBoost',
     clRfGini: 'clRfGini', 
-    clSVCFirst: 'clSVCFirst',
-    clSVCShrinking: 'clSVCShrinking'
-    // clnnSknn3Layer: 'clnnSknn3Layer'
     // clLogisticRegression: 'clLogisticRegression'
   },
   longDataSet: {
@@ -39,8 +105,8 @@ module.exports = {
     // clnnSknn: 'clnnSknn',
     // clKnn: 'clKnn',
     // clRfEntropy: 'clRfEntropy',
-    // clLogisticRegression: 'clLogisticRegression',
-    // clAdaBoost: 'clAdaBoost',
+    clLogisticRegression: 'clLogisticRegression',
+    clAdaBoost: 'clAdaBoost',
     // clAdaLossLinear: 'clAdaLossLinear',
     // clAdaLossSquare: 'clAdaLossSquare',
     // clAdaLossExponential: 'clAdaLossExponential',
