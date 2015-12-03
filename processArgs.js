@@ -128,10 +128,10 @@ module.exports = function() {
 
   // we have several different objects in our classifierListOptions, depending on the length of dataset we're training against. 
   // rather than trying to build in the logic of figuring out which one we want, just cycle through them all and add in all the possible options as keys.
-  for( var obj in classifierListOptions ) {
-    for( var algo in classifierListOptions[obj] ) {
-      global.trainedAlgoCounts[algo] = 0;
-    }
+  classifierListOptions = classifierListOptions('all');
+  console.log('classifierListOptions inside processArgs:',classifierListOptions);
+  for( var algo in classifierListOptions ) {
+    global.trainedAlgoCounts[algo] = 0;
   }
 
 
