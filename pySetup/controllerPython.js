@@ -75,14 +75,15 @@ module.exports = {
     argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
     console.log('we are starting to train all the machine learning algorithms!');
 
+    var classiferList = classifierOptions(utils.fileNames.problemType, utils.fileNames.trainingDataLength);
 
-    if( argv.dev ) {
-      var classifierList = classifierOptions.dev;
-    } else if( utils.fileNames.trainingDataLength < 10000 ) {
-      var classifierList = classifierOptions.shortDataSet;
-    } else {
-      var classifierList = classifierOptions.longDataSet;
-    }
+    // if( argv.dev ) {
+    //   var classifierList = classifierOptions.dev;
+    // } else if( utils.fileNames.trainingDataLength < 10000 ) {
+    //   var classifierList = classifierOptions.shortDataSet;
+    // } else {
+    //   var classifierList = classifierOptions.longDataSet;
+    // }
     classifierList = Object.keys( classifierList );
     var classifiersByRound = [];
 
