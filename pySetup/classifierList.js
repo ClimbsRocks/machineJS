@@ -18,13 +18,13 @@ module.exports = function(problemType, dataLength) {
     clRfGini: 'clRfGini',
     clXGBoost: 'clXGBoost',
     clRfBootstrapTrue: 'clRfBootstrapTrue',
-    clAdaBoost: 'clAdaBoost',
+    clAdaBoost: 'clAdaBoost'
   };
 
   // these algorithms only work on classification problems, due to being instantiated with classification-specific parameters 
   var classifierOnlyAlgorithms = {
-    clnnSknn: 'clnnSknn',
-    clnnSknn3Layer: 'clnnSknn3Layer',
+    // clnnSknn: 'clnnSknn',
+    // clnnSknn3Layer: 'clnnSknn3Layer',
     clLogisticRegression: 'clLogisticRegression',
     clRfEntropy: 'clRfEntropy'
   }
@@ -45,12 +45,11 @@ module.exports = function(problemType, dataLength) {
   var brokenRegressionAlgorithms = {
     clnnSknn: 'clnnSknn',
     clnnSknn3Layer: 'clnnSknn3Layer',
-    clKnn: 'clKnn',
+    clKnn: 'clKnn'
   };
 
   var brokenClassifierAlgorithms = {
     clKnn: 'clKnn'
-
   };
 
   // these are algorithms we are in the process of implementing now or shortly
@@ -62,17 +61,19 @@ module.exports = function(problemType, dataLength) {
 
   // this entire next section is dedicated to extending the universalAlgorithms object, which we will eventually return
 
-  if( problemType === 'category' ) {
+  if( problemType === 'category' || problemType === 'all') {
     for(var key in classifierOnlyAlgorithms) {
       universalAlgorithms[key] = classifierOnlyAlgorithms[key];
     }
-  } else if(problemType === 'regression') {
+  } 
+  if(problemType === 'regression' || problemType === 'all') {
     for(var key in regressionOnlyAlgorithms) {
       universalAlgorithms[key] = regressionOnlyAlgorithms[key];
     }    
-  } else {
-    console.error('we heard a problemType, ' + problemType + ', that is not currently supported.');
-  }
+  } 
+  // else {
+  //   console.error('we heard a problemType, ' + problemType + ', that is not currently supported.');
+  // }
 
   if( dataLength === 'longDataSet' ) {
     for( var key in delForLongDatasets ) {
@@ -80,38 +81,41 @@ module.exports = function(problemType, dataLength) {
     }
   }
 
+  console.log('returning from classifierList.js');
+  console.log(universalAlgorithms);
+
   return universalAlgorithms;
 
 }
 
-module.exports = {
-  dev: {
-    clRfGini: 'clRfGini',
-    clXGBoost: 'clXGBoost',
-    clRfBootstrapTrue: 'clRfBootstrapTrue'
-  },
-  shortDataSet: {
-    clXGBoost: 'clXGBoost',
-    clRfEntropy: 'clRfEntropy',
-    clAdaBoost: 'clAdaBoost',
-    clRfGini: 'clRfGini', 
-    // clLogisticRegression: 'clLogisticRegression'
-  },
-  longDataSet: {
-    // clSVCFirst: 'clSVCFirst',
-    // clSVCShrinking: 'clSVCShrinking',
-    // clnnNoLearn: 'clnnNoLearn',
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clnnSknn: 'clnnSknn',
-    // clKnn: 'clKnn',
-    // clRfEntropy: 'clRfEntropy',
-    clLogisticRegression: 'clLogisticRegression',
-    clAdaBoost: 'clAdaBoost',
-    // clAdaLossLinear: 'clAdaLossLinear',
-    // clAdaLossSquare: 'clAdaLossSquare',
-    // clAdaLossExponential: 'clAdaLossExponential',
-    clRfGini: 'clRfGini',
-    clXGBoost: 'clXGBoost',
-    clRfBootstrapTrue: 'clRfBootstrapTrue'
-  }
-};
+// module.exports = {
+//   dev: {
+//     clRfGini: 'clRfGini',
+//     clXGBoost: 'clXGBoost',
+//     clRfBootstrapTrue: 'clRfBootstrapTrue'
+//   },
+//   shortDataSet: {
+//     clXGBoost: 'clXGBoost',
+//     clRfEntropy: 'clRfEntropy',
+//     clAdaBoost: 'clAdaBoost',
+//     clRfGini: 'clRfGini', 
+//     // clLogisticRegression: 'clLogisticRegression'
+//   },
+//   longDataSet: {
+//     // clSVCFirst: 'clSVCFirst',
+//     // clSVCShrinking: 'clSVCShrinking',
+//     // clnnNoLearn: 'clnnNoLearn',
+//     // clnnSknn3Layer: 'clnnSknn3Layer',
+//     // clnnSknn: 'clnnSknn',
+//     // clKnn: 'clKnn',
+//     // clRfEntropy: 'clRfEntropy',
+//     clLogisticRegression: 'clLogisticRegression',
+//     clAdaBoost: 'clAdaBoost',
+//     // clAdaLossLinear: 'clAdaLossLinear',
+//     // clAdaLossSquare: 'clAdaLossSquare',
+//     // clAdaLossExponential: 'clAdaLossExponential',
+//     clRfGini: 'clRfGini',
+//     clXGBoost: 'clXGBoost',
+//     clRfBootstrapTrue: 'clRfBootstrapTrue'
+//   }
+// };
