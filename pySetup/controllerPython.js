@@ -14,7 +14,6 @@ argv = global.argv;
 
 var startOneClassifier = function(classifierList) {
 
-  console.log('inside startOneClassifier',classifierList);
   if( classifierList.length > 0 ) {
     // for our last classifier, tell it to run on all cores on the machine
     // this way, when the second-to-last classifier finishes, and those half the machine cores are empty, we can put them to use!
@@ -25,21 +24,9 @@ var startOneClassifier = function(classifierList) {
     var classifierName = classifierList.shift();
 
     var algosBestScore = global.allTrainingResults[classifierName];
-    console.log('classifierName:',classifierName);
-    console.log('global.trainedAlgoCounts:',global.trainedAlgoCounts);
-
-    console.log('global.trainedAlgoCounts[classifierName]')
-    console.log(global.trainedAlgoCounts[classifierName])
-    console.log('algosBestScore')
-    console.log(algosBestScore)
-    console.log('global.bestSearchScore')
-    console.log(global.bestSearchScore)
-    console.log('argv.continueToTrainThreshold')
-    console.log(argv.continueToTrainThreshold)
 
     // if we have trained more than three of this algorithm, and it's best score is not within X percent of the best we've found so far, don't both training another one. 
     if( global.trainedAlgoCounts[classifierName] < 3 || algosBestScore > global.bestSearchScore * argv.continueToTrainThreshold ) {
-      console.log('invoked training');
       // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
       utils.kickOffTraining( function() {
         module.exports.makePredictions(classifierName);
@@ -47,7 +34,6 @@ var startOneClassifier = function(classifierList) {
 
     } else {
       // since we said at the start to expect a certain number of algorithms to be trained, we must still emit an event to notify ensembler that we are skipping over an algorithm
-      console.log('algoSkippedTraining');
       process.emit('algoSkippedTraining');
     }
 
@@ -93,18 +79,9 @@ module.exports = {
     argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
     console.log('we are starting to train all the machine learning algorithms!');
 
-    console.log('utils.fileNames:',utils.fileNames);
     var classifierList = classifierOptions(utils.fileNames.problemType, utils.fileNames.trainingDataLength);
 
-    // if( argv.dev ) {
-    //   var classifierList = classifierOptions.dev;
-    // } else if( utils.fileNames.trainingDataLength < 10000 ) {
-    //   var classifierList = classifierOptions.shortDataSet;
-    // } else {
-    //   var classifierList = classifierOptions.longDataSet;
-    // }
     classifierList = Object.keys( classifierList );
-    console.log('classifierList in controllerPython.js',classifierList);
     var classifiersByRound = [];
 
     // we are going to get many trained classifiers from this!
