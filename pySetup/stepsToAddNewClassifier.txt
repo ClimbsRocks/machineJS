@@ -1,6 +1,6 @@
 BeforEach: copy the exact classifier name to your clipboard so we can be consistent. 
 
-1. classifierList.js- just add the name, in both dev and non-dev spots
+1. classifierList.js- just add the name, in either universal, classifierOnly, or regressionOnly
 2. paramaterMakers/classifierName: create the parameters, make available through a function called makeParams that returns a dict that can be passed directly into the classifier. 
 3. paramMakers.py: add the new file as a module to be imported and as a part of the returned dict. make sure to add a comma in between properties :)
 4. makeClassifiers.py: add the instantiated classifier here with the parameters it should have. make sure to add a comma in between properties :)
