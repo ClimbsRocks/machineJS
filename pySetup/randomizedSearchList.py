@@ -10,7 +10,7 @@ def rsList():
         'clSVCFirst': False,
         'clSVCShrinking': False,
         'clnnSknn3Layer': False,
-        'clLogisticRegression': False,
+        'clLogisticRegression': True,
         'clXGBoost': True,
         'clRfGini': True,
         'clRfBootstrapTrue': True,
