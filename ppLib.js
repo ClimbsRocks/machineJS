@@ -15,6 +15,8 @@
 
     if( argv.validationRound !== true ) {
       processArgs();
+    } else {
+      argv.ensemblerArgs.validationRound = false;
     }
 
     if (argv.devEnsemble) {
