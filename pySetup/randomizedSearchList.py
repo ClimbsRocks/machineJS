@@ -19,5 +19,6 @@ def rsList():
         'clAdaLossSquare': True,
         'clAdaLossExponential': True,
         'clMultinomialNB': True,
-        'clPerceptron': True
+        'clPerceptron': True,
+        'clSGDClassifier': True
     }

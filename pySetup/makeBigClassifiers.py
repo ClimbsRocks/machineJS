@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sknn.mlp import Classifier, Layer
+from sklearn.linear_model import SGDClassifier
 
 from sklearn.ensemble import RandomForestRegressor
 from sknn.mlp import Regressor, Layer
@@ -21,6 +22,7 @@ def makeAll(globalArgs, dev, problemType):
             'clRfGini': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='gini'),
             'clRfBootstrapTrue': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, bootstrap=True),
             'clRfEntropy': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='entropy'),
+            'clSGDClassifier': SGDClassifier(n_iter=iterationCount),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),

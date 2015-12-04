@@ -16,5 +16,6 @@ def getAll():
         'clAdaLossExponential':False,
         'clXGBoost':False,
         'clMultinomialNB':False,
-        'clPerceptron':False
+        'clPerceptron':False,
+        'clSGDClassifier':True
     }

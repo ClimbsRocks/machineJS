@@ -22,6 +22,7 @@ import clRfBootstrapBoth
 import clAdaLossAll
 import clMultinomialNB
 import clPerceptron
+import clSGDClassifier
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev, problemType):
@@ -42,6 +43,7 @@ def makeAll(X,y,globalArgs, dev, problemType):
         'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType),
         'clRfBootstrapTrue': clRfBootstrapBoth.makeParams(X,y,globalArgs, dev, problemType),
         'clMultinomialNB': clMultinomialNB.makeParams(X,y,globalArgs,dev,problemType),
-        'clPerceptron': clPerceptron.makeParams(X,y,globalArgs,dev,problemType)
+        'clPerceptron': clPerceptron.makeParams(X,y,globalArgs,dev,problemType),
+        'clSGDClassifier': clSGDClassifier.makeParams(X,y,globalArgs,dev,problemType)
     }
     return returnDict

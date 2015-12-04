@@ -6,6 +6,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sknn.mlp import Classifier, Layer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import Perceptron
+from sklearn.linear_model import SGDClassifier
 
 import xgboost
 
@@ -40,6 +41,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clXGBoost': xgboost.XGBClassifier(),
             'clMultinomialNB': MultinomialNB(),
             'clPerceptron': Perceptron(),
+            'clSGDClassifier': SGDClassifier(n_iter=n_iter),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
