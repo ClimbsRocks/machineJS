@@ -103,7 +103,13 @@ except:
 
 # get predictions for each item in the prediction data set
 if problemType == 'category':
-    testDataPredictions = classifier.predict_proba(XTest)    
+    try:
+        testDataPredictions = classifier.predict_proba(XTest)
+    except:
+        # perceptron does not support predict_proba
+        # and MultinomialNB does not do probability predictions all that well
+        testDataPredictions = classifier.predict(XTest)
+        
 else:
     testDataPredictions = classifier.predict(XTest)
 
@@ -122,7 +128,11 @@ if not argv['validationRound']:
 
 
     if problemType == 'category':
-        validationPredictions = classifier.predict_proba(validationData)
+        try:
+            validationPredictions = classifier.predict_proba(validationData)
+        except:
+            validationPredictions = classifier.predict(validationData)
+            
     else:
         validationPredictions = classifier.predict(validationData)
 
