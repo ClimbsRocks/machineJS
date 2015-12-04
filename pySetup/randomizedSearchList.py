@@ -18,5 +18,6 @@ def rsList():
         'clAdaLossLinear': True,
         'clAdaLossSquare': True,
         'clAdaLossExponential': True,
-        'clMultinomailNB':True
+        'clMultinomialNB': True,
+        'clPerceptron': True
     }

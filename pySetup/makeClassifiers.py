@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import AdaBoostClassifier
 from sknn.mlp import Classifier, Layer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import Perceptron
 
 import xgboost
 
@@ -38,6 +39,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clAdaBoost': AdaBoostClassifier(),
             'clXGBoost': xgboost.XGBClassifier(),
             'clMultinomialNB': MultinomialNB(),
+            'clPerceptron': Perceptron(),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),

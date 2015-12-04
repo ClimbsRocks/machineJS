@@ -27,7 +27,8 @@ module.exports = function(problemType, dataLength) {
     // clnnSknn3Layer: 'clnnSknn3Layer',
     clLogisticRegression: 'clLogisticRegression',
     clMultinomialNB: 'clMultinomialNB',
-    clRfEntropy: 'clRfEntropy'
+    clRfEntropy: 'clRfEntropy',
+    clPerceptron: 'clPerceptron'
   }
 
   var regressionOnlyAlgorithms = {

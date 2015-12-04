@@ -21,6 +21,7 @@ import clXGBoost
 import clRfBootstrapBoth
 import clAdaLossAll
 import clMultinomialNB
+import clPerceptron
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev, problemType):
@@ -40,6 +41,7 @@ def makeAll(X,y,globalArgs, dev, problemType):
         'clAdaLossExponential':clAdaLossAll.makeParams(X,y,globalArgs, dev, problemType),
         'clXGBoost':clXGBoost.makeParams(X,y,globalArgs, dev, problemType),
         'clRfBootstrapTrue': clRfBootstrapBoth.makeParams(X,y,globalArgs, dev, problemType),
-        'clMultinomialNB': clMultinomialNB.makeParams(X,y,globalArgs,dev,problemType)
+        'clMultinomialNB': clMultinomialNB.makeParams(X,y,globalArgs,dev,problemType),
+        'clPerceptron': clPerceptron.makeParams(X,y,globalArgs,dev,problemType)
     }
     return returnDict
