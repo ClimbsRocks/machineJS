@@ -58,18 +58,19 @@ def makeParams(X, y, globalArgs, dev, problemType):
 # slide 12 has exact param recommendations:
     # http://www.slideshare.net/odsc/owen-zhangopen-sourcetoolsanddscompetitions1
 
+        
+
 
 
     # RandomSearchCV parameters:
-    # the commented-out lines do not work for regressors
     parameters_to_try = {
-        # 'num_round': [100, 250, 500],
-        # 'eta': [0.05, 0.1, 0.3],
-        'max_depth': scipy.stats.randint(2,50),
+        'max_depth': scipy.stats.randint(1,150),
         'subsample': scipy.stats.uniform(.80,1),
-        'max_delta_step': scipy.stats.randint(0,1),
         'colsample_bytree': scipy.stats.uniform(.80,1)
     }
+
+    # TODO: create two separate XGBoosts, one for gbtree adn one for gblinear
+    # 'booster': ['gbtree','gblinear']
 
     if dev:
         parameters_to_try.pop('subsample', None)
