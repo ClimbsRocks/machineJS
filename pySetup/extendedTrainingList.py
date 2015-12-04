@@ -14,5 +14,6 @@ def getAll():
         'clAdaLossLinear':False,
         'clAdaLossSquare':False,
         'clAdaLossExponential':False,
-        'clXGBoost':False
+        'clXGBoost':False,
+        'clMultinomialNB':False
     }

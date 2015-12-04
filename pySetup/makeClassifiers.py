@@ -4,6 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import AdaBoostClassifier
 from sknn.mlp import Classifier, Layer
+from sklearn.naive_bayes import MultinomialNB
 
 import xgboost
 
@@ -36,6 +37,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000),
             'clAdaBoost': AdaBoostClassifier(),
             'clXGBoost': xgboost.XGBClassifier(),
+            'clMultinomialNB': MultinomialNB(),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
