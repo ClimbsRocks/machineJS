@@ -26,6 +26,7 @@ module.exports = function(problemType, dataLength) {
     // clnnSknn: 'clnnSknn',
     // clnnSknn3Layer: 'clnnSknn3Layer',
     clLogisticRegression: 'clLogisticRegression',
+    clMultinomialNB: 'clMultinomialNB',
     clRfEntropy: 'clRfEntropy'
   }
 
