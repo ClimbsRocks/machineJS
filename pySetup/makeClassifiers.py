@@ -9,7 +9,7 @@ from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
 
 import xgboost
-from sklearn.ensemble import ExtraTrees
+from sklearn.ensemble import ExtraTreesClassifier
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
@@ -17,6 +17,7 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.svm import SVR
 from sknn.mlp import Regressor, Layer
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import ExtraTreesRegressor
 
 # other splits for SVC kernel:
 # linear, poly, rbf, sigmoid, precomputed
@@ -43,7 +44,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clMultinomialNB': MultinomialNB(),
             'clPerceptron': Perceptron(),
             'clSGDClassifier': SGDClassifier(n_iter=n_iter),
-            'clExtraTrees': ExtraTrees(n_estimators=n_estimators, n_jobs=1),
+            'clExtraTrees': ExtraTreesClassifier(n_estimators=n_estimators, n_jobs=1),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
@@ -79,6 +80,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clAdaLossSquare': AdaBoostRegressor(loss='square'),
             'clAdaLossExponential': AdaBoostRegressor(loss='exponential'),
             'clXGBoost': xgboost.XGBRegressor(),
+            'clExtraTrees': ExtraTreesRegressor(n_estimators=n_estimators, n_jobs=1),
             'clnnSknn': Regressor(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),

@@ -35,10 +35,13 @@ def makeParams(X, y, globalArgs, dev, problemType):
     parameters_to_try = {
         'criterion': ['gini','entropy'],
         'max_features': scipy.stats.randint(1,numColumns),
-        'min_samples_leaf': scipy.stats.randint(1,100),
         'min_samples_split': scipy.stats.randint(2,20),
+        'min_samples_leaf': scipy.stats.randint(1,100),
         'bootstrap': [True,False]
     }
+
+    if problemType != 'category':
+        parameters_to_try.pop('criterion', None)
 
     # if dev:
     #     parameters_to_try.pop('min_samples_leaf', None)
