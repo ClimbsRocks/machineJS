@@ -9,6 +9,7 @@ from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
 
 import xgboost
+from sklearn.ensemble import ExtraTrees
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
@@ -42,6 +43,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clMultinomialNB': MultinomialNB(),
             'clPerceptron': Perceptron(),
             'clSGDClassifier': SGDClassifier(n_iter=n_iter),
+            'clExtraTrees': ExtraTrees(n_estimators=n_estimators, n_jobs=1),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),

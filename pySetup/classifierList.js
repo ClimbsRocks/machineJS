@@ -29,7 +29,8 @@ module.exports = function(problemType, dataLength) {
     clMultinomialNB: 'clMultinomialNB',
     clRfEntropy: 'clRfEntropy',
     clPerceptron: 'clPerceptron',
-    clSGDClassifier: 'clSGDClassifier'
+    clSGDClassifier: 'clSGDClassifier',
+    clExtraTrees: 'clExtraTrees'
   }
 
   var regressionOnlyAlgorithms = {
