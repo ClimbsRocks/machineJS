@@ -36,7 +36,7 @@ def makeParams(X, y, globalArgs, dev, problemType):
         'learning_rate': ['constant','invscaling','adaptive'],
         'learning_rate_init': scipy.stats.expon(.01,.0001),
         'early_stopping': [True],
-        'validation_fraction': scipy.stats.uniform(0.8,0.9999),
+        'validation_fraction': np.random.uniform(0.8,1,1000),
         'epsilon': scipy.stats.expon( math.pow(10,-7), math.pow(10,-9))
     }
         

@@ -65,8 +65,8 @@ def makeParams(X, y, globalArgs, dev, problemType):
     # RandomSearchCV parameters:
     parameters_to_try = {
         'max_depth': scipy.stats.randint(1,150),
-        'subsample': scipy.stats.uniform(.80,1),
-        'colsample_bytree': scipy.stats.uniform(.80,1)
+        'subsample': np.random.uniform(.80,1,1000),
+        'colsample_bytree': np.random.uniform(.80,1,1000)
     }
 
     # TODO: create two separate XGBoosts, one for gbtree adn one for gblinear
