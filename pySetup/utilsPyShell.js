@@ -45,7 +45,14 @@ module.exports = {
   startPythonShell: function(scriptName, callback, pythonOptions) {
     var pyShell = PythonShell.run(scriptName, pythonOptions, function (err, results) {
       if (err) {
-        console.error(err);
+        // TODO: add in logging of the error message if verbosity is set to
+        // right now we get error messages for a bunch of things the user should not concern themselves with, including:
+          // deprecation warnings (we're optionally using a pre-release version of sklearn; we'll refactor to take care of those deprecation warnings once they're merged into an officially released version)
+          // searches that fail to converge
+        // to avoid distracting the user, we're only logging error messages with an exit code that is not 0, meaning that the process failed to finish executing
+        if( err.exitCode !== 0 ) {
+          console.error(err);
+        } 
       } else {
         console.log('successfully finished running',scriptName + '!');
 
