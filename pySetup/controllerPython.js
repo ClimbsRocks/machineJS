@@ -42,7 +42,6 @@ var startOneClassifier = function(classifierList) {
 };
 
 
-
 module.exports = {
   killAll: function() {
     // kill all child processes
@@ -57,24 +56,24 @@ module.exports = {
   },
 
   startClassifiers: function(classifierList) {
+    var classifiersByRound = module.exports.makeClassifierList();
 
-    startOneClassifier(classifierList);
-    startOneClassifier(classifierList);
-    
+    startOneClassifier(classifiersByRound);
+    startOneClassifier(classifiersByRound);
+
+
+    // whenever one estimator finishes training (or has not performed well enough in training so far to justify training another instance of it), we want to start training another!
     process.on('algoFinishedTraining', function() {
-      startOneClassifier(classifierList);
+      startOneClassifier(classifiersByRound);
     });
 
     process.on('algoSkippedTraining', function() {
-      startOneClassifier(classifierList);
-
+      startOneClassifier(classifiersByRound);
     });
 
   },
 
-  startTraining: function() {
-    console.log('we are starting to train all the machine learning algorithms!');
-
+  makeClassifierList: function() {
     var classifierList = classifierOptions(utils.fileNames.problemType, utils.fileNames.trainingDataLength);
 
     classifierList = Object.keys( classifierList );
@@ -101,10 +100,16 @@ module.exports = {
 
     numberOfClassifiers = classifiersByRound.length;
 
+    // tell ensembler how many algos to wait for before ensembler takes over
     ensembler.startListeners( numberOfClassifiers, argv.ensemblerArgs);
 
+    return classifiersByRound;
+  },
+
+  startTraining: function() {
+
     if( argv.validationRound ) {
-      module.exports.startClassifiers(classifiersByRound);
+      module.exports.startClassifiers();
       
     } else if( argv.alreadyFormatted ) {
     // if we have already formatted the data, skip over repeating that step. This allows us to train more classifiers rapidly without repeating the oftentimes lengthy data formatting process. 
@@ -114,7 +119,7 @@ module.exports = {
             // make fileNames part of the global.argv object in machineJS
         // and we will need to build in some logic to training.py to have it not split out the data, make predictions on the raw validation dataset, etc. 
       utils.splitData(function() {
-        module.exports.startClassifiers(classifiersByRound);
+        module.exports.startClassifiers();
       });
     } else {
       // here is where we invoke data-formatter to handle all our data formatting needs
@@ -122,13 +127,14 @@ module.exports = {
         // https://github.com/ClimbsRocks/data-formatter
       utils.formatData( function() {
         utils.splitData(function() {
-          module.exports.startClassifiers(classifiersByRound);
+          module.exports.startClassifiers();
         });
       });
     }
 
   },
 
+  // TODO: likely deprecate this functionality. 
   makeAllPredictions: function(folderName) {
     // we are taking in a folderName where our results are stored, and only making predictions against those classifiers
     
