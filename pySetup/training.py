@@ -67,15 +67,12 @@ else:
 
 if globalArgs['validationRound']:
     y_file_name = globalArgs['validationYs']
-    # TODO: 
-        # make sure we pass these correct variables into makePredictions (again, with test and validation separated out)
 else:
     # for neural networks, the y values do not need to be normalized
     y_file_name = fileNames['y_traintrainingData']
 
 
 try:
-    
     X = load_sparse_csr(X_file_name)
 
 # the following block works for dense arrays
@@ -134,6 +131,22 @@ try:
 except:
     pass
 
+if fileNames['testingDataLength'] < 100000:
+    # train on all the available (non-validation) data
+    testSize = 0
+    # a small data set should have many rounds of cross-validation. this will take longer to train, but means we will be training on more data
+    cvRounds = 6
+elif fileNames['testingDataLength'] < 200000:
+    testSize = .25
+    cvRounds = 3
+else:
+    # if this is the stage 0 round
+    # we have already separated out our validation data (currently 30% of the entire training data set by default)
+    # the data that we have loaded in here is the 70% that is not our validation data
+    # we want to have 30% of our entire training data set used as our "search" data set, meaning it is ~43% of this 70% data set
+    # the number we must give though is how much we want saved for testing, which is 1-.43 = .57
+    testSize = .57
+    cvRounds = 3
 
 if globalArgs['validationRound']:
     # if this is the validation round, we do not want to split our data out any further. 
@@ -144,6 +157,7 @@ if globalArgs['validationRound']:
     validationLength = combinedLength - fileNames['testingDataLength']
     validationIndices = range( validationLength )
 
+    # slicing the X array to only contain the training data
     X_train = X[validationIndices , : ]
 
     # unless we are doing multi-category or multi-label predictions, we have converted y to be a list, meaning we have to slice it differently
@@ -160,11 +174,7 @@ if globalArgs['validationRound']:
     y = y_train
 
 else:
-    # if this is the stage 0 round
-    # we have already separated out our validation data (currently 20% of the entire training data set by default)
-    # the data that we have loaded in here is the 80% that is not our validation data
-    # we want to have 30% of our entire training data set used as our "search" data set, meaning it is 37.5% of this 80% data set
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.625, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=testSize, random_state=0)
 
     # if we're developing, train on only a small percentage of the dataset, and do not train the final large classifier (where we significantly bump up the number of estimators).
     if dev:
@@ -202,16 +212,13 @@ try:
         if classifierName in ['clSGDClassifier','clnnSklearnMLP']:
             # these algorithms train very quickly, and have many parameters to try, so they get more attempts than other algorithms
             n_iter = n_iter * 5
-        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True)
+        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True, cv=cvRounds)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
-        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True, cv=cvRounds)
 except:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
-        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)    
-
-printParent('X.shape before searchCV')
-printParent(X.shape)
+        searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True, cv=cvRounds)    
 
 searchCV.fit(X_train, y_train ) 
 printParent('\n')
@@ -260,21 +267,20 @@ if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0 and exte
     longTrainClassifier.set_params(**searchCV.best_params_)
 
 # grab the best esimator from our searchCV
-# attempt to tell it to warm_start, if it supports that option
-# this will tell it to start from it's already-trained point, and then just add new training on top, rather than starting to train again from scratch
 else:
     longTrainClassifier = searchCV.best_estimator_
 
 startLongTrainTime = time.time()
 
-# when doing the cross-validated search, we have of course been holding out a significant portion of the dataset
+# when doing the cross-validated search, we potentially been holding out a significant portion of the dataset
 # once we have found the best hyperparameters, train on the entire dataset
     # we have already verified that this is the best set of hyperparameters using cross-validation
-longTrainClassifier.fit(X, y)
+if X.shape[0] != X_train.shape[0] or extendedTraining:
+    longTrainClassifier.fit(X, y)
 
-finishLongTrainTime = time.time()
-printParent(classifierName + "'s training on the longer data set took:")
-printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
+    finishLongTrainTime = time.time()
+    printParent(classifierName + "'s training on the longer data set took:")
+    printParent( round((finishLongTrainTime - startLongTrainTime)/60, 1) )
 
 
 longTrainClassifierScore = longTrainClassifier.score(X, y)
@@ -282,12 +288,6 @@ printParent(classifierName + "'s score against the larger training data set is:"
 printParent(longTrainClassifierScore)
 messageObj['longTrainScore'] = longTrainClassifierScore
 
-
-# else:
-#     messageObj['longTrainScore'] = 0
-#     # if we did not longTrain, then just save the best esimator from our cross-validated search instead
-#     # TODO TODO: this part does not appear to be working.
-#     longTrainClassifier = searchCV.best_estimator_
 
 # save our classifiers from the validationRound to a separate folder
 if globalArgs['validationRound']:
@@ -297,7 +297,7 @@ else:
 
 if not os.path.exists(classifierFolder):
     os.makedirs(classifierFolder)
-# TODO TODO: Make sure we are writing classifier to file correctly
+
 joblib.dump(longTrainClassifier,  path.join(classifierFolder, 'best' + classifierName + '.pkl') )
 
 messageParent(messageObj, 'trainingResults')
