@@ -33,20 +33,20 @@ def makeClassifiers(globalArgs, dev, problemType):
 
     if problemType == 'category':
         return {
-            'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='gini'),
-            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True),
-            'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='entropy'),
+            'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='gini', warm_start=True),
+            'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True, warm_start=True),
+            'clRfEntropy': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='entropy', warm_start=True),
             'clSVCFirst': SVC(probability=True, shrinking=False),
             'clSVCShrinking': SVC(probability=True, shrinking=True),
             'clKnn': KNeighborsClassifier(),
-            'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000),
+            'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000, warm_start=True),
             'clAdaBoost': AdaBoostClassifier(),
             'clXGBoost': xgboost.XGBClassifier(),
             'clMultinomialNB': MultinomialNB(),
-            'clPerceptron': Perceptron(),
-            'clSGDClassifier': SGDClassifier(n_iter=n_iter),
-            'clExtraTrees': ExtraTreesClassifier(n_estimators=n_estimators, n_jobs=1),
-            'clnnSklearnMLP': MLPClassifier(),
+            'clPerceptron': Perceptron(warm_start=True),
+            'clSGDClassifier': SGDClassifier(n_iter=n_iter, warm_start=True),
+            'clExtraTrees': ExtraTreesClassifier(n_estimators=n_estimators, n_jobs=1, warm_start=True),
+            'clnnSklearnMLP': MLPClassifier(warm_start=True),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
