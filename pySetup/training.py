@@ -193,10 +193,9 @@ try:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work.
         # numIterationsPerRound defaults to 10, unless the user has passed in a more specific value.
         n_iter = globalArgs['numIterationsPerRound']
-        if classifierName == 'clSGDClassifier':
-            # our SGDClassifier has so many options to try, it gets some extra attempts
-            # it is a linear operation, so it trains super quickly, meaning the extra iterations are not much of a burden
-            n_iter = n_iter * 3
+        if classifierName in ['clSGDClassifier','clnnSklearnMLP']:
+            # these algorithms train very quickly, and have many parameters to try, so they get more attempts than other algorithms
+            n_iter = n_iter * 5
         searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
