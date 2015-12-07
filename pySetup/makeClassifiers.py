@@ -7,6 +7,7 @@ from sknn.mlp import Classifier, Layer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
+from sklearn.neural_network import MLPClassifier
 
 import xgboost
 from sklearn.ensemble import ExtraTreesClassifier
@@ -45,6 +46,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clPerceptron': Perceptron(),
             'clSGDClassifier': SGDClassifier(n_iter=n_iter),
             'clExtraTrees': ExtraTreesClassifier(n_estimators=n_estimators, n_jobs=1),
+            'clnnSklearnMLP': MLPClassifier(),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),

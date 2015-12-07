@@ -18,5 +18,6 @@ def getAll():
         'clMultinomialNB':False,
         'clPerceptron':False,
         'clSGDClassifier':True,
-        'clExtraTrees':True
+        'clExtraTrees':True,
+        'clnnSklearnMLP':False
     }

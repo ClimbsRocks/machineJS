@@ -21,5 +21,6 @@ def rsList():
         'clMultinomialNB': True,
         'clPerceptron': True,
         'clSGDClassifier': True,
-        'clExtraTrees': True
+        'clExtraTrees': True,
+        'clnnSklearnMLP': True
     }

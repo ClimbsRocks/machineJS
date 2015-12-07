@@ -24,6 +24,7 @@ import clMultinomialNB
 import clPerceptron
 import clSGDClassifier
 import clExtraTrees
+import clnnSklearnMLP
 from sendMessages import printParent
 
 def makeAll(X,y,globalArgs, dev, problemType):
@@ -46,6 +47,7 @@ def makeAll(X,y,globalArgs, dev, problemType):
         'clMultinomialNB': clMultinomialNB.makeParams(X,y,globalArgs,dev,problemType),
         'clPerceptron': clPerceptron.makeParams(X,y,globalArgs,dev,problemType),
         'clSGDClassifier': clSGDClassifier.makeParams(X,y,globalArgs,dev,problemType),
-        'clExtraTrees': clExtraTrees.makeParams(X,y,globalArgs,dev,problemType)
+        'clExtraTrees': clExtraTrees.makeParams(X,y,globalArgs,dev,problemType),
+        'clnnSklearnMLP': clnnSklearnMLP.makeParams(X,y,globalArgs,dev,problemType)
     }
     return returnDict

@@ -15,22 +15,23 @@ classifier summary descriptions
 module.exports = function(problemType, dataLength) {
   // these algorithms work for all problemTypes and dataLengths we have encountered so far
   var universalAlgorithms = {
-    clRfGini: 'clRfGini',
-    clXGBoost: 'clXGBoost',
-    clRfBootstrapTrue: 'clRfBootstrapTrue',
-    clAdaBoost: 'clAdaBoost'
+    // clRfGini: 'clRfGini',
+    // clXGBoost: 'clXGBoost',
+    // clRfBootstrapTrue: 'clRfBootstrapTrue',
+    // clAdaBoost: 'clAdaBoost',
+    clExtraTrees: 'clExtraTrees'
   };
 
   // these algorithms only work on classification problems, due to being instantiated with classification-specific parameters 
   var classifierOnlyAlgorithms = {
     // clnnSknn: 'clnnSknn',
     // clnnSknn3Layer: 'clnnSknn3Layer',
-    clLogisticRegression: 'clLogisticRegression',
-    clMultinomialNB: 'clMultinomialNB',
-    clRfEntropy: 'clRfEntropy',
-    clPerceptron: 'clPerceptron',
-    clSGDClassifier: 'clSGDClassifier',
-    clExtraTrees: 'clExtraTrees'
+    // clLogisticRegression: 'clLogisticRegression',
+    // clMultinomialNB: 'clMultinomialNB',
+    // clRfEntropy: 'clRfEntropy',
+    // clPerceptron: 'clPerceptron',
+    // clSGDClassifier: 'clSGDClassifier',
+    clnnSklearnMLP: 'clnnSklearnMLP'
   }
 
   var regressionOnlyAlgorithms = {
@@ -70,14 +71,12 @@ module.exports = function(problemType, dataLength) {
       universalAlgorithms[key] = classifierOnlyAlgorithms[key];
     }
   } 
+
   if(problemType === 'regression' || problemType === 'all') {
     for(var key in regressionOnlyAlgorithms) {
       universalAlgorithms[key] = regressionOnlyAlgorithms[key];
     }    
   } 
-  // else {
-  //   console.error('we heard a problemType, ' + problemType + ', that is not currently supported.');
-  // }
 
   if( dataLength === 'longDataSet' ) {
     for( var key in delForLongDatasets ) {
