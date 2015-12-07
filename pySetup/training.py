@@ -65,8 +65,6 @@ elif( classifierName[0:4] == 'clnn' ):
 else:    
     X_file_name = fileNames['X_traintrainingData']
 
-printParent('X_file_name')
-printParent(X_file_name)
 if globalArgs['validationRound']:
     y_file_name = globalArgs['validationYs']
     # TODO: 
@@ -183,7 +181,6 @@ if classifierName == 'clXGBoost':
     except:
         pass
 
-
 # create features that are custom to the size of the input data. 
 # Each individual paramaterMaker file sits in the paramaterMakers folder. If you want to modify what the parameters are, or submit a PR with a better combination of parameters to try, that is the place to start. 
 allParams = paramMakers.makeAll(X,y,globalArgs, dev, problemType)
@@ -195,20 +192,18 @@ try:
     if randomizedSearchCVList[classifierName]:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work.
         # numIterationsPerRound defaults to 10, unless the user has passed in a more specific value.
-        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=globalArgs['numIterationsPerRound'], refit=True)
+        n_iter = globalArgs['numIterationsPerRound']
+        if classifierName == 'clSGDClassifier':
+            # our SGDClassifier has so many options to try, it gets some extra attempts
+            # it is a linear operation, so it trains super quickly, meaning the extra iterations are not much of a burden
+            n_iter = n_iter * 3
+        searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)
 except:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True)    
-
-
-if classifierName[0:4] == 'clnn':
-    X = X.todense()
-    obviousPrint('X.shape',X.shape)
-    y = np.array(y)
-    obviousPrint('y.shape before gridsearch',y.shape)
 
 printParent('X.shape before searchCV')
 printParent(X.shape)
@@ -264,17 +259,6 @@ if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0 and exte
 # this will tell it to start from it's already-trained point, and then just add new training on top, rather than starting to train again from scratch
 else:
     longTrainClassifier = searchCV.best_estimator_
-    try:
-        longTrainClassifier.set_params({warm_start: True})
-    except:
-        pass
-
-
-if classifierName[0:4] == 'clnn':
-    X = X.todense()
-    obviousPrint('X.shape right before long training in training.py',X.shape)
-    y = np.array(y)
-    obviousPrint('y.shape right before long training in training.py',y.shape)
 
 startLongTrainTime = time.time()
 
