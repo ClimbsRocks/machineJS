@@ -19,5 +19,5 @@ def getAll():
         'clPerceptron':False,
         'clSGDClassifier':True,
         'clExtraTrees':True,
-        'clnnSklearnMLP':False
+        'clnnSklearnMLP':True
     }

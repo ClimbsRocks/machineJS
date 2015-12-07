@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sknn.mlp import Classifier, Layer
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.neural_network import MLPClassifier
 
 from sklearn.ensemble import RandomForestRegressor
 from sknn.mlp import Regressor, Layer
@@ -25,6 +26,7 @@ def makeAll(globalArgs, dev, problemType):
             'clRfEntropy': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='entropy'),
             'clSGDClassifier': SGDClassifier(n_iter=iterationCount),
             'clExtraTrees': ExtraTreesClassifier(n_estimators=estimator_count, n_jobs=-1),
+            'clnnSklearnMLP': MLPClassifier(max_iter=iterationCount*20),
             'clnnSknn': Classifier(
                 layers=[
                     Layer("Maxout", units=100, pieces=2),
