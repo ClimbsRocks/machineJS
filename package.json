@@ -7,10 +7,14 @@
     "test": "npm run test:regression",
     "test:regression": "mocha test/regression/test.js",
     "test:categorical": "mocha test/categorical/test.js",
-    "dev": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --dev",
+    "dev": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --kagglePredict data/rossman/short/test.csv --join data/rossman/short/store.csv --alreadyFormatted --dev",
     "devEnsemble": "node ppLib.js data/rossman/rossShortTrainDev.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
-    "train:rossman": "node ppLib.js data/rossman/tran_filled_gap.csv --kagglePredict data/rossman/test.csv --join store.csv --alreadyFormatted",
-    "train:numerai": "node ppLib.js data/numerai/numerai_training_data.csv --kagglePredict data/numerai/numerai_test_data.csv --binaryOutput --alreadyFormatted"
+    "train:rossman": "node ppLib.js data/rossman/tran_filled_gap.csv --kagglePredict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted",
+    "train:rossShort": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --kagglePredict data/rossman/short/test.csv --join store.csv",
+    "train:numeraiDev": "node ppLib.js data/numerai/numerai_training_data.csv --kagglePredict data/numerai/numerai_test_data.csv --binaryOutput --alreadyFormatted",
+    "train:numerai": "node ppLib.js data/numerai/numerai_training_data_tournament.csv --kagglePredict data/numerai/numerai_tournament_data.csv --alreadyFormatted",
+    "ensemble:rossShort": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --kagglePredict data/rossman/short/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
+    "ensemble:numerai": "node ppLib.js data/numerai/numerai_training_data_tournament.csv --kagglePredict data/numerai/numerai_tournament_data.csv --alreadyFormatted --devEnsemble"
   },
   "repository": {
     "type": "git",
@@ -62,8 +66,7 @@
   "homepage": "https://github.com/ClimbsRocks/machineJS",
   "dependencies": {
     "babyparse": "^0.4.3",
-    "brain": "^0.7.0",
-    "data-formatter": "^1.3.0",
+    "data-formatter": "^1.5.1",
     "ensembler": "^0.5.7",
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
