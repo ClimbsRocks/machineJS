@@ -102,7 +102,6 @@ module.exports = function() {
   }
   var nextValidationRound = !argv.validationRound;
 
-
   argv.ensemblerArgs = {
     inputFolder: argv.predictionsFolder,
     outputFolder: argv.ensemblerOutputFolder,
@@ -125,6 +124,10 @@ module.exports = function() {
   global.finishedAlgos = 0;
   global.copyValidationData = true;
 
+  // each classifier is only allowed to take up half the CPUs on the machine.
+  // we will be training two in parallel
+  // this way, if a single classifier takes so long to train that it effectively fails, we can still train classifiers on the other cores
+  argv.numCPUs = argv.numCPUs || Math.round( argv.computerTotalCPUs / 2 ) + 1;
 
   // we have several different objects in our classifierListOptions, depending on the length of dataset we're training against. 
   // rather than trying to build in the logic of figuring out which one we want, just cycle through them all and add in all the possible options as keys.
