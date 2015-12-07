@@ -66,7 +66,7 @@ module.exports = function() {
     argv.validationPercent = argv.validationPercent || .85;
   } else {
     argv.searchPercent = argv.searchPercent || .3;
-    argv.validationPercent = argv.validationPercent || .2;
+    argv.validationPercent = argv.validationPercent || .3;
   }
 
   // set out how many combinations of parameters we want to try. 
@@ -132,7 +132,6 @@ module.exports = function() {
   // we have several different objects in our classifierListOptions, depending on the length of dataset we're training against. 
   // rather than trying to build in the logic of figuring out which one we want, just cycle through them all and add in all the possible options as keys.
   classifierListOptions = classifierListOptions('all');
-  console.log('classifierListOptions inside processArgs:',classifierListOptions);
   for( var algo in classifierListOptions ) {
     global.trainedAlgoCounts[algo] = 0;
   }
