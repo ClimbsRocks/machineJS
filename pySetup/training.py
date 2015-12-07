@@ -173,6 +173,12 @@ else:
 # instantiate a new classifier, given the type passed in to us
 classifier = classifierCreater[classifierName]
 
+# if possible, have the algorithm warm_start, taking advantage of the training it's done previously and then simply building on top of that
+try:
+    classifier.set_params(warm_start=True)
+except:
+    pass
+
 # XGBoost requires data to be in it's own particular format. 
 if classifierName == 'clXGBoost':
     try:
