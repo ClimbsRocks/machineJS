@@ -11,6 +11,8 @@ pip install numpy
 pip install scipy
 pip install cython
 pip install xgboost
+pip install python-dateutil
+
 
 # once we're working off the latest stable release, we'll be able to install sklearn through pip:
 # pip install sklearn
