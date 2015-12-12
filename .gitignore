@@ -20,3 +20,4 @@ data/*
 *.txt
 src/*
 .npmignore
+pySetup/testingFileNames
