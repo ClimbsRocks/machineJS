@@ -15,22 +15,20 @@ classifier summary descriptions
 module.exports = function(problemType, dataLength) {
   // these algorithms work for all problemTypes and dataLengths we have encountered so far
   var universalAlgorithms = {
-    // clRfGini: 'clRfGini',
-    // clXGBoost: 'clXGBoost',
-    // clRfBootstrapTrue: 'clRfBootstrapTrue',
-    // clAdaBoost: 'clAdaBoost',
+    clRfGini: 'clRfGini',
+    clXGBoost: 'clXGBoost',
+    clRfBootstrapTrue: 'clRfBootstrapTrue',
+    clAdaBoost: 'clAdaBoost',
     clExtraTrees: 'clExtraTrees'
   };
 
   // these algorithms only work on classification problems, due to being instantiated with classification-specific parameters 
   var classifierOnlyAlgorithms = {
-    // clnnSknn: 'clnnSknn',
-    // clnnSknn3Layer: 'clnnSknn3Layer',
-    // clLogisticRegression: 'clLogisticRegression',
-    // clMultinomialNB: 'clMultinomialNB',
-    // clRfEntropy: 'clRfEntropy',
-    // clPerceptron: 'clPerceptron',
-    // clSGDClassifier: 'clSGDClassifier',
+    clLogisticRegression: 'clLogisticRegression',
+    clMultinomialNB: 'clMultinomialNB',
+    clRfEntropy: 'clRfEntropy',
+    clPerceptron: 'clPerceptron',
+    clSGDClassifier: 'clSGDClassifier',
     clnnSklearnMLP: 'clnnSklearnMLP'
   }
 
@@ -48,11 +46,10 @@ module.exports = function(problemType, dataLength) {
 
   // these algorithms just aren't working right now for one reason or another
   var brokenRegressionAlgorithms = {
-    clnnSknn: 'clnnSknn',
-    clnnSknn3Layer: 'clnnSknn3Layer',
     clKnn: 'clKnn'
   };
 
+  // the clnn algos may not be broken, but we're probably going to deprecate them pretty shortly since sklearn launched their own MLP
   var brokenClassifierAlgorithms = {
     clKnn: 'clKnn'
   };
@@ -66,6 +63,8 @@ module.exports = function(problemType, dataLength) {
 
   // this entire next section is dedicated to extending the universalAlgorithms object, which we will eventually return
 
+  // we use the 'all' flag inside processArgs to set initial placeholder values for all possible classifiers we may end up training
+  // then, once data-formatter has run, we will know the problemType and only return those classifiers
   if( problemType === 'category' || problemType === 'all') {
     for(var key in classifierOnlyAlgorithms) {
       universalAlgorithms[key] = classifierOnlyAlgorithms[key];
@@ -84,8 +83,11 @@ module.exports = function(problemType, dataLength) {
     }
   }
 
-  console.log('returning from classifierList.js');
-  console.log(universalAlgorithms);
+  // scikit-learn's MLP is only available in v^0.18.0
+  // if the user has not installed that version, we want to make sure to remove that from our classifierList
+  // try{
+    
+  // }  
 
   return universalAlgorithms;
 

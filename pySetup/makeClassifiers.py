@@ -3,7 +3,6 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import AdaBoostClassifier
-from sknn.mlp import Classifier, Layer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
@@ -16,7 +15,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.svm import SVR
-from sknn.mlp import Regressor, Layer
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import ExtraTreesRegressor
 
@@ -47,24 +45,6 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clSGDClassifier': SGDClassifier(n_iter=n_iter),
             'clExtraTrees': ExtraTreesClassifier(n_estimators=n_estimators, n_jobs=1),
             'clnnSklearnMLP': MLPClassifier(),
-            'clnnSknn': Classifier(
-                layers=[
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Softmax")
-                ],
-                learning_rate=0.001,
-                n_iter=n_iter
-            ),
-            'clnnSknn3Layer': Classifier(
-                layers=[
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Softmax")
-                ],
-                learning_rate=0.001,
-                n_iter=n_iter
-            )
         }
 
     # Regression models
@@ -83,22 +63,4 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clAdaLossExponential': AdaBoostRegressor(loss='exponential'),
             'clXGBoost': xgboost.XGBRegressor(),
             'clExtraTrees': ExtraTreesRegressor(n_estimators=n_estimators, n_jobs=1),
-            'clnnSknn': Regressor(
-                layers=[
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Softmax")
-                ],
-                learning_rate=0.001,
-                n_iter=n_iter
-            ),
-            'clnnSknn3Layer': Regressor(
-                layers=[
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Maxout", units=100, pieces=2),
-                    Layer("Softmax")
-                ],
-                learning_rate=0.001,
-                n_iter=n_iter
-            )
         }
