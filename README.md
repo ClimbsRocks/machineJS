@@ -50,6 +50,11 @@ machineJS({
 We use the `data-formatter` module to automatically format your data, and even perform some basic feature engineering on it. 
 Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-formatter) for information on the tiny bit of preparation you need to do for your dataset to be ready for `machineJS`.
 
+## What types of problems does this library work on?
+Right now, `machineJS` only works on regression and some categorical problems. 
+Specifically, machineJS works if your problem is asking for a single column of binary output (did this customer buy a product or not, did these two users end up being a match or not). 
+If you are predicting multiple labels for that single column, `machineJS` does not work for your dataset at the moment. We're working on building in support for that soon :)
+
 
 #### Note: This library is designed to run across all but one cores on the host machine. What this means for you:
 1. Please plug in.
@@ -59,4 +64,6 @@ Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-fo
 5. Please don't run any other Python scripts while this is running.
 
 Thanks for inviting us along on your machine learning journey!
+
+
 
