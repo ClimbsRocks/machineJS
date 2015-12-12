@@ -43,7 +43,7 @@ module.exports = function() {
     it('should use the existing validation split if it already exists', function() {
       var secondStartTime = Date.now();
       // TODO: try running the test again, and 
-      execSync('node ppLib.js ' 
+      execSync('node machineJS.js ' 
         + path.join(rTest.dataLocation,'tinyTrain.csv') 
         + ' --predict ' + path.join(rTest.dataLocation,'test.csv') 
         + ' --join ' + path.join(rTest.dataLocation, 'store.csv') 

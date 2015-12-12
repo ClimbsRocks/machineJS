@@ -30,7 +30,7 @@ module.exports = function() {
   // to see detailed output while running the tests, use node-inspector.
     // npm install -g node-inspector
     // change "node" below to be "node-debug"
-  execSync('node ppLib.js ' 
+  execSync('node machineJS.js ' 
     + path.join(rTest.dataLocation,'tinyTrain.csv') 
     + ' --predict ' + path.join(rTest.dataLocation,'test.csv') 
     + ' --join ' + path.join(rTest.dataLocation, 'store.csv') 

@@ -13,9 +13,9 @@ module.exports = function() {
 
   var dataFile = global.argv.dataFile || process.argv[2];
   argv.computerTotalCPUs = require('os').cpus().length;
-  argv.ppCompleteLocation = path.dirname(__filename);
+  argv.machineJSLocation = path.dirname(__filename);
 
-  // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the ppComplete library itself)
+  // setting defaults if using the --dev or --devKaggle flags (speeds up development time when doing engineering work on the machineJS library itself)
   if( argv.dev ) {
     require('longjohn');
     if (dataFile === undefined) {
@@ -84,14 +84,14 @@ module.exports = function() {
   }
 
 
-  argv.predictionsFolder = argv.predictionsFolder || path.join(argv.ppCompleteLocation, 'predictions', argv.testOutputFileName);
+  argv.predictionsFolder = argv.predictionsFolder || path.join(argv.machineJSLocation, 'predictions', argv.testOutputFileName);
   argv.validationFolder = path.join(argv.predictionsFolder, 'validation');
-  argv.bestClassifiersFolder = argv.bestClassifiersFolder || path.join(argv.ppCompleteLocation, 'pySetup','bestClassifiers',argv.outputFileName);
+  argv.bestClassifiersFolder = argv.bestClassifiersFolder || path.join(argv.machineJSLocation, 'pySetup','bestClassifiers',argv.outputFileName);
   mkdirp(argv.predictionsFolder);
   mkdirp(argv.validationFolder);
   mkdirp(argv.bestClassifiersFolder);
 
-  argv.ensemblerOutputFolder = argv.ensemblerOutputFolder || argv.ppCompleteLocation;
+  argv.ensemblerOutputFolder = argv.ensemblerOutputFolder || argv.machineJSLocation;
 
 
   // the first time we run machineJS, it will just make predictions for a ton of different algos

@@ -35,7 +35,7 @@ If you are installing this as a node_module to be used within another repo:
 You can use machineJS either from the command line, or as a node module by requiring it into files being run by node.js.
 
 ### From the command line
-`node ppLib.js path/to/trainData.csv --predict path/to/testData.csv`
+`node machineJS.js path/to/trainData.csv --predict path/to/testData.csv`
 
 ### As a node_module
 ``` 

@@ -2,20 +2,20 @@
   "name": "machinejs",
   "version": "0.9.0",
   "description": "Automated machine learning structure. Ensembles random forests, XGBoost, neural networks, AdaBoost, KNN, SVM together, handling data formatting ensembling, and running predictions for you. Feel free to tweak the settings if you want a lot of control, or just start it up and let it run if you're looking for a push-button MVP solution.",
-  "main": "ppLib.js",
+  "main": "machineJS.js",
   "scripts": {
     "test": "npm run test:regression",
     "test:regression": "mocha test/regression/test.js",
     "test:categorical": "mocha test/categorical/test.js",
-    "dev": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join data/rossman/short/store.csv --alreadyFormatted --dev",
-    "devEnsemble": "node ppLib.js data/rossman/rossShortTrainDev.csv --predict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
-    "train:rossman": "node ppLib.js data/rossman/tran_filled_gap.csv --predict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted",
-    "train:rossShort": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join store.csv",
-    "train:numeraiDev": "node ppLib.js data/numerai/numerai_training_data.csv --predict data/numerai/numerai_test_data.csv --binaryOutput --alreadyFormatted",
-    "train:numerai": "node ppLib.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted",
-    "ensemble:rossShort": "node ppLib.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
-    "ensemble:numerai": "node ppLib.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted --devEnsemble",
-    "train:giveCredit": "node ppLib.js data/giveCredit/train.csv --predict data/giveCredit/test.csv"
+    "dev": "node machineJS.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join data/rossman/short/store.csv --alreadyFormatted --dev",
+    "devEnsemble": "node machineJS.js data/rossman/rossShortTrainDev.csv --predict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
+    "train:rossman": "node machineJS.js data/rossman/tran_filled_gap.csv --predict data/rossman/test.csv --join data/rossman/store.csv --alreadyFormatted",
+    "train:rossShort": "node machineJS.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join store.csv",
+    "train:numeraiDev": "node machineJS.js data/numerai/numerai_training_data.csv --predict data/numerai/numerai_test_data.csv --binaryOutput --alreadyFormatted",
+    "train:numerai": "node machineJS.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted",
+    "ensemble:rossShort": "node machineJS.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
+    "ensemble:numerai": "node machineJS.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted --devEnsemble",
+    "train:giveCredit": "node machineJS.js data/giveCredit/train.csv --predict data/giveCredit/test.csv"
   },
   "repository": {
     "type": "git",
@@ -59,7 +59,7 @@
   "author": "Preston Parry",
   "license": "MIT",
   "bin": {
-    "machineJS": "ppLib.js"
+    "machineJS": "machineJS.js"
   },
   "bugs": {
     "url": "https://github.com/ClimbsRocks/machineJS/issues"

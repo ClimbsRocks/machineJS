@@ -28,12 +28,12 @@ module.exports = {
   },
 
   generatePythonOptions: function(fileNameFromRoot, otherArgs) {
-    // the first argument for all python shells is going to be a path to a file, relative to the root of ppLib
+    // the first argument for all python shells is going to be a path to a file, relative to the root of machineJS
     var fullPathToFile = path.join(global.rootDir, fileNameFromRoot);
     var args = [];
     args = args.concat(fullPathToFile, otherArgs);
 
-    var pySetupLocation = path.join(argv.ppCompleteLocation, 'pySetup');
+    var pySetupLocation = path.join(argv.machineJSLocation, 'pySetup');
 
     return {
       scriptPath: pySetupLocation,

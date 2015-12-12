@@ -1,7 +1,7 @@
 def makeParams(X, y, globalArgs, dev, problemType):
 
     # TODO: knn breaks with sparse matrices. it consumes huge amounts of memory. 
-    # https://github.com/ClimbsRocks/ppComplete/issues/74
+    # https://github.com/ClimbsRocks/machineJS/issues/74
 
     # leaf size only applies to ball or kd tree, so i'm not sure if we can include it in grid search or not
     # TODO: break all of these out into their own classifiers- 6 possible combinations of algorithm*weights

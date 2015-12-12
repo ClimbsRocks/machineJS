@@ -33,7 +33,7 @@ classifierName = sys.argv[4]
 problemType = sys.argv[5]
 bestSearchScore = float(sys.argv[6])
 
-sys.path.append(globalArgs['ppCompleteLocation'] + '/pySetup/parameterMakers')
+sys.path.append(globalArgs['machineJSLocation'] + '/pySetup/parameterMakers')
 import paramMakers
 
 import makeBigClassifiers
