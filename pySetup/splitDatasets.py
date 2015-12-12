@@ -12,8 +12,6 @@ from sendMessages import printParent
 from sendMessages import messageParent
 from sendMessages import obviousPrint
 
-printParent('inside splitDatasets.py')
-
 args = json.loads(sys.argv[2])
 fileNames = json.loads(sys.argv[3])
 XFileName = fileNames['X_train']
@@ -41,7 +39,7 @@ numRows = X.shape[0]
 includeOrNot = [random.random() for x in range(0,numRows)]
 
 # we want to save the validation indices with the test data. that way we can have multiple different training data sets scattered throughout a computer, but still use these same validationIndices for all of them
-validationIndexFolder = path.dirname(args['kagglePredict'])
+validationIndexFolder = path.dirname(args['predict'])
 validationIndexFileName = 'dfValidationIndices' + args['testOutputFileName'] + '.pkl'
 validationIndicesFile = path.join( validationIndexFolder, validationIndexFileName )
 

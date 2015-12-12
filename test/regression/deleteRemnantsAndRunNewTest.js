@@ -32,7 +32,7 @@ module.exports = function() {
     // change "node" below to be "node-debug"
   execSync('node ppLib.js ' 
     + path.join(rTest.dataLocation,'tinyTrain.csv') 
-    + ' --kagglePredict ' + path.join(rTest.dataLocation,'test.csv') 
+    + ' --predict ' + path.join(rTest.dataLocation,'test.csv') 
     + ' --join ' + path.join(rTest.dataLocation, 'store.csv') 
     + ' --dfOutputFolder ' + path.join(rTest.testFileLocation, 'dfTestResults')
     + ' --predictionsFolder ' + path.join(rTest.testFileLocation, 'rTestPredictions')

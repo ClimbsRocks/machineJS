@@ -54,7 +54,7 @@ module.exports = {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
     var dataFormatterArgs = {
       trainingData: argv.dataFile,
-      testingData: argv.kagglePredict,
+      testingData: argv.predict,
       trainingPrettyName: argv.outputFileName,
       testingPrettyName: argv.testOutputFileName,
       joinFileName: argv.join,
@@ -124,7 +124,7 @@ module.exports = {
       var classifierTrainingObj = global.allTrainingResults[global.allTrainingResults.length -1];
       var classifierTrainingScore = classifierTrainingObj.longTrainScore;
 
-      var pythonOptions = utilsPyShell.generatePythonOptions(argv.kagglePredict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData ]);
+      var pythonOptions = utilsPyShell.generatePythonOptions(argv.predict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData ]);
 
       // if this hyperparameter search did not yield an algorithm that was close enough to our best that it was worth investing in a longTraining, we did not train it and gave it a score of 0. 
       // therefore, we only want to make predictions using this classifier if we actually trained an algorithm successfully (classifierTrainingScore > 0)
