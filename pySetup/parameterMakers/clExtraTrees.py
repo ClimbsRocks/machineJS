@@ -40,7 +40,7 @@ def makeParams(X, y, globalArgs, dev, problemType):
         'bootstrap': [True,False]
     }
 
-    if problemType != 'category':
+    if problemType not in ['category', 'multi-category']:
         parameters_to_try.pop('criterion', None)
 
     # if dev:

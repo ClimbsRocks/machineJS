@@ -109,7 +109,8 @@ if problemType == 'category':
         # perceptron does not support predict_proba
         # and MultinomialNB does not do probability predictions all that well
         testDataPredictions = classifier.predict(XTest)
-        
+
+# else will handle both regression and multi-category predictions at the moment. 
 else:
     testDataPredictions = classifier.predict(XTest)
 
@@ -134,6 +135,7 @@ if not argv['validationRound']:
             validationPredictions = classifier.predict(validationData)
             
     else:
+        # else will handle both regression and multi-category predictions for now
         validationPredictions = classifier.predict(validationData)
 
     validationScore = classifier.score(validationData,validationY)

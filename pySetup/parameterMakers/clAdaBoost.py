@@ -21,7 +21,7 @@ def makeParams(X, y, globalArgs, dev, problemType):
         "algorithm": ['SAMME','SAMME.R']
     }
 
-    if problemType != 'category':
+    if problemType not in ['category', 'multi-category']:
         try:
             parameters_to_try.pop('algorithm', None)
         except:

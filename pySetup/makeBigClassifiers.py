@@ -16,7 +16,7 @@ def makeAll(globalArgs, dev, problemType):
     if dev:
         iterationCount=2
 
-    if problemType == 'category':
+    if problemType == 'category' or problemType == 'multi-category':
     
         return {
             'clRfGini': RandomForestClassifier(n_estimators=estimator_count, n_jobs=-1, criterion='gini'),

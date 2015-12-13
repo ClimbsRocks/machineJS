@@ -19,7 +19,7 @@ module.exports = {
     // X_train_nn- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
     // X_test_nn- used by neural networks. we will use the same ID and y_train files as the rest of the dataset. It is only the input features that have to be normalized, not the output features. 
     // trainingDataLength- technically not a file name, but fits much more logically here than reading in that file again in node.js
-    // problemType: 'regression' or 'category'
+    // problemType: 'regression' or 'category' or 'multi-category'
   },
 
   splitData: function(callback) {

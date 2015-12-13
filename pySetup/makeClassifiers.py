@@ -29,7 +29,7 @@ def makeClassifiers(globalArgs, dev, problemType):
         n_iter=2
         n_estimators=5
 
-    if problemType == 'category':
+    if problemType == 'category' or problemType == 'multi-category':
         return {
             'clRfGini': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, criterion='gini'),
             'clRfBootstrapTrue': RandomForestClassifier(n_estimators=n_estimators, n_jobs=1, bootstrap=True),

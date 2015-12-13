@@ -65,7 +65,7 @@ module.exports = function(problemType, dataLength) {
 
   // we use the 'all' flag inside processArgs to set initial placeholder values for all possible classifiers we may end up training
   // then, once data-formatter has run, we will know the problemType and only return those classifiers
-  if( problemType === 'category' || problemType === 'all') {
+  if( problemType === 'category' || problemType === 'multi-category' || problemType === 'all') {
     for(var key in classifierOnlyAlgorithms) {
       universalAlgorithms[key] = classifierOnlyAlgorithms[key];
     }
