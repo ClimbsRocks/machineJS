@@ -135,10 +135,10 @@ if fileNames['testingDataLength'] < 100000:
     # train on all the available (non-validation) data
     testSize = 0
     # a small data set should have many rounds of cross-validation. this will take longer to train, but means we will be training on more data
-    cvRounds = 6
+    cvRounds = 3
 elif fileNames['testingDataLength'] < 200000:
     testSize = .25
-    cvRounds = 3
+    cvRounds = 2
 else:
     # if this is the stage 0 round
     # we have already separated out our validation data (currently 30% of the entire training data set by default)
@@ -146,7 +146,7 @@ else:
     # we want to have 30% of our entire training data set used as our "search" data set, meaning it is ~43% of this 70% data set
     # the number we must give though is how much we want saved for testing, which is 1-.43 = .57
     testSize = .57
-    cvRounds = 3
+    cvRounds = 2
 
 if globalArgs['validationRound']:
     # if this is the validation round, we do not want to split our data out any further. 
