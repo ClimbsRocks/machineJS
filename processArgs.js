@@ -38,6 +38,10 @@ module.exports = function() {
 
   // python throws a keyError if you try to look up a key that doesn't exist, so we are explicitly giving it a blank value to ensure the key will exist when we need it later
   argv.join = argv.join || '';
+  argv.on = argv.on || '';
+  argv.allFeatureCombinations = argv.allFeatureCombinations || '';
+  argv.keepAllFeatures = argv.keepAllFeatures || '';
+
 
   argv.testFileName = path.basename( argv.predict );
   argv.testFilePretty = argv.testFileName.slice(0,-4);

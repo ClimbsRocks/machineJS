@@ -52,13 +52,16 @@ module.exports = {
 
   formatData: function( callback ) {
     // the callback function will be invoked with an object that holds the fileNames needed by module.exports.fileNames
+
     var dataFormatterArgs = {
       trainingData: argv.dataFile,
       testingData: argv.predict,
       trainingPrettyName: argv.outputFileName,
       testingPrettyName: argv.testOutputFileName,
       joinFileName: argv.join,
-      on: argv.on
+      on: argv.on,
+      allFeatureCombinations: argv.allFeatureCombinations,
+      keepAllFeatures: argv.keepAllFeatures
     };
 
     if( argv.dfOutputFolder ) {
