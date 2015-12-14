@@ -98,7 +98,7 @@ except:
             trainingIndices.append(idx)
 
     if writeToFile:
-        with open(validationIndicesFile, 'w+') as writeFile:
+        with open(validationIndicesFile, 'w') as writeFile:
             # now save that file as a .pkl next to where our test data sits. 
             pickle.dump(validationIndices, writeFile)
 
