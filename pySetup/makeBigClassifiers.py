@@ -8,7 +8,7 @@ from sklearn.ensemble import ExtraTreesRegressor
 
 
 def makeAll(globalArgs, dev, problemType):
-    estimator_count=1200
+    estimator_count=200
     if dev:
         estimator_count=120
         
