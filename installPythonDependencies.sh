@@ -8,6 +8,7 @@ python get-pip.py
 
 pip install joblib
 pip install numpy
+pip install pandas
 pip install scipy
 pip install cython
 pip install xgboost
