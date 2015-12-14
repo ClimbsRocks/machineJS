@@ -6,6 +6,7 @@ import csv
 import time
 import joblib
 import numpy as np
+import pandas as pd
 import logging
 import xgboost
 
@@ -246,13 +247,12 @@ if not argv['validationRound']:
         #         except:
         #             csvwriter.writerow([int(rowID),yValue])
 
+# The following sections write our output in a format that the user requested. This output is not used for anything else later down the line in machineJS or ensembler, it is solely for the user. 
 
 
 # if the final output is binary, create a separate file at this stage that can be easily uploaded to kaggle by rounding the predicted value to the nearest int
 # We will use the actual probability in ensembler, but it's nice at this stage to be able to upload results to kaggle and get some feedback
 if argv[ 'binaryOutput'] == 'true':
-
-    # first check to make sure that we have a distinct file name. if not, append the name of the enclosing folder to the fileName
                     
     # add kaggle to the front of the name to make it obvious that this is for kaggle
     # this also keeps the rest of our files consistent for ensembler
@@ -275,4 +275,38 @@ if argv[ 'binaryOutput'] == 'true':
                 pass
             csvwriter.writerow( [rowID,prediction] )
 
-# if we can, keep metadata on each file (or, in the array with the file names, hold objects that have information such as observed error rate, relative ranking within all the classifiers of that type, type of classifier, training time, etc.)
+# for multi-category data, we can choose to output a single column with all the categories contained in that column, or we can translate that into a set of binary columns, where each column represents a single categorical value. 
+# if the final output is matrixOutput, create a separate file at this stage that can be easily referenced by the user
+# We will use the single categorical column in ensembler, but it's nice at this stage to be able to view results in the expected format and get some feedback
+if argv[ 'matrixOutput'] == 'true':
+
+    # convert our predictions on the test set to a pandas series
+    pdPredictions = pd.Series(testDataPredictions)
+
+    # take our single column of category predictions, and turn it into a matrix, where each column represents a yes or no for a single category
+    # prefix puts our outputHeader in front of each of the values for our header row
+    matrixPredictions = pd.get_dummies(pdPredictions, prefix=outputHeader)
+    # get the header row from the data frame:
+    matrixHeaderRow = matrixPredictions.columns.values.tolist()
+    # convert from pandas data frame to a python list
+    matrixPredictions = matrixPredictions.values.tolist()
+
+    # add the id to the header row
+    outputFileHeaderRow = [idHeader] + matrixHeaderRow
+
+    obviousPrint('outputFileHeaderRow',outputFileHeaderRow)
+
+    # add matrix to the front of the name to make it obvious
+    # this also keeps the rest of our files consistent for ensembler
+    matrixPath = argv['matrixOutputFolder']
+    matrixFileName = argv['outputFileName'] + classifierName + str(time.time()) + '.csv'
+    with open( path.join(matrixPath, matrixFileName) , 'w+') as predictionsFile:
+        csvwriter = csv.writer(predictionsFile)
+
+        csvwriter.writerow(outputFileHeaderRow)
+        for idx, listOfMatrixPredictions in enumerate(matrixPredictions):
+
+            rowID = testIDColumn[idx]
+            csvwriter.writerow( [rowID] + listOfMatrixPredictions )
+
+
