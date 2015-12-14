@@ -41,6 +41,7 @@ module.exports = function() {
   argv.on = argv.on || '';
   argv.allFeatureCombinations = argv.allFeatureCombinations || '';
   argv.keepAllFeatures = argv.keepAllFeatures || '';
+  argv.dfOutputFolder = argv.dfOutputFolder || path.join(argv.machineJSLocation,'pySetup','data-formatterResults');
 
 
   argv.testFileName = path.basename( argv.predict );
@@ -117,6 +118,11 @@ module.exports = function() {
   if( argv.binaryOutput ) {
     argv.kaggleBinaryOutputFolder = path.join(argv.predictionsFolder, 'kaggleBinaryOutput');
     mkdirp(argv.kaggleBinaryOutputFolder);
+  }
+
+  if( argv.matrixOutput ) {
+    argv.matrixOutputFolder = path.join(argv.predictionsFolder, 'matrixOutput');
+    mkdirp(argv.matrixOutputFolder);
   }
 
   // we will eventually be storing information about our trained algorithms here.
