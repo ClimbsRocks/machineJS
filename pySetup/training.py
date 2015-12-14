@@ -242,13 +242,13 @@ messageObj = {
     "algoName": classifierName
 }
 
-if globalArgs['validationRound']:
-    try:
-        printParent('feature_importances_ from searchCV:')
-        printParent(searchCV.best_estimator_.feature_importances_.tolist())
-    except:
-        printParent('we were not able to print feature_importances_ for this estimator')
-        pass
+# if globalArgs['validationRound']:
+#     try:
+#         printParent('feature_importances_ from searchCV:')
+#         printParent(searchCV.best_estimator_.feature_importances_.tolist())
+#     except:
+#         printParent('we were not able to print feature_importances_ for this estimator')
+#         pass
 
 # TODO TODO: 
     # think through how we want to handle training or not training larger versions of these classifiers
@@ -259,7 +259,7 @@ if globalArgs['validationRound']:
 # Get info on whether this algo supports creating a larger version of that classifier. 
 # for example, a random forest you can train with more trees, a neural network you can train for more epochs, etc.
 extendedTraining = extendedTrainingList.getAll()[classifierName]
-if searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0 and extendedTraining:
+if (searchCV.best_score_ > longTrainThreshold and longTrainThreshold > 0) or globalArgs['validationRound'] and extendedTraining:
 
     allBigClassifiers = makeBigClassifiers.makeAll(globalArgs, dev, problemType)
     longTrainClassifier = allBigClassifiers[classifierName]
