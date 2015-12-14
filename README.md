@@ -51,9 +51,8 @@ We use the `data-formatter` module to automatically format your data, and even p
 Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-formatter) for information on the tiny bit of preparation you need to do for your dataset to be ready for `machineJS`.
 
 ## What types of problems does this library work on?
-Right now, `machineJS` only works on regression and some categorical problems. 
-Specifically, machineJS works if your problem is asking for a single column of binary output (did this customer buy a product or not, did these two users end up being a match or not). 
-If you are predicting multiple labels for that single column, `machineJS` does not work for your dataset at the moment. We're working on building in support for that soon :)
+`machineJS` works on both regression and categorical problems, as long as there is a single output column in the training data. This includes multi-category (frequently called multi-class) problems, where the category you are predicting is one of many possible categories. 
+There are no immediate plans to support multiple output columns in the training data. If you have three output columns you're interested in predicting, and they cannot be combined into a single column in the training data, you could run `machineJS` once for each of those three columns. 
 
 
 #### Note: This library is designed to run across all but one cores on the host machine. What this means for you:
