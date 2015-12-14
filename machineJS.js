@@ -19,7 +19,7 @@
       argv.ensemblerArgs.validationRound = false;
     }
 
-    if (argv.devEnsemble) {
+    if (argv.devEnsemble || argv.ensemble) {
       ensembler.createEnsemble( argv.ensemblerArgs );
     } else if( argv.makePredictions ) {
       controllerPython.makeAllPredictions( argv.makePredictions );
