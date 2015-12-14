@@ -294,8 +294,6 @@ if argv[ 'matrixOutput'] == 'true':
     # add the id to the header row
     outputFileHeaderRow = [idHeader] + matrixHeaderRow
 
-    obviousPrint('outputFileHeaderRow',outputFileHeaderRow)
-
     # add matrix to the front of the name to make it obvious
     # this also keeps the rest of our files consistent for ensembler
     matrixPath = argv['matrixOutputFolder']
@@ -308,5 +306,3 @@ if argv[ 'matrixOutput'] == 'true':
 
             rowID = testIDColumn[idx]
             csvwriter.writerow( [rowID] + listOfMatrixPredictions )
-
-
