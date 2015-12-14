@@ -42,6 +42,7 @@ module.exports = function() {
   argv.allFeatureCombinations = argv.allFeatureCombinations || '';
   argv.keepAllFeatures = argv.keepAllFeatures || '';
   argv.dfOutputFolder = argv.dfOutputFolder || path.join(argv.machineJSLocation,'pySetup','data-formatterResults');
+  argv.matrixOutput = argv.matrixOutput || '';
 
 
   argv.testFileName = path.basename( argv.predict );
