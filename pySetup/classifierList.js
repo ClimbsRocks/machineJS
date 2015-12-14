@@ -69,7 +69,11 @@ module.exports = function(problemType, dataLength) {
     for(var key in classifierOnlyAlgorithms) {
       universalAlgorithms[key] = classifierOnlyAlgorithms[key];
     }
-  } 
+  }
+
+  if( problemType === 'multi-category' ) {
+    delete universalAlgorithms['clnnSklearnMLP'];
+  }
 
   if(problemType === 'regression' || problemType === 'all') {
     for(var key in regressionOnlyAlgorithms) {
