@@ -69,6 +69,7 @@ module.exports = {
     }
 
     df(dataFormatterArgs, function(fileNames) {
+      console.log('Here are the fileNames from data-formatter. If you want to skip the data-formatter part next time you want to play with this dataset, copy and paste this object into machineJS/pySetup/testingFileNames.js, following the instructions included in that file.');
       console.log(fileNames);
       // df takes in a callback function that will be invoked with the fileNames object, holding the names and locations of the files it saved the data into
       module.exports.fileNames = fileNames;
