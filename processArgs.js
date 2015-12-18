@@ -156,7 +156,7 @@ module.exports = function() {
   argv.continueToTrainThreshold = argv.continueToTrainThreshold || argv.longTrainThreshold;
   
   if( argv.alreadyFormatted === undefined ) {
-    if( argv.dev || argv.makePredictions || argv.ensemble ) {
+    if( argv.dev || argv.ensemble ) {
       argv.alreadyFormatted = true;
     } else {
       argv.alreadyFormatted = false;

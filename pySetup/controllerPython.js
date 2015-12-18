@@ -23,7 +23,7 @@ var startOneClassifier = function(classifierList) {
 
     var classifierName = classifierList.shift();
 
-    var algosBestScore = global.allTrainingResults[classifierName];
+    var algosBestScore = global.trainingResultsSummary[classifierName];
 
     // if we have trained more than three of this algorithm, and it's best score is not within X percent of the best we've found so far, don't both training another one. 
     if( global.trainedAlgoCounts[classifierName] < 3 || algosBestScore > global.bestSearchScore * argv.continueToTrainThreshold ) {
@@ -33,6 +33,8 @@ var startOneClassifier = function(classifierList) {
       }, classifierName);
 
     } else {
+      console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+      console.log('We have skipped training for this classifier:',classifierName);
       // since we said at the start to expect a certain number of algorithms to be trained, we must still emit an event to notify ensembler that we are skipping over an algorithm
       process.emit('algoSkippedTraining');
     }
@@ -113,11 +115,6 @@ module.exports = {
       
     } else if( argv.alreadyFormatted ) {
     // if we have already formatted the data, skip over repeating that step. This allows us to train more classifiers rapidly without repeating the oftentimes lengthy data formatting process. 
-      // TODO TODO: do not start splitDatasets
-        // we need to get the fileNames
-          // grab them from within ensembler before invoking machineJS a second time
-            // make fileNames part of the global.argv object in machineJS
-        // and we will need to build in some logic to training.py to have it not split out the data, make predictions on the raw validation dataset, etc. 
       utils.splitData(function() {
         module.exports.startClassifiers();
       });
@@ -134,27 +131,6 @@ module.exports = {
 
   },
 
-  // TODO: likely deprecate this functionality. 
-  makeAllPredictions: function(folderName) {
-    // we are taking in a folderName where our results are stored, and only making predictions against those classifiers
-    
-    fs.readdir(folderName, function(err,files) {
-      if (err) {
-        console.error('there are no files in the input folder',folderName);
-
-        console.error("We need the pickled (.pkl) results of the trained classifiers saved into their own folders within this folder. Please make sure that this is the right folder, and that you have properly saved each classifier into it's own directory within this folder.");
-      } else { 
-        var numberOfClassifiers = files.length;
-        ensembler.startListeners( numberOfClassifiers, argv.ensemblerArgs);
-        files.forEach(function(fileName) {
-          // our file names already have "best" in them, but our makePredictions script is just expecting the classifierName itself, without "best"
-          fileName = fileName.slice(4);
-          module.exports.makePredictions(fileName);
-        });
-      }
-    });
-
-  },
 
   makePredictions: function(classifierName) {
 
