@@ -169,7 +169,7 @@ with open( path.join(predictionsPath, predictionsFileName) , 'w+') as prediction
     csvwriter = csv.writer(predictionsFile)
 
     # we are going to have to modify this when we allow it to make categorical predictions too. 
-    # TODO: write the scores here!
+    # write the scores to the top row
     csvwriter.writerow([validationScore, trainingScore])
     csvwriter.writerow([idHeader,outputHeader])
     for idx, prediction in enumerate(testDataPredictions):

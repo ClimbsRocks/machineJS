@@ -4,7 +4,6 @@ def makeParams(X, y, globalArgs, dev, problemType):
     # https://github.com/ClimbsRocks/machineJS/issues/74
 
     # leaf size only applies to ball or kd tree, so i'm not sure if we can include it in grid search or not
-    # TODO: break all of these out into their own classifiers- 6 possible combinations of algorithm*weights
     parameters_to_try = {
         # 'algorithm': ['ball_tree','kd_tree','brute'],
         # 'weights': ['uniform','distance'],
