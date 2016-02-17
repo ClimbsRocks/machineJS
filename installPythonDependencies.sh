@@ -3,7 +3,7 @@
 npm install
 # if pip is not installed, install it using the instructions at: https://pip.pypa.io/en/stable/installing/
 
-wget https://bootstrap.pypa.io/get-pip.py
+curl -O https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 
 pip install joblib
