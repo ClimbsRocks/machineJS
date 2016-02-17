@@ -23,13 +23,13 @@ If you want to install this in it's own standalone repo, and work on the source 
 1. `git clone https://github.com/ClimbsRocks/machineJS.git`
 2. `cd machineJS`
 3. `npm install`
-4. `installPythonDependencies.sh`
+4. `./installPythonDependencies.sh`
 
 ### As a node_module
 If you are installing this as a node_module to be used within another repo:
 1. `npm install --save machinejs`
 2. `cd node_modules/machinejs`
-3. `installPythonDependencies.sh`
+3. `./installPythonDependencies.sh`
 
 ## How to use
 You can use machineJS either from the command line, or as a node module by requiring it into files being run by node.js.
