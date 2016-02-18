@@ -24,3 +24,9 @@ cd scikit-learn
 python setup.py build
 sudo python setup.py install
 
+# get back out of the scikit-learn directory
+cd ..
+
+# clean up after ourselves
+sudo rm -rf ./scikit-learn
+rm ./get-pip.py
