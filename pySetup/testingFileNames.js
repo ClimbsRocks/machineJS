@@ -42,18 +42,65 @@ module.exports = {
   homesitetrain: { 
     idHeader: 'quotenumber',
     outputHeader: 'quoteconversion_flag',
-    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/id_train_homesitetrain.npz',
-    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/y_train_homesitetrain.npz',
-    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/id_test_homesitetesthomesitetrain.npz',
-    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/X_test_homesitetesthomesitetrain.npz',
-    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/X_train_homesitetrain.npz',
-    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/X_train_nn_homesitetrain.npz',
-    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/y_train_nn_homesitetrain.npz',
-    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/node_modules/ensembler/node_modules/machinejs/pySetup/data-formatterResults/X_test_nn_homesitetesthomesitetrain.npz',
+    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_homesitetrain.npz',
+    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_homesitetrain.npz',
+    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_homesitetesthomesitetrain.npz',
+    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_homesitetesthomesitetrain.npz',
+    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_homesitetrain.npz',
+    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_homesitetrain.npz',
+    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_homesitetrain.npz',
+    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_homesitetesthomesitetrain.npz',
     testingDataLength: 173836,
     trainingDataLength: 260753,
     problemType: 'category' 
-  }
+  },
 
+  walmarttrain: { 
+    idHeader: 'visitnumber',
+    outputHeader: 'triptype',
+    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_walmarttrain.npz',
+    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_walmarttrain.npz',
+    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_walmarttestwalmarttrain.npz',
+    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_walmarttestwalmarttrain.npz',
+    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_walmarttrain.npz',
+    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_walmarttrain.npz',
+    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_walmarttrain.npz',
+    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_walmarttestwalmarttrain.npz',
+    testingDataLength: 9935,
+    trainingDataLength: 95674,
+    problemType: 'multi-category' 
+  },
+
+  shortTrain: {
+    idHeader: 'visitnumber',
+    outputHeader: 'triptype',
+    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_shortTrain.npz',
+    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_shortTrain.npz',
+    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_shortTestshortTrain.npz',
+    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_shortTestshortTrain.npz',
+    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_shortTrain.npz',
+    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_shortTrain.npz',
+    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_shortTrain.npz',
+    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_shortTestshortTrain.npz',
+    testingDataLength: 9935,
+    trainingDataLength: 10115,
+    problemType: 'multi-category' 
+  },
+
+  telstratrain: { 
+    idHeader: 'id',
+    outputHeader: 'fault_severity',
+    id_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_train_telstratrain.npz',
+    y_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_telstratrain.npz',
+    id_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/id_test_telstratesttelstratrain.npz',
+    X_test: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_telstratesttelstratrain.npz',
+    X_train: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_telstratrain.npz',
+    X_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_train_nn_telstratrain.npz',
+    y_train_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/y_train_nn_telstratrain.npz',
+    X_test_nn: '/Users/preston/ghLocal/machineLearningWork/machineJS/pySetup/data-formatterResults/X_test_nn_telstratesttelstratrain.npz',
+    testingDataLength: 11171,
+    trainingDataLength: 7381,
+    problemType: 'multi-category' 
+  }
 };
 

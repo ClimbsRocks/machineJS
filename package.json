@@ -15,7 +15,10 @@
     "train:numerai": "node machineJS.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted",
     "ensemble:rossShort": "node machineJS.js data/rossman/short/rossShortTrainDev.csv --predict data/rossman/short/test.csv --join data/rossman/store.csv --alreadyFormatted --devEnsemble",
     "ensemble:numerai": "node machineJS.js data/numerai/numerai_training_data_tournament.csv --predict data/numerai/numerai_tournament_data.csv --alreadyFormatted --devEnsemble",
-    "train:giveCredit": "node machineJS.js data/giveCredit/train.csv --predict data/giveCredit/test.csv"
+    "train:giveCredit": "node machineJS.js data/giveCredit/train.csv --predict data/giveCredit/test.csv",
+    "train:homesite": "node machineJS.js data/homesite/train.csv --predict data/homesite/test.csv",
+    "train:homesiteShort": "node machineJS.js data/homesite/shortTrain.csv --predict data/homesite/shortTest.csv",
+    "train:telstra": "node machineJS.js data/telstra/train.csv --predict data/telstra/test.csv"
   },
   "repository": {
     "type": "git",
