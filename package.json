@@ -1,6 +1,6 @@
 {
   "name": "machinejs",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Automated machine learning structure. Ensembles random forests, XGBoost, neural networks, AdaBoost, KNN, SVM together, handling data formatting ensembling, and running predictions for you. Feel free to tweak the settings if you want a lot of control, or just start it up and let it run if you're looking for a push-button MVP solution.",
   "main": "machineJS.js",
   "scripts": {
