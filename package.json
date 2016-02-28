@@ -1,6 +1,6 @@
 {
   "name": "machinejs",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Automated machine learning structure. Ensembles random forests, XGBoost, neural networks, AdaBoost, KNN, SVM together, handling data formatting ensembling, and running predictions for you. Feel free to tweak the settings if you want a lot of control, or just start it up and let it run if you're looking for a push-button MVP solution.",
   "main": "machineJS.js",
   "scripts": {
@@ -70,8 +70,8 @@
   "homepage": "https://github.com/ClimbsRocks/machineJS",
   "dependencies": {
     "babyparse": "^0.4.3",
-    "data-formatter": "^1.5.1",
-    "ensembler": "^0.5.7",
+    "data-formatter": "latest",
+    "ensembler": "latest",
     "fast-csv": "^0.6.0",
     "longjohn": "^0.2.9",
     "minimist": "^1.1.2",
