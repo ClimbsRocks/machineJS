@@ -1,6 +1,7 @@
 # machineJS
 > a fully-featured default process for machine learning- all the parts are here and have functional default values in place. Modify to your heart's delight so you can focus on the important parts for your dataset, or run it all the way through with the default values to have fully automated machine learning!
 
+
 ## What is it?
 `machineJS` provides a fully automated framework for applying machine learning to a dataset.
 
@@ -9,6 +10,7 @@ All you have to do is give it a .csv file, with some basic information about eac
 If you've already done this kind of thing before, it's useful as an outline, putting in place a working structure for you to make modifications within, rather than having to build from scratch again every time. 
 
 machineJS will tell you:
+
 - Which algorithms are going to be most effective for this problem 
 - Which features are most useful
 - Whether this problem is solvable by machine learning at all (useful if you're not sure you've collected enough data yet)
@@ -20,13 +22,16 @@ If you haven't done much (or any) machine learning before- it does some fairly a
 
 ### As a standalone directory (recommended)
 If you want to install this in it's own standalone repo, and work on the source code directly, then from the command line, type the following:
+
 1. `git clone https://github.com/ClimbsRocks/machineJS.git`
 2. `cd machineJS`
 3. `npm install`
 4. `./installPythonDependencies.sh`
 
+
 ### As a node_module
 If you are installing this as a node_module to be used within another repo:
+
 1. `npm install --save machinejs`
 2. `cd node_modules/machinejs`
 3. `./installPythonDependencies.sh`
