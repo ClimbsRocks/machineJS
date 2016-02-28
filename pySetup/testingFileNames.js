@@ -101,6 +101,20 @@ module.exports = {
     testingDataLength: 11171,
     trainingDataLength: 7381,
     problemType: 'multi-category' 
-  }
+  },
+
+  numerai_training_data: { idHeader: 't_id',
+    outputHeader: 'target',
+    id_train: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/id_train_numerai_training_data.npz',
+    y_train: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/y_train_numerai_training_data.npz',
+    id_test: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/id_test_numerai_tournament_datanumerai_training_data.npz',
+    X_test: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/X_test_numerai_tournament_datanumerai_training_data.npz',
+    X_train: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/X_train_numerai_training_data.npz',
+    X_train_nn: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/X_train_nn_numerai_training_data.npz',
+    y_train_nn: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/y_train_nn_numerai_training_data.npz',
+    X_test_nn: '/Users/preston/Desktop/machineJS/pySetup/data-formatterResults/X_test_nn_numerai_tournament_datanumerai_training_data.npz',
+    testingDataLength: 19461,
+    trainingDataLength: 55038,
+    problemType: 'category' }
 };
 

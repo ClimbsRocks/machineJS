@@ -40,7 +40,7 @@ numRows = X.shape[0]
 
 includeOrNot = [random.random() for x in range(0,numRows)]
 
-# we want to save the validation indices with the test data. that way we can have multiple different training data sets scattered throughout a computer, but still use these same validationIndices for all of them
+# we want to save the validation indices with the test data. that way we can have multiple different versions of the sme training data set scattered throughout a computer, but still use these same validationIndices for all of them
 validationIndexFolder = path.dirname(args['predict'])
 validationIndexFileName = 'dfValidationIndices' + args['testOutputFileName'] + '.pkl'
 validationIndicesFile = path.join( validationIndexFolder, validationIndexFileName )
@@ -50,9 +50,9 @@ writeToFile = True
 createNewSplit = False
 
 if hasCustomValidationSplit:
-    # TODO: load the validation split column
+    # load the validation split column
     validationSplitColumn = load_sparse_csr(validationSplitColumnFileName)
-    # TODO: create both training and validation indices
+    # create both training and validation indices
     # validationIndices are rows we will hold out as the validation data set
     # trainingIndices are rows we will include in the training data set
     validationIndices = []
@@ -62,8 +62,6 @@ if hasCustomValidationSplit:
             validationIndices.append(idx)
         else:
             trainingIndices.append(idx)
-    printParent('validationIndices with custom validation split')
-    printParent(validationIndices)
 
 else:
     # try to load in existing validationIndices

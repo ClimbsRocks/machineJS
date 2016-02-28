@@ -87,6 +87,11 @@ module.exports = function(problemType, dataLength) {
     }
   }
 
+  if( argv.devEnsemble ) {
+    delete universalAlgorithms['clXGBoost']
+    delete universalAlgorithms['clRfBootstrapTrue']
+  }
+
   // scikit-learn's MLP is only available in v^0.18.0
   // if the user has not installed that version, we want to make sure to remove that from our classifierList
   // try{

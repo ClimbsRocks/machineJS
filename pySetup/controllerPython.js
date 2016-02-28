@@ -94,6 +94,11 @@ module.exports = {
       // whereas if it were an all-or-nothing game of having to get to all 100, we would have nothing.
     // another thing that's appealling about running multiple rounds is it let's us test more algorithms against the valdiation data set. it's somewhat difficult to predict how each algorithm is going to generalize, so having a chance to actually test them against the validation data set gives us more options
     // the drawback is that it will take more time (training a "bigger" version of the selected algorithm 10 times is not trivial, nor is running 10 rounds of predictions against the validation and test data sets)
+
+    if(argv.devEnsemble) {
+      argv.numRounds = 1;
+    }
+
     for( var i = 0; i < argv.numRounds; i++) {
       for( var j = 0; j < classifierList.length; j++) {
         classifiersByRound.push(classifierList[j]);
