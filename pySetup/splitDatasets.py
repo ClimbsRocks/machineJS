@@ -19,6 +19,8 @@ XnnFileName = fileNames['X_train_nn']
 ynnFileName = fileNames['y_train_nn']
 idFileName = fileNames['id_train']
 yTrainFileName = fileNames['y_train']
+validationSplitColumnFileName = fileNames['validation_split_column']
+hasCustomValidationSplit = fileNames['hasCustomValidationSplit']
 
 outputDirectory = path.dirname(XFileName)
 
@@ -47,60 +49,77 @@ validationIndicesFile = path.join( validationIndexFolder, validationIndexFileNam
 writeToFile = True
 createNewSplit = False
 
-# try to load in existing validationIndices
-try:
-    with open(validationIndicesFile, 'rb') as openFile:
-        validationIndices = pickle.load(openFile)
-
-        # check to make sure that the validation length is less than the length of our X dataset
-        if len(validationIndices) > numRows * ( validationPercent + .02):
-            printParent('validationIndices too long')
-            # if it isn't, create a new validationIndices for this dataset, but do not write it to file
-            # this lets us keep our larger validationIndices split (for the full training data set), while still having something to work with for this smaller dataset we're currently testing on.
-            writeToFile = False
-            raise IndexError("this dataset is shorter than the one we built the validation split on previously")
-
-        # check to make sure that the validation length is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the length of the validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
-        elif len(validationIndices) < numRows * validationPercent * .98:
-            printParent('validationIndices too short')
-            # If it is not, create a new validationIndices and write that to file
-            raise IndexError("this dataset is longer than the one we built the validation split on previously")
-            
-        # In both cases, fall into the except state below
-        # but create a variable that lays out whether to write that new validationIndices to file or not in the try block, and then use that in the except block below
-
-        # if we found existing validationIndices that meet the criteria above, we still want to split our incoming dataset on those indices
-        # this allows us to change our feature engineering on a training dataset, and pass those features through to machineJS
-        trainingIndices = []
-        validationIndicesCopy = validationIndices[:]
-        # it should already be sorted, but we're being safe here in case of future changes
-        validationIndicesCopy.sort()
-        validationIndicesCounter = 0
-
-        # linear comparison of two lists to only put indices into trainingIndices if they are not in validationIndices
-        for x in range(0,numRows):
-            if x == validationIndicesCopy[validationIndicesCounter]:
-                validationIndicesCounter += 1
-            else:
-                trainingIndices.append(x)
-        del validationIndicesCopy
-
-
-# in the case that we were not able to load in validationIndices successfully, we want to write our validationIndices to file for all future runs to use
-except:
-    createNewSplit = True
+if hasCustomValidationSplit:
+    # TODO: load the validation split column
+    validationSplitColumn = load_sparse_csr(validationSplitColumnFileName)
+    # TODO: create both training and validation indices
+    # validationIndices are rows we will hold out as the validation data set
+    # trainingIndices are rows we will include in the training data set
     validationIndices = []
     trainingIndices = []
-    for idx, randomNum in enumerate(includeOrNot):
-        if randomNum < validationPercent:
+    for idx, item in enumerate(validationSplitColumn.todense().tolist()[0]):
+        if item == 1:
             validationIndices.append(idx)
         else:
             trainingIndices.append(idx)
+    printParent('validationIndices with custom validation split')
+    printParent(validationIndices)
 
-    if writeToFile:
-        with open(validationIndicesFile, 'w') as writeFile:
-            # now save that file as a .pkl next to where our test data sits. 
-            pickle.dump(validationIndices, writeFile)
+else:
+    # try to load in existing validationIndices
+    try:
+        with open(validationIndicesFile, 'rb') as openFile:
+            validationIndices = pickle.load(openFile)
+
+            # check to make sure that the validation length is less than the length of our X dataset
+            if len(validationIndices) > numRows * ( validationPercent + .02):
+                printParent('validationIndices too long')
+                # if it isn't, create a new validationIndices for this dataset, but do not write it to file
+                # this lets us keep our larger validationIndices split (for the full training data set), while still having something to work with for this smaller dataset we're currently testing on.
+                writeToFile = False
+                raise IndexError("this dataset is shorter than the one we built the validation split on previously")
+
+            # check to make sure that the validation length is within a few percentage points of our validationPercent number (in other words, if X is 10,000 rows long, and the length of the validationIndices is only 1,200, then we know validationIndices was built on a smaller test dataset earlier.)
+            elif len(validationIndices) < numRows * validationPercent * .98:
+                printParent('validationIndices too short')
+                # If it is not, create a new validationIndices and write that to file
+                raise IndexError("this dataset is longer than the one we built the validation split on previously")
+                
+            # In both cases, fall into the except state below
+            # but create a variable that lays out whether to write that new validationIndices to file or not in the try block, and then use that in the except block below
+
+            # if we found existing validationIndices that meet the criteria above, we still want to split our incoming dataset on those indices
+            # this allows us to change our feature engineering on a training dataset, and pass those features through to machineJS
+            trainingIndices = []
+            validationIndicesCopy = validationIndices[:]
+            # it should already be sorted, but we're being safe here in case of future changes
+            validationIndicesCopy.sort()
+            validationIndicesCounter = 0
+
+            # linear comparison of two lists to only put indices into trainingIndices if they are not in validationIndices
+            for x in range(0,numRows):
+                if x == validationIndicesCopy[validationIndicesCounter]:
+                    validationIndicesCounter += 1
+                else:
+                    trainingIndices.append(x)
+            del validationIndicesCopy
+
+
+    # in the case that we were not able to load in validationIndices successfully, we want to write our validationIndices to file for all future runs to use
+    except:
+        createNewSplit = True
+        validationIndices = []
+        trainingIndices = []
+        for idx, randomNum in enumerate(includeOrNot):
+            if randomNum < validationPercent:
+                validationIndices.append(idx)
+            else:
+                trainingIndices.append(idx)
+
+        if writeToFile:
+            with open(validationIndicesFile, 'w') as writeFile:
+                # now save that file as a .pkl next to where our test data sits. 
+                pickle.dump(validationIndices, writeFile)
 
 
 # continued callout to the person originally responsible for this function:
