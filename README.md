@@ -48,11 +48,21 @@ machineJS({
 
 ## Format of Data Files:
 We use the `data-formatter` module to automatically format your data, and even perform some basic feature engineering on it. 
-Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-formatter) for information on the tiny bit of preparation you need to do for your dataset to be ready for `machineJS`.
+Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-formatter) for information on how to label each column to be ready for `machineJS`.
+
+## How to customize/dive in deeper:
+machineJS is designed to be super easy to use without diving into any of the internals. Be a conjurer- just give it data and let it run!
+That said, it's super powerful once you start customizing it. 
+
+It's designed to be relatively easy to modify, and well-documented. The obvious place to start is inside `processArgs.js`. Here we set nearly all the parameters that are used throughout the project. 
+
+The other obvious area many people will be interested in is adding in new models, and different hyperparameter search spaces. This can be found in the `pySetup` folder. The exact steps are listed in `stepsToAddNewClassifier.txt`. 
 
 ## What types of problems does this library work on?
 `machineJS` works on both regression and categorical problems, as long as there is a single output column in the training data. This includes multi-category (frequently called multi-class) problems, where the category you are predicting is one of many possible categories. 
 There are no immediate plans to support multiple output columns in the training data. If you have three output columns you're interested in predicting, and they cannot be combined into a single column in the training data, you could run `machineJS` once for each of those three columns. 
+
+This library is well-tested on Macs. I've designed it to work on PCs as well, but I haven't tested that at all yet. If you're a PC user, I'd love some issues or Pull Requests to make this work for PCs!
 
 
 #### Note: This library is designed to run across all but one cores on the host machine. What this means for you:
