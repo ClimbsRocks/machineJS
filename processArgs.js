@@ -1,7 +1,8 @@
 var path = require('path');
 var mkdirp = require('mkdirp');
-var utils = require(path.join('pySetup','utils.js'));
-var classifierListOptions = require(path.join('pySetup', 'classifierList.js'));
+// we will soon save path.dirname(__filename) into argv.machineJSLocation, but to get all this started by loading our require statements, we'll type it in directly here
+var utils = require(path.join(path.dirname(__filename), 'pySetup','utils.js'));
+var classifierListOptions = require(path.join(path.dirname(__filename), 'pySetup', 'classifierList.js'));
 
 module.exports = function() {
   if(argv.dev || argv.devKaggle || argv.devEnsemble) {
