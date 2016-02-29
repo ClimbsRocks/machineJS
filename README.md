@@ -59,9 +59,9 @@ Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-fo
 machineJS is designed to be super easy to use without diving into any of the internals. Be a conjurer- just give it data and let it run!
 That said, it's super powerful once you start customizing it. 
 
-It's designed to be relatively easy to modify, and well-documented. The obvious place to start is inside `processArgs.js`. Here we set nearly all the parameters that are used throughout the project. 
+It's designed to be relatively easy to modify, and well-documented. The [obvious place to start](https://github.com/ClimbsRocks/machineJS/blob/master/processArgs.js) is inside `processArgs.js`. Here we set nearly all the parameters that are used throughout the project. 
 
-The other obvious area many people will be interested in is adding in new models, and different hyperparameter search spaces. This can be found in the `pySetup` folder. The exact steps are listed in `stepsToAddNewClassifier.txt`. 
+The other obvious area many people will be interested in is adding in new models, and different hyperparameter search spaces. This can be found in the `pySetup` folder. The [exact steps](https://github.com/ClimbsRocks/machineJS/blob/master/pySetup/stepsToAddNewClassifier.txt) are listed in `stepsToAddNewClassifier.txt`. 
 
 ## What types of problems does this library work on?
 `machineJS` works on both regression and categorical problems, as long as there is a single output column in the training data. This includes multi-category (frequently called multi-class) problems, where the category you are predicting is one of many possible categories. 
