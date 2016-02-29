@@ -3,15 +3,15 @@
 npm install
 # if pip is not installed, install it using the instructions at: https://pip.pypa.io/en/stable/installing/
 
-curl -O https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
+# curl -O https://bootstrap.pypa.io/get-pip.py
+# sudo python get-pip.py
 
-pip install joblib
+sudo pip install joblib
 pip install numpy
-pip install pandas
+sudo pip install pandas
 pip install scipy
-pip install cython
-pip install xgboost
+sudo pip install cython
+sudo pip install xgboost
 pip install python-dateutil
 
 
