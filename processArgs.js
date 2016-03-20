@@ -80,11 +80,11 @@ module.exports = function() {
   // so if we have numRounds = 20, we will search for optimal hyperparameters for each algorithm 20 times
   // numIterationsPerRound is how many different combinations of hyperparameters we will attempt for each of those rounds
   if( argv.dev ) {
-    argv.numRounds = argv.numRounds || 10;
+    argv.numRounds = argv.numRounds || 2;
     argv.numIterationsPerRound = argv.numIterationsPerRound || 5;
 
   } else {
-    argv.numRounds = argv.numRounds || 30;
+    argv.numRounds = argv.numRounds || 3;
     argv.numIterationsPerRound = argv.numIterationsPerRound || 10;
     
   }
