@@ -26,7 +26,13 @@ If you want to install this in it's own standalone repo, and work on the source 
 1. `git clone https://github.com/ClimbsRocks/machineJS.git`
 2. `cd machineJS`
 3. `npm install`
-4. `./installPythonDependencies.sh`
+4. `pip install -r requirements.txt`
+5. ```
+git clone https://github.com/scikit-learn/scikit-learn.git
+cd scikit-learn
+python setup.py build
+sudo python setup.py install
+```
 
 
 ### As a node_module
