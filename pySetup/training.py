@@ -211,7 +211,7 @@ try:
         n_iter = globalArgs['numIterationsPerRound']
         if classifierName in ['clSGDClassifier','clnnSklearnMLP']:
             # these algorithms train very quickly, and have many parameters to try, so they get more attempts than other algorithms
-            n_iter = n_iter * 5
+            n_iter = n_iter * 2
         searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True, cv=cvRounds)
     else:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
