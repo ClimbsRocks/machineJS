@@ -52,12 +52,14 @@ module.exports = {
         // to avoid distracting the user, we're only logging error messages with an exit code that is not 0, meaning that the process failed to finish executing
         if( err.exitCode !== 0 ) {
           console.error(err);
-        } 
+        } else {
+          callback();
+        }
       } else {
         console.log('successfully finished running',scriptName + '!');
+        callback();
 
       }
-      callback();
     });
 
     module.exports.attachLogListener(pyShell);
