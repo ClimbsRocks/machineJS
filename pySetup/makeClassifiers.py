@@ -37,7 +37,7 @@ def makeClassifiers(globalArgs, dev, problemType):
             'clSVCFirst': SVC(probability=True, shrinking=False),
             'clSVCShrinking': SVC(probability=True, shrinking=True),
             'clKnn': KNeighborsClassifier(),
-            'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=1000),
+            'clLogisticRegression': LogisticRegression(penalty='l2', dual=False, max_iter=100, warm_start=True),
             'clAdaBoost': AdaBoostClassifier(),
             'clXGBoost': xgboost.XGBClassifier(),
             'clMultinomialNB': MultinomialNB(),
