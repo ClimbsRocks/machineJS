@@ -40,9 +40,9 @@ If you are installing this as a node_module to be used within another repo:
 2. `cd node_modules/machinejs`
 3. `./installPythonDependencies.sh`
  -->
-## How to use
+<!-- ## How to use
 You can use machineJS either from the command line, or as a node module by requiring it into files being run by node.js.
-
+ -->
 ### From the command line
 `node machineJS.js path/to/trainData.csv --predict path/to/testData.csv`
 
