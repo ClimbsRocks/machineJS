@@ -33,20 +33,20 @@ If you want to install this in it's own standalone repo, and work on the source 
 8. `sudo python setup.py install`
 
 
-### As a node_module
+<!-- ### As a node_module
 If you are installing this as a node_module to be used within another repo:
 
 1. `npm install --save machinejs`
 2. `cd node_modules/machinejs`
 3. `./installPythonDependencies.sh`
-
+ -->
 ## How to use
 You can use machineJS either from the command line, or as a node module by requiring it into files being run by node.js.
 
 ### From the command line
 `node machineJS.js path/to/trainData.csv --predict path/to/testData.csv`
 
-### As a node_module
+<!-- ### As a node_module
 ``` 
 var machineJS = require('machinejs');
 machineJS({
@@ -54,7 +54,7 @@ machineJS({
   predict: 'path/to/testData.csv'
 });
 ```
-
+ -->
 ## Format of Data Files:
 We use the `data-formatter` module to automatically format your data, and even perform some basic feature engineering on it. 
 Please refer to `data-formatter`'s [docs](https://github.com/ClimbsRocks/data-formatter) for information on how to label each column to be ready for `machineJS`.
