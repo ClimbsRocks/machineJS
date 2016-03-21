@@ -85,6 +85,7 @@ module.exports = function() {
   numIterationsPerRound is how many different combinations of hyperparameters we will attempt for each of those rounds
   so numIterationsPerRound = 10 means we will try 10 different combinations of hyperparameters each round. 
   for competitions, more numRounds and lower numIterationsPerRound is ideal. In that case, we have more material to feed into ensembler, since we will have more algos trained at the end. For production environments, fewer numRounds and much higher numIterationsPerRound means that each of the algos we train will be higher quality. We will probably miss out on accuracy to a tiny degree, but we will need far fewer algos to accomplish this, which will be much more efficient in a production environment. 
+  bumping up these values will increase accuracy at the cost of compute time
   */
 
   if( argv.dev ) {
@@ -93,7 +94,7 @@ module.exports = function() {
 
   } else {
     argv.numRounds = argv.numRounds || 3;
-    argv.numIterationsPerRound = argv.numIterationsPerRound || 10;
+    argv.numIterationsPerRound = argv.numIterationsPerRound || 8;
     
   }
 
