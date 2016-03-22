@@ -24,6 +24,7 @@ argv = json.loads(sys.argv[3])
 problemType = sys.argv[6]
 trainingScore = sys.argv[7]
 copyValidationData = sys.argv[8]
+searchScore = sys.argv[9]
 
 if argv['validationRound']:
     X_file_name = argv['dataFile']
@@ -147,8 +148,8 @@ if not argv['validationRound']:
     printParent(validationScore)
     printParent('***************')
 else:
-    # we still need something to write to the file. unfortunately, for now, that's just going to be another copy of the trainingScore, which we are now writing twice to the first row of the file
-    validationScore = trainingScore
+    # we still need something to write to the file. we will write the score from the hyperparameter search, which is the cross-validation score on the holdout data from that search. in that way, it's actualy a pretty accurate score to be using. 
+    validationScore = searchScore
 
 # write our predictions on the test data to a file
 if argv['validationRound']:
