@@ -93,7 +93,7 @@ module.exports = {
 
       // once we get a message back with the trained results, 
       if(message.type === 'trainingResults') {
-        var classifierName = message.classifierName;
+        var classifierName = message.text.algoName;
 
         // save it into our allResults array
         global.allTrainingResults.push(message.text);
@@ -127,8 +127,9 @@ module.exports = {
 
       var classifierTrainingObj = global.allTrainingResults[global.allTrainingResults.length -1];
       var classifierTrainingScore = classifierTrainingObj.longTrainScore;
+      var classifierSearchScore = classifierTrainingObj.searchScore
 
-      var pythonOptions = utilsPyShell.generatePythonOptions(argv.predict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData ]);
+      var pythonOptions = utilsPyShell.generatePythonOptions(argv.predict, [module.exports.dictVectMapping, JSON.stringify(argv), JSON.stringify(module.exports.fileNames), classifierName, module.exports.fileNames.problemType, classifierTrainingScore, copyValidationData, classifierSearchScore ]);
 
       // if this hyperparameter search did not yield an algorithm that was close enough to our best that it was worth investing in a longTraining, we did not train it and gave it a score of 0. 
       // therefore, we only want to make predictions using this classifier if we actually trained an algorithm successfully (classifierTrainingScore > 0)
