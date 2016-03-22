@@ -207,17 +207,15 @@ printParent('we are about to run a cross-validated search for the best hyperpara
 try:
     if randomizedSearchCVList[classifierName]:
         # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work.
-        # numIterationsPerRound defaults to 10, unless the user has passed in a more specific value.
+        # numIterationsPerRound defaults to 8, unless the user has passed in a more specific value.
         n_iter = globalArgs['numIterationsPerRound']
-        if classifierName in ['clSGDClassifier','clnnSklearnMLP']:
+        if classifierName in ['clSGDClassifier']:
             # these algorithms train very quickly, and have many parameters to try, so they get more attempts than other algorithms
             n_iter = n_iter * 2
         searchCV = RandomizedSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, n_iter=n_iter, refit=True, cv=cvRounds)
     else:
-        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True, cv=cvRounds)
 except:
-        # error_score=0 means that if some combinations of parameters fail to train properly, the rest of the search process will work
         searchCV = GridSearchCV(classifier, parameters_to_try, n_jobs=globalArgs['numCPUs'], error_score=0, refit=True, cv=cvRounds)    
 
 searchCV.fit(X_train, y_train ) 

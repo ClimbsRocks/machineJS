@@ -25,16 +25,16 @@ var startOneClassifier = function(classifierList) {
 
     var algosBestScore = global.trainingResultsSummary[classifierName];
 
-    // if we have trained more than three of this algorithm, and it's best score is not within X percent of the best we've found so far, don't both training another one. 
-    if( global.trainedAlgoCounts[classifierName] < 3 || algosBestScore > global.bestSearchScore * argv.continueToTrainThreshold ) {
+    // if we have trained more than two of this algorithm, and it's best score is not within X percent of the best we've found so far, don't bother training another one. 
+    // during the ensemble round, we are intentionally skipping over any algorithms that did not perform well during the earlier round of training. this should save significant amounts of time and make sure we only have high quality results at the end. 
+    // if you want to train all classifiers during the ensemble round, simply add in an expression to the boolean phrase below
+    if( global.trainedAlgoCounts[classifierName] < 2 || algosBestScore > global.bestSearchScore * argv.continueToTrainThreshold ) {
       // kick off training, and then, once that is done, invoke the callback, which starts the process of making predictions
       utils.kickOffTraining( function() {
         module.exports.makePredictions(classifierName);
       }, classifierName);
 
     } else {
-      console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
-      console.log('We have skipped training for this classifier:',classifierName);
       // since we said at the start to expect a certain number of algorithms to be trained, we must still emit an event to notify ensembler that we are skipping over an algorithm
       process.emit('algoSkippedTraining');
     }
