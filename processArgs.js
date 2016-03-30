@@ -190,7 +190,7 @@ module.exports = function() {
     if( argv.fileNames !== undefined ) {
       utils.fileNames = argv.fileNames;
     } else {
-      var fileNamesOptions = require(path.join('pySetup','testingFileNames.js'));
+      var fileNamesOptions = require(path.join(argv.machineJSLocation,'pySetup','testingFileNames.js'));
       utils.fileNames = fileNamesOptions[argv.outputFileName];
       argv.fileNames = utils.fileNames;
     }
