@@ -1,8 +1,15 @@
 # machineJS
 > a fully-featured default process for machine learning- all the parts are here and have functional default values in place. Modify to your heart's delight so you can focus on the important parts for your dataset, or run it all the way through with the default values to have fully automated machine learning!
 
+# [`auto_ml`](https://github.com/ClimbsRocks/auto_ml) - machineJS, but better!
+I just built out [v2 of this project](https://github.com/ClimbsRocks/auto_ml) that now gives you analytics info from your models, and is production-ready. machineJS is an amazing research project that clearly proved there's a hunger for automated machine learning. 
 
-## What is it?
+[auto_ml](https://github.com/ClimbsRocks/auto_ml) tackles this exact same goal, but with more features, cleaner code, and the ability to be copy/pasted into production. 
+
+Check it out!
+https://github.com/ClimbsRocks/auto_ml
+
+## What is machineJS?
 `machineJS` provides a fully automated framework for applying machine learning to a dataset.
 
 All you have to do is give it a .csv file, with some basic information about each column in the first row, and it will go off and do all the machine learning for you!
